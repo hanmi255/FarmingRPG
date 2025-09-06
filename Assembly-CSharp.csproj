@@ -66,6 +66,7 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Player\Player.cs" />
     <Compile Include="Assets\Scripts\Misc\SingletonMonoBehaviour.cs" />
+    <Compile Include="Assets\Scripts\Animation\MovementAnimationParameterControl.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
