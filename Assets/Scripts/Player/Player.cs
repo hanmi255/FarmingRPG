@@ -1,8 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using Assets.Scripts.Misc;
 using UnityEngine;
 
-public class Player : SingletonMonoBehaviour<Player>
+namespace Assets.Scripts.Player
 {
-    
+    public class Player : SingletonMonoBehaviour<Player>
+    {
+
+    }
 }

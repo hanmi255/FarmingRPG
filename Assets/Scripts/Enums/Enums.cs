@@ -1,5 +1,8 @@
-public enum ToolEffect
+namespace Assets.Scripts.Enums
 {
-    NONE,
-    WATERING
+    public enum ToolEffect
+    {
+        None,
+        Watering
+    }
 }

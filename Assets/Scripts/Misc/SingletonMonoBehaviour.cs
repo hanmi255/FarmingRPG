@@ -1,26 +1,29 @@
 using UnityEngine;
 
-public abstract class SingletonMonoBehaviour<T> : MonoBehaviour where T : MonoBehaviour
+namespace Assets.Scripts.Misc
 {
-    private static T _instance;
-
-    public static T Instance
+    public abstract class SingletonMonoBehaviour<T> : MonoBehaviour where T : MonoBehaviour
     {
-        get
-        {
-            return _instance;
-        }
-    }
+        private static T _instance;
 
-    protected virtual void Awake()
-    {
-        if (_instance == null)
+        public static T Instance
         {
-            _instance = this as T;
+            get
+            {
+                return _instance;
+            }
         }
-        else
+
+        protected virtual void Awake()
         {
-            Destroy(gameObject);
+            if (_instance == null)
+            {
+                _instance = this as T;
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
     }
 }
