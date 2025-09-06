@@ -1,34 +1,53 @@
-public delegate void MovementDelegate(float inputX, float inputY,
-    bool isWalking, bool isRunning, bool isIdle, bool isCarrying,
-    ToolEffect toolEffect,
-    bool isUsingToolRight, bool isUsingToolLeft, bool isUsingToolUp, bool isUsingToolDown,
-    bool isLiftingToolRight, bool isLiftingToolLeft, bool isLiftingToolUp, bool isLiftingToolDown,
-    bool isPickingRight, bool isPickingLeft, bool isPickingUp, bool isPickingDown,
-    bool isSwingingToolRight, bool isSwingingToolLeft, bool isSwingingToolUp, bool isSwingingToolDown,
-    bool idleUp, bool idleDown, bool idleLeft, bool idleRight);
+public struct MovementParameters
+{
+    // 基本移动输入
+    public float inputX;
+    public float inputY;
+    public bool isWalking;
+    public bool isRunning;
+    public bool isIdle;
+    public bool isCarrying;
+    public ToolEffect toolEffect;
+
+    // 工具使用状态
+    public bool isUsingToolRight;
+    public bool isUsingToolLeft;
+    public bool isUsingToolUp;
+    public bool isUsingToolDown;
+
+    // 工具抬起状态
+    public bool isLiftingToolRight;
+    public bool isLiftingToolLeft;
+    public bool isLiftingToolUp;
+    public bool isLiftingToolDown;
+
+    // 拾取状态
+    public bool isPickingRight;
+    public bool isPickingLeft;
+    public bool isPickingUp;
+    public bool isPickingDown;
+
+    // 工具挥动状态
+    public bool isSwingingToolRight;
+    public bool isSwingingToolLeft;
+    public bool isSwingingToolUp;
+    public bool isSwingingToolDown;
+
+    // 空闲方向状态
+    public bool isIdleUp;
+    public bool isIdleDown;
+    public bool isIdleLeft;
+    public bool isIdleRight;
+}
+
+public delegate void MovementDelegate(MovementParameters movementParams);
 
 public static class EventHandler
 {
     public static event MovementDelegate MovementEvent;
 
-    public static void CallMovementEvent(float inputX, float inputY,
-        bool isWalking, bool isRunning, bool isIdle, bool isCarrying,
-        ToolEffect toolEffect,
-        bool isUsingToolRight, bool isUsingToolLeft, bool isUsingToolUp, bool isUsingToolDown,
-        bool isLiftingToolRight, bool isLiftingToolLeft, bool isLiftingToolUp, bool isLiftingToolDown,
-        bool isPickingRight, bool isPickingLeft, bool isPickingUp, bool isPickingDown,
-        bool isSwingingToolRight, bool isSwingingToolLeft, bool isSwingingToolUp, bool isSwingingToolDown,
-        bool idleUp, bool idleDown, bool idleLeft, bool idleRight
-    )
+    public static void CallMovementEvent(MovementParameters movementParams)
     {
-        MovementEvent?.Invoke(inputX, inputY,
-            isWalking, isRunning, isIdle, isCarrying,
-            toolEffect,
-            isUsingToolRight, isUsingToolLeft, isUsingToolUp, isUsingToolDown,
-            isLiftingToolRight, isLiftingToolLeft, isLiftingToolUp, isLiftingToolDown,
-            isPickingRight, isPickingLeft, isPickingUp, isPickingDown,
-            isSwingingToolRight, isSwingingToolLeft, isSwingingToolUp, isSwingingToolDown,
-            idleUp, idleDown, idleLeft, idleRight
-        );
+        MovementEvent?.Invoke(movementParams);
     }
 }
