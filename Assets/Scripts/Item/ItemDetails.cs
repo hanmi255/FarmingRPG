@@ -11,8 +11,8 @@ namespace Assets.Scripts.Item
         public ItemType itemType;
 
         // 物品描述
-        public string itemShortDescription;
-        public string itemLongDescription;
+        public string itemName;
+        public string itemDescription;
 
         // 物品视觉效果
         public Sprite itemSprite;
