@@ -1,9 +1,8 @@
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 
 namespace Assets.Scripts.Item
 {
-    public class Item : MonoBehaviour
+    public class ItemUnit : MonoBehaviour
     {
         [SerializeField]
         private int _itemCode;
@@ -26,7 +25,7 @@ namespace Assets.Scripts.Item
 
         public void Init(int itemCode)
         {
-            
+
         }
     }
 }

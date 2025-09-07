@@ -65,11 +65,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Item\ItemDetails.cs" />
+    <Compile Include="Assets\Scripts\Player\ItemPickUp.cs" />
+    <Compile Include="Assets\Scripts\Inventory\InventoryManager.cs" />
     <Compile Include="Assets\Scripts\Player\Player.cs" />
     <Compile Include="Assets\Scripts\Misc\SingletonMonoBehaviour.cs" />
     <Compile Include="Assets\Scripts\Item\ObscuringItemFader.cs" />
     <Compile Include="Assets\Scripts\Events\EventHandler.cs" />
-    <Compile Include="Assets\Scripts\Item\Item.cs" />
     <Compile Include="Assets\Scripts\Item\SO_ItemList.cs" />
     <Compile Include="Assets\Scripts\Enums\Enums.cs" />
     <Compile Include="Assets\Scripts\Misc\Tags.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="Assets\Scripts\Misc\Settings.cs" />
     <Compile Include="Assets\Scripts\Scene\SwitchConfineBoundingShape.cs" />
     <Compile Include="Assets\Scripts\Item\TriggerObscuringItemFader.cs" />
+    <Compile Include="Assets\Scripts\Item\ItemUnit.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

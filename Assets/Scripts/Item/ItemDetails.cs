@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Assets.Scripts.Item
 {
     [System.Serializable]
-    public struct ItemDetails
+    public class ItemDetails
     {
         // 物品标识
         public int itemCode;

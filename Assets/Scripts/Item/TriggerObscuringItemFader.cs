@@ -4,9 +4,9 @@ namespace Assets.Scripts.Item
 {
     public class TriggerObscuringItemFader : MonoBehaviour
     {
-        private void OnTriggerEnter2D(Collider2D other)
+        private void OnTriggerEnter2D(Collider2D collision)
         {
-            ObscuringItemFader[] obscuringItemFaders = other.gameObject.GetComponentsInChildren<ObscuringItemFader>();
+            ObscuringItemFader[] obscuringItemFaders = collision.gameObject.GetComponentsInChildren<ObscuringItemFader>();
 
             foreach (ObscuringItemFader fader in obscuringItemFaders)
             {
@@ -14,9 +14,9 @@ namespace Assets.Scripts.Item
             }
         }
 
-        private void OnTriggerExit2D(Collider2D other)
+        private void OnTriggerExit2D(Collider2D collision)
         {
-            ObscuringItemFader[] obscuringItemFaders = other.gameObject.GetComponentsInChildren<ObscuringItemFader>();
+            ObscuringItemFader[] obscuringItemFaders = collision.gameObject.GetComponentsInChildren<ObscuringItemFader>();
 
             foreach (ObscuringItemFader fader in obscuringItemFaders)
             {
