@@ -13,4 +13,20 @@ namespace Assets.Scripts.Enums
         Left,
         Right
     }
+
+    public enum ItemType
+    {
+        None,
+        Seed,
+        Commodity,
+        WateringTool,
+        HoeingTool,
+        ChoppingTool,
+        BreakingTool,
+        ReapingTool,
+        CollectingTool,
+        ReapableScenary,
+        Furniture,
+        Count
+    }
 }
