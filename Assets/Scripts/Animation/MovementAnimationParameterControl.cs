@@ -7,11 +7,11 @@ namespace Assets.Scripts.Animation
     [RequireComponent(typeof(Animator))]
     public class MovementAnimationParameterControl : MonoBehaviour
     {
-        private Animator animator;
+        private Animator _animator;
 
         private void Awake()
         {
-            animator = GetComponent<Animator>();
+            _animator = GetComponent<Animator>();
         }
 
         private void OnEnable()
@@ -27,11 +27,11 @@ namespace Assets.Scripts.Animation
         private void SetAnimationParameters(MovementParameters movementParams)
         {
             // 基本移动输入
-            animator.SetFloat(Settings.inputX, movementParams.inputX);
-            animator.SetFloat(Settings.inputY, movementParams.inputY);
-            animator.SetBool(Settings.isWalking, movementParams.isWalking);
-            animator.SetBool(Settings.isRunning, movementParams.isRunning);
-            animator.SetInteger(Settings.toolEffect, (int)movementParams.toolEffect);
+            _animator.SetFloat(Settings.inputX, movementParams.inputX);
+            _animator.SetFloat(Settings.inputY, movementParams.inputY);
+            _animator.SetBool(Settings.isWalking, movementParams.isWalking);
+            _animator.SetBool(Settings.isRunning, movementParams.isRunning);
+            _animator.SetInteger(Settings.toolEffect, (int)movementParams.toolEffect);
 
             // 工具使用状态
             SetDirectionalTriggers(movementParams, Settings.ActionType.UsingTool,
@@ -64,19 +64,19 @@ namespace Assets.Scripts.Animation
         {
             if (isUp)
             {
-                animator.SetTrigger(Settings.GetDirectionalAnimation(actionType, Settings.Direction.Up));
+                _animator.SetTrigger(Settings.GetDirectionalAnimation(actionType, Settings.Direction.Up));
             }
             if (isDown)
             {
-                animator.SetTrigger(Settings.GetDirectionalAnimation(actionType, Settings.Direction.Down));
+                _animator.SetTrigger(Settings.GetDirectionalAnimation(actionType, Settings.Direction.Down));
             }
             if (isLeft)
             {
-                animator.SetTrigger(Settings.GetDirectionalAnimation(actionType, Settings.Direction.Left));
+                _animator.SetTrigger(Settings.GetDirectionalAnimation(actionType, Settings.Direction.Left));
             }
             if (isRight)
             {
-                animator.SetTrigger(Settings.GetDirectionalAnimation(actionType, Settings.Direction.Right));
+                _animator.SetTrigger(Settings.GetDirectionalAnimation(actionType, Settings.Direction.Right));
             }
         }
 

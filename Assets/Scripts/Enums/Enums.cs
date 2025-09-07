@@ -5,4 +5,12 @@ namespace Assets.Scripts.Enums
         None,
         Watering
     }
+
+    public enum Direction
+    {
+        Up,
+        Down,
+        Left,
+        Right
+    }
 }

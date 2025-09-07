@@ -5,6 +5,10 @@ namespace Assets.Scripts.Misc
 {
     public static class Settings
     {
+        // 玩家数据
+        public const float walkingSpeed = 2.666f;
+        public const float runningSpeed = 5.333f;
+
         // 基本移动输入
         public static int inputX;
         public static int inputY;

@@ -42,20 +42,20 @@ namespace UnityEditor
     [CustomEditor(typeof(CoordinateBrush))]
     public class CoordinateBrushEditor : GridBrushEditor
     {
-        private CoordinateBrush coordinateBrush { get { return target as CoordinateBrush; } }
+        private CoordinateBrush _coordinateBrush { get { return target as CoordinateBrush; } }
 
         public override void PaintPreview(GridLayout grid, GameObject brushTarget, Vector3Int position)
         {
-            var zPosition = new Vector3Int(position.x, position.y, coordinateBrush.z);
+            var zPosition = new Vector3Int(position.x, position.y, _coordinateBrush.z);
             base.PaintPreview(grid, brushTarget, zPosition);
         }
 
         public override void OnPaintSceneGUI(GridLayout grid, GameObject brushTarget, BoundsInt position, GridBrushBase.Tool tool, bool executing)
         {
             base.OnPaintSceneGUI(grid, brushTarget, position, tool, executing);
-            if (coordinateBrush.z != 0)
+            if (_coordinateBrush.z != 0)
             {
-                var zPosition = new Vector3Int(position.min.x, position.min.y, coordinateBrush.z);
+                var zPosition = new Vector3Int(position.min.x, position.min.y, _coordinateBrush.z);
                 BoundsInt newPosition = new BoundsInt(zPosition, position.size);
                 Vector3[] cellLocals = new Vector3[]
                 {
@@ -74,7 +74,7 @@ namespace UnityEditor
                 }
             }
 
-            var labelText = "Pos: " + new Vector3Int(position.x, position.y, coordinateBrush.z);
+            var labelText = "Pos: " + new Vector3Int(position.x, position.y, _coordinateBrush.z);
             if (position.size.x > 1 || position.size.y > 1)
             {
                 labelText += " Size: " + new Vector2Int(position.size.x, position.size.y);
@@ -84,7 +84,7 @@ namespace UnityEditor
             myStyle.normal.textColor = Color.white;
 
 
-            Handles.Label(grid.CellToWorld(new Vector3Int(position.x, position.y, coordinateBrush.z)), labelText, myStyle);
+            Handles.Label(grid.CellToWorld(new Vector3Int(position.x, position.y, _coordinateBrush.z)), labelText, myStyle);
         }
     }
 }
