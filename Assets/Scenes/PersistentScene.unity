@@ -280,8 +280,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1127472956}
   - component: {fileID: 1127472955}
-  - component: {fileID: 1127472957}
   - component: {fileID: 1127472958}
+  - component: {fileID: 1127472957}
   m_Layer: 0
   m_Name: PlayerFollowVirtualCamera
   m_TagString: Untagged
@@ -353,14 +353,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1127472954}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2fba25a5cd15594e8f050a11e386c80, type: 3}
+  m_Script: {fileID: 11500000, guid: bc39b2f97bda02145875d9168e1015ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_ConfineMode: 0
-  m_BoundingVolume: {fileID: 0}
-  m_BoundingShape2D: {fileID: 0}
-  m_ConfineScreenEdges: 1
-  m_Damping: 0
 --- !u!114 &1127472958
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -370,9 +365,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1127472954}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bc39b2f97bda02145875d9168e1015ca, type: 3}
+  m_Script: {fileID: 11500000, guid: f453f694addf4275988fac205bc91968, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_BoundingShape2D: {fileID: 0}
+  m_Damping: 0.5
+  m_MaxWindowSize: -1
+  m_Padding: 0
 --- !u!1 &2077992527
 GameObject:
   m_ObjectHideFlags: 3
@@ -489,6 +488,7 @@ GameObject:
   - component: {fileID: 7272017455381085790}
   - component: {fileID: 1925571598988959325}
   - component: {fileID: 3317611444084274988}
+  - component: {fileID: 7272017455381085792}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1178,6 +1178,18 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.96, y: 0.13}
   m_EdgeRadius: 0
+--- !u!114 &7272017455381085792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 397517840359191718}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bff2e5fc32ad804db098748e3edfe6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &7616582726913527686
 Transform:
   m_ObjectHideFlags: 0

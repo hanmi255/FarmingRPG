@@ -66,12 +66,14 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Player\Player.cs" />
     <Compile Include="Assets\Scripts\Misc\SingletonMonoBehaviour.cs" />
+    <Compile Include="Assets\Scripts\Item\ObscuringItemFader.cs" />
     <Compile Include="Assets\Scripts\Events\EventHandler.cs" />
     <Compile Include="Assets\Scripts\Enums\Enums.cs" />
     <Compile Include="Assets\Scripts\Misc\Tags.cs" />
     <Compile Include="Assets\Scripts\Animation\MovementAnimationParameterControl.cs" />
     <Compile Include="Assets\Scripts\Misc\Settings.cs" />
     <Compile Include="Assets\Scripts\Scene\SwitchConfineBoundingShape.cs" />
+    <Compile Include="Assets\Scripts\Item\TriggerObscuringItemFader.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

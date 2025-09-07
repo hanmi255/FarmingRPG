@@ -5,6 +5,11 @@ namespace Assets.Scripts.Misc
 {
     public static class Settings
     {
+        // 玩家与物体接触时暗淡
+        public const float fadeInSeconds = 0.25f;
+        public const float fadeOutSeconds = 0.35f;
+        public const float targetAlpha = 0.45f;
+
         // 玩家数据
         public const float walkingSpeed = 2.666f;
         public const float runningSpeed = 5.333f;
