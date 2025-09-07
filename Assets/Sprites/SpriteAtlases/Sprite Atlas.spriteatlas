@@ -2485,7 +2485,7 @@ SpriteAtlas:
   - GreenCursor
   - Acorn
   - Chair
-  - Collision Tile Diagonal
+  - CollisionTileDiagonal
   - InventoryHighlight
   - PauseScreenSelectedTab
   - Stone2Seed
