@@ -6,7 +6,6 @@ namespace Assets.Scripts.Item
     [CreateAssetMenu(fileName = "so_ItemList", menuName = "ScriptableObjects/Item/ItemList")]
     public class SO_ItemList : ScriptableObject
     {
-        [SerializeField]
-        public List<ItemDetails> itemDetails;
+        public List<ItemDetails> itemDetails;  // 物品详情列表
     }
 }

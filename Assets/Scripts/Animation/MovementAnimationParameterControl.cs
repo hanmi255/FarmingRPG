@@ -7,7 +7,7 @@ namespace Assets.Scripts.Animation
     [RequireComponent(typeof(Animator))]
     public class MovementAnimationParameterControl : MonoBehaviour
     {
-        private Animator _animator;
+        private Animator _animator;  // 动画控制器
 
         private void Awake()
         {

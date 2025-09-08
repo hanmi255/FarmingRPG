@@ -57,6 +57,7 @@
     <Compile Include="Assets\Scripts\Utilities\PropertyDrawers\ItemCodeDescriptionAttribute.cs" />
     <Compile Include="Assets\Scripts\Item\SO_ItemList.cs" />
     <Compile Include="Assets\Scripts\Enums\Enums.cs" />
+    <Compile Include="Assets\Scripts\Inventory\InventoryItem.cs" />
     <Compile Include="Assets\Scripts\Misc\Tags.cs" />
     <Compile Include="Assets\Scripts\Animation\MovementAnimationParameterControl.cs" />
     <Compile Include="Assets\Scripts\Misc\Settings.cs" />

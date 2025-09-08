@@ -6,8 +6,8 @@ namespace Assets.Scripts.Item
 {
     public class ItemUnit : MonoBehaviour
     {
-        [ItemCodeDescription][SerializeField] private int _itemCode;
-        private SpriteRenderer _spriteRenderer;
+        [ItemCodeDescription][SerializeField] private int _itemCode;  // 物品代号
+        private SpriteRenderer _spriteRenderer;                       // 精灵渲染器
 
         public int ItemCode { get { return _itemCode; } set { _itemCode = value; } }
 

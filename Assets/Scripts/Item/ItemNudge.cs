@@ -1,13 +1,12 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace Assets.Scripts.Item
 {
     public class ItemNudge : MonoBehaviour
     {
-        private WaitForSeconds _pause;
-        private bool _isAnimating = false;
+        private WaitForSeconds _pause;      // 用于协程暂停
+        private bool _isAnimating = false;  // 是否播放动画中
 
         private void Awake()
         {

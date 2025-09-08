@@ -14,6 +14,11 @@ namespace Assets.Scripts.Misc
         public const float walkingSpeed = 2.666f;
         public const float runningSpeed = 5.333f;
 
+        // 背包容量
+        public static int playerInitialInventoryCapacity = 24;
+        public static int playerMaximumInventoryCapacity = 48;
+
+
         // 基本移动输入
         public static int inputX;
         public static int inputY;

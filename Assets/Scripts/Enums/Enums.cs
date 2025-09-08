@@ -1,12 +1,19 @@
 namespace Assets.Scripts.Enums
 {
-    public enum ToolEffect
+    public enum InventoryLocation  // 背包位置
+    {
+        Player,
+        Chest,
+        Count
+    }
+
+    public enum ToolEffect  // 工具效果
     {
         None,
         Watering
     }
 
-    public enum Direction
+    public enum Direction  // 方向
     {
         Up,
         Down,
@@ -14,7 +21,7 @@ namespace Assets.Scripts.Enums
         Right
     }
 
-    public enum ItemType
+    public enum ItemType  // 物品类型
     {
         None,
         Seed,

@@ -8,8 +8,8 @@ namespace Assets.Scripts.Utilities.PropertyDrawers.Editor
     [CustomPropertyDrawer(typeof(ItemCodeDescriptionAttribute))]
     public class ItemCodeDescriptionDrawer : PropertyDrawer
     {
-        private SO_ItemList _itemListCache;
-        private string _lastAssetPath;
+        private SO_ItemList _itemListCache;  // 缓存物品列表
+        private string _lastAssetPath;       // 缓存物品列表的资源路径
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
@@ -37,7 +37,7 @@ namespace Assets.Scripts.Utilities.PropertyDrawers.Editor
 
         private string GetItemDescription(int itemCode)
         {
-            // 如果物品代码为默认值0，则返回空字符串
+            // 如果物品代号为默认值0，则返回空字符串
             if (itemCode == 0)
                 return "";
 

@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using Assets.Scripts.Enums;
+using Assets.Scripts.Inventory;
 
 namespace Assets.Scripts.Events
 {
@@ -48,8 +51,15 @@ namespace Assets.Scripts.Events
 
     public static class EventHandler
     {
-        public static event MovementDelegate MovementEvent;
+        // 背包更新事件
+        public static event Action<InventoryLocation, List<InventoryItem>> InventoryUpdatedEvent;
+        public static void CallInventoryUpdatedEvent(InventoryLocation inventoryLocation, List<InventoryItem> inventoryList)
+        {
+            InventoryUpdatedEvent?.Invoke(inventoryLocation, inventoryList);
+        }
 
+        // 移动事件
+        public static event MovementDelegate MovementEvent;
         public static void CallMovementEvent(MovementParameters movementParams)
         {
             MovementEvent?.Invoke(movementParams);

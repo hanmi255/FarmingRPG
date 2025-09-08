@@ -7,8 +7,8 @@ namespace Assets.Scripts.Item
     [RequireComponent(typeof(SpriteRenderer))]
     public class ObscuringItemFader : MonoBehaviour
     {
-        private SpriteRenderer _spriteRenderer;
-        private Color _currentColor;
+        private SpriteRenderer _spriteRenderer;  // 精灵渲染器
+        private Color _currentColor;             // 当前颜色
 
         private void Awake()
         {
