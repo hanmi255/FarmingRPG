@@ -1,11 +1,11 @@
+using Assets.Scripts.Utilities.PropertyDrawers;
 using UnityEngine;
 
 namespace Assets.Scripts.Item
 {
     public class ItemUnit : MonoBehaviour
     {
-        [SerializeField]
-        private int _itemCode;
+        [ItemCodeDescription][SerializeField] private int _itemCode;
         private SpriteRenderer _spriteRenderer;
 
         public int ItemCode { get { return _itemCode; } set { _itemCode = value; } }

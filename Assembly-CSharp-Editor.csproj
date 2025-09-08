@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Tilemap\CustomBrushScripts\CoordinateBrush\Editor\CoordinateBrush.cs" />
+    <Compile Include="Assets\Scripts\Utilities\PropertyDrawers\Editor\ItemCodeDescriptionDrawer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

@@ -71,6 +71,7 @@
     <Compile Include="Assets\Scripts\Misc\SingletonMonoBehaviour.cs" />
     <Compile Include="Assets\Scripts\Item\ObscuringItemFader.cs" />
     <Compile Include="Assets\Scripts\Events\EventHandler.cs" />
+    <Compile Include="Assets\Scripts\Utilities\PropertyDrawers\ItemCodeDescriptionAttribute.cs" />
     <Compile Include="Assets\Scripts\Item\SO_ItemList.cs" />
     <Compile Include="Assets\Scripts\Enums\Enums.cs" />
     <Compile Include="Assets\Scripts\Misc\Tags.cs" />
