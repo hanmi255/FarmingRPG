@@ -14,7 +14,7 @@ namespace Assets.Scripts.Player
                 // 获取物品详情
                 ItemDetails itemDetails = InventoryManager.Instance.GetItemDetails(unit.ItemCode);
 
-                Debug.Log("物品详情：" + itemDetails.itemName);
+                Debug.Log("物品名称：" + itemDetails.itemName);
             }
         }
     }

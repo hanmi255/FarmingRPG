@@ -1,3 +1,4 @@
+using Assets.Scripts.Inventory;
 using Assets.Scripts.Utilities.PropertyDrawers;
 using UnityEngine;
 
@@ -25,7 +26,18 @@ namespace Assets.Scripts.Item
 
         public void Init(int itemCode)
         {
+            if (itemCode != 0)
+            {
+                ItemCode = itemCode;
+                ItemDetails itemDetails = InventoryManager.Instance.GetItemDetails(ItemCode);
 
+                _spriteRenderer.sprite = itemDetails.itemSprite;
+
+                if (itemDetails.itemType == Enums.ItemType.ReapableScenary)
+                {
+                    gameObject.AddComponent<ItemNudge>();
+                }
+            }
         }
     }
 }

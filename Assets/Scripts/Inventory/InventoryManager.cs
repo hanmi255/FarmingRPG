@@ -11,8 +11,9 @@ namespace Assets.Scripts.Inventory
 
         [SerializeField] private SO_ItemList _itemList = null;
 
-        private void Start()
+        protected override void Awake()
         {
+            base.Awake();
             CreateItemDetailsDic();
         }
 
