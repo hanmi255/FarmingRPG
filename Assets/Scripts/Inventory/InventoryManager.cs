@@ -3,6 +3,7 @@ using Assets.Scripts.Enums;
 using Assets.Scripts.Events;
 using Assets.Scripts.Item;
 using Assets.Scripts.Misc;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Assets.Scripts.Inventory
@@ -188,6 +189,24 @@ namespace Assets.Scripts.Inventory
         {
             _itemDetailsDic.TryGetValue(itemCode, out ItemDetails itemDetails);
             return itemDetails;
+        }
+
+        /// <summary>
+        /// 获取物品类型描述
+        /// </summary>
+        public string GetItemTypeDescription(ItemType itemType)
+        {
+            string itemTypeDescription = itemType switch
+            {
+                ItemType.WateringTool => Settings.WateringTool,
+                ItemType.HoeingTool => Settings.HoeingTool,
+                ItemType.ChoppingTool => Settings.ChoppingTool,
+                ItemType.BreakingTool => Settings.BreakingTool,
+                ItemType.ReapingTool => Settings.ReapingTool,
+                ItemType.CollectingTool => Settings.CollectingTool,
+                _ => itemType.ToString()
+            };
+            return itemTypeDescription;
         }
     }
 }

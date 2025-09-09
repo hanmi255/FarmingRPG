@@ -26,6 +26,14 @@ namespace Assets.Scripts.Misc
         public static int isRunning;
         public static int toolEffect;
 
+        // 工具
+        public const string WateringTool = "WateringCan";
+        public const string HoeingTool = "Hoe";
+        public const string ChoppingTool = "Axe";
+        public const string BreakingTool = "Pickaxe";
+        public const string ReapingTool = "Scythe";
+        public const string CollectingTool = "Basket";
+
         // 方向枚举
         public enum Direction
         {
