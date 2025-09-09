@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Assets.Scripts.Player
 {
     [RequireComponent(typeof(Rigidbody2D))]
-    public class Player : SingletonMonoBehaviour<Player>
+    public class PlayerUnit : SingletonMonoBehaviour<PlayerUnit>
     {
         // 基本移动输入
         private float _inputX;
@@ -57,11 +57,14 @@ namespace Assets.Scripts.Player
             set => _isInputDisabled = value;
         }
 
+        private Camera _mainCamera;
+
         protected override void Awake()
         {
             base.Awake();
 
             _rigidbody2D = GetComponent<Rigidbody2D>();
+            _mainCamera = Camera.main;
         }
 
         private void Update()
@@ -199,6 +202,11 @@ namespace Assets.Scripts.Player
         {
             Vector2 moveDistance = new(_inputX * _movementSpeed * Time.deltaTime, _inputY * _movementSpeed * Time.deltaTime);
             _rigidbody2D.MovePosition(_rigidbody2D.position + moveDistance);
+        }
+
+        public Vector3 GetPlayerViewporPosition()
+        {
+            return _mainCamera.WorldToViewportPoint(transform.position);
         }
     }
 }
