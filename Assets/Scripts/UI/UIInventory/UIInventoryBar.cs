@@ -13,6 +13,7 @@ namespace Assets.Scripts.UI.UIInventory
     {
         [SerializeField] private Sprite _blank16x16Sprite = null;
         [SerializeField] private UIInventorySlot[] _inventorySlots = null;
+        public GameObject inventoryDraggedItem;
         private RectTransform _rectTransform;
         private bool _isInventoryBarPositionAtBottom = true;
         public bool IsInventoryBarPositionAtBottom

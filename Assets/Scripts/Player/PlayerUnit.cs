@@ -71,12 +71,15 @@ namespace Assets.Scripts.Player
         {
             #region 处理输入
 
-            ResetAnimationTriggers();
-            PlayerMovementInput();
-            PlayerWalkInput();
+            if (!IsInputDisabled)
+            {
+                ResetAnimationTriggers();
+                PlayerMovementInput();
+                PlayerWalkInput();
 
-            SetMovementParameters();
-            EventHandler.CallMovementEvent(_parameters);
+                SetMovementParameters();
+                EventHandler.CallMovementEvent(_parameters);
+            }
 
             #endregion
         }
@@ -84,6 +87,14 @@ namespace Assets.Scripts.Player
         private void FixedUpdate()
         {
             PlayerMovement();
+        }
+
+        public void DisablePlayerInputAndResetMovement()
+        {
+            DisablePlayerInput();
+            ResetMovement();
+
+            EventHandler.CallMovementEvent(_parameters);
         }
 
         private void ResetAnimationTriggers()
@@ -157,6 +168,27 @@ namespace Assets.Scripts.Player
                 _isIdle = false;
                 _movementSpeed = Settings.walkingSpeed;
             }
+        }
+
+        public void EnablePlayerInput()
+        {
+            IsInputDisabled = false;
+        }
+
+        private void DisablePlayerInput()
+        {
+            IsInputDisabled = true;
+        }
+
+        private void ResetMovement()
+        {
+            _inputX = 0f;
+            _inputY = 0f;
+            _isWalking = false;
+            _isRunning = false;
+            _isIdle = true;
+
+            SetMovementParameters();
         }
 
         private void SetMovementParameters()
