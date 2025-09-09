@@ -86,6 +86,41 @@ namespace Assets.Scripts.Inventory
         }
 
         /// <summary>
+        /// 从背包中移除物品
+        /// </summary>
+        public void RemoveItem(InventoryLocation inventoryLocation, int itemCode)
+        {
+            List<InventoryItem> inventoryList = _inventoryLists[(int)inventoryLocation];
+
+            int itemPosition = FindItemInInventory(inventoryLocation, itemCode);
+            if (itemPosition != -1)
+            {
+                RemoveItemAtPosition(inventoryList, itemCode, itemPosition);
+            }
+
+            EventHandler.CallInventoryUpdatedEvent(inventoryLocation, _inventoryLists[(int)inventoryLocation]);
+        }
+
+        /// <summary>
+        /// 交换两个物品的位置
+        /// </summary>
+        public void SwapInventoryItems(InventoryLocation player, int fromSlot, int toSlot)
+        {
+            if (fromSlot < _inventoryLists[(int)player].Count && toSlot < _inventoryLists[(int)player].Count
+                && fromSlot != toSlot && fromSlot >= 0 && toSlot >= 0)
+            {
+                InventoryItem fromItem = _inventoryLists[(int)player][fromSlot];
+                InventoryItem toItem = _inventoryLists[(int)player][toSlot];
+
+                _inventoryLists[(int)player][fromSlot] = toItem;
+                _inventoryLists[(int)player][toSlot] = fromItem;
+
+                EventHandler.CallInventoryUpdatedEvent(player, _inventoryLists[(int)player]);
+            }
+
+        }
+
+        /// <summary>
         /// 查找物品是否在背包中
         /// 返回物品在背包中的位置 或 -1 表示未找到
         /// </summary>
@@ -125,6 +160,25 @@ namespace Assets.Scripts.Inventory
                 itemQuantity = 1
             };
             inventoryList.Add(inventoryItem);
+        }
+
+        /// <summary>
+        /// 移除背包指定位置的物品 计数-1
+        /// 如果物品数量为0 则移除索引
+        /// </summary>
+        private void RemoveItemAtPosition(List<InventoryItem> inventoryList, int itemCode, int itemPosition)
+        {
+            InventoryItem inventoryItem = inventoryList[itemPosition];
+            inventoryItem.itemQuantity--;
+
+            if (inventoryItem.itemQuantity <= 0)
+            {
+                inventoryList.RemoveAt(itemPosition);
+            }
+            else
+            {
+                inventoryList[itemPosition] = inventoryItem;
+            }
         }
 
         /// <summary>
