@@ -112,7 +112,6 @@ namespace Assets.Scripts.Inventory
             InventoryItem inventoryItem = inventoryList[itemPosition];
             inventoryItem.itemQuantity++;
             inventoryList[itemPosition] = inventoryItem;
-            DebugPrintInventoryList(inventoryList);
         }
 
         /// <summary>
@@ -126,8 +125,6 @@ namespace Assets.Scripts.Inventory
                 itemQuantity = 1
             };
             inventoryList.Add(inventoryItem);
-
-            DebugPrintInventoryList(inventoryList);
         }
 
         /// <summary>
@@ -137,17 +134,6 @@ namespace Assets.Scripts.Inventory
         {
             _itemDetailsDic.TryGetValue(itemCode, out ItemDetails itemDetails);
             return itemDetails;
-        }
-
-        private void DebugPrintInventoryList(List<InventoryItem> inventoryList)
-        {
-#if UNITY_EDITOR
-            foreach (InventoryItem inventoryItem in inventoryList)
-            {
-                Debug.Log($"Item Name: {Instance.GetItemDetails(inventoryItem.itemCode)?.itemName} Quantity: {inventoryItem.itemQuantity}");
-            }
-            Debug.Log("-----------------------------");
-#endif
         }
     }
 }
