@@ -10,25 +10,50 @@ using UnityEngine.UI;
 
 namespace Assets.Scripts.UI.UIInventory
 {
-    public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+    public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler
     {
         private Camera _mainCamera;
+        private Canvas _parentCanvas;
         private Transform _parentItem;
         private GameObject _draggedItem;
 
         [SerializeField] private Image _inventorySlotHighlight;
         public Image inventorySlotImage;
         public TextMeshProUGUI textMeshProUGUI;
-        [SerializeField] private UIInventoryBar _uiInventoryBar = null;
+        [SerializeField] private UIInventoryBar _inventoryBar = null;
+        [SerializeField] private GameObject _inventoryTextBoxPrefab = null;
         [HideInInspector] public ItemDetails itemDetails;
         [SerializeField] private GameObject _itemPrefab = null;
         [HideInInspector] public int itemQuantity;
         [SerializeField] private int _slotNumber = 0;
 
+        private TextParameters _textParameters;
+        private string _itemTypeDescription;
+
+        private void Awake()
+        {
+            _parentCanvas = GetComponentInParent<Canvas>();
+        }
+
         private void Start()
         {
             _mainCamera = Camera.main;
             _parentItem = GameObject.FindWithTag(Tags.ItemsParentTransform).transform;
+        }
+
+        private void SetTextParameters()
+        {
+            _itemTypeDescription = InventoryManager.Instance.GetItemTypeDescription(itemDetails.itemType);
+
+            _textParameters = new()
+            {
+                textTop1 = itemDetails.itemName,
+                textTop2 = _itemTypeDescription,
+                textTop3 = "",
+                textBottom1 = itemDetails.itemDescription,
+                textBottom2 = "",
+                textBottom3 = "",
+            };
         }
 
         public void OnBeginDrag(PointerEventData eventData)
@@ -39,7 +64,7 @@ namespace Assets.Scripts.UI.UIInventory
             // 禁止玩家输入移动
             PlayerUnit.Instance.DisablePlayerInputAndResetMovement();
             // 实例化拖拽物品
-            _draggedItem = Instantiate(_uiInventoryBar.inventoryDraggedItem, _uiInventoryBar.transform);
+            _draggedItem = Instantiate(_inventoryBar.inventoryDraggedItem, _inventoryBar.transform);
             Image draggedItemImage = _draggedItem.GetComponentInChildren<Image>();
             draggedItemImage.sprite = itemDetails.itemSprite;
 
@@ -67,6 +92,7 @@ namespace Assets.Scripts.UI.UIInventory
                 int toSlotNumber = eventData.pointerCurrentRaycast.gameObject.GetComponent<UIInventorySlot>()._slotNumber;
 
                 InventoryManager.Instance.SwapInventoryItems(InventoryLocation.Player, _slotNumber, toSlotNumber);
+                DestoryInventoryTextBox();
             }
             // 直接放置物品到地面
             else if (itemDetails != null && itemDetails.canBeDropped)
@@ -89,6 +115,50 @@ namespace Assets.Scripts.UI.UIInventory
             item.ItemCode = itemDetails.itemCode;
 
             InventoryManager.Instance.RemoveItem(InventoryLocation.Player, item.ItemCode);
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            if (itemQuantity == 0)
+                return;
+
+            _inventoryBar.inventoryTextBoxGameobject = Instantiate(_inventoryTextBoxPrefab, transform.position, Quaternion.identity);
+            _inventoryBar.inventoryTextBoxGameobject.transform.SetParent(_parentCanvas.transform, false);
+
+            UIInventoryTextBox inventoryTextBox = _inventoryBar.inventoryTextBoxGameobject.GetComponent<UIInventoryTextBox>();
+
+            SetTextParameters();
+
+            inventoryTextBox.SetTextBoxText(_textParameters);
+
+            RectTransform textBoxRectTransform = _inventoryBar.inventoryTextBoxGameobject.GetComponent<RectTransform>();
+            Vector3 textBoxPosition = transform.position;
+
+            if (_inventoryBar.IsInventoryBarPositionAtBottom)
+            {
+                textBoxRectTransform.pivot = new Vector2(0.5f, 0f);
+                textBoxPosition.y += 50f;
+            }
+            else
+            {
+                textBoxRectTransform.pivot = new Vector2(0.5f, 1f);
+                textBoxPosition.y -= 50f;
+            }
+
+            _inventoryBar.inventoryTextBoxGameobject.transform.position = textBoxPosition;
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            DestoryInventoryTextBox();
+        }
+
+        private void DestoryInventoryTextBox()
+        {
+            if (_inventoryBar.inventoryTextBoxGameobject == null)
+                return;
+
+            Destroy(_inventoryBar.inventoryTextBoxGameobject);
         }
     }
 }

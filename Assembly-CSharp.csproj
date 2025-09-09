@@ -59,6 +59,7 @@
     <Compile Include="Assets\Scripts\UI\UIInventory\UIInventorySlot.cs" />
     <Compile Include="Assets\Scripts\Item\SO_ItemList.cs" />
     <Compile Include="Assets\Scripts\Enums\Enums.cs" />
+    <Compile Include="Assets\Scripts\UI\UIInventory\UIInventoryTextBox.cs" />
     <Compile Include="Assets\Scripts\Inventory\InventoryItem.cs" />
     <Compile Include="Assets\Scripts\Misc\Tags.cs" />
     <Compile Include="Assets\Scripts\Animation\MovementAnimationParameterControl.cs" />
