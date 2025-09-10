@@ -1,13 +1,21 @@
+using System.Collections.Generic;
+using Assets.Scripts.Animation;
 using Assets.Scripts.Enums;
 using Assets.Scripts.Events;
+using Assets.Scripts.Inventory;
+using Assets.Scripts.Item;
 using Assets.Scripts.Misc;
 using UnityEngine;
 
 namespace Assets.Scripts.Player
 {
     [RequireComponent(typeof(Rigidbody2D))]
+    [RequireComponent(typeof(AnimationOverrides))]
     public class PlayerUnit : SingletonMonoBehaviour<PlayerUnit>
     {
+        // 动画覆盖
+        private AnimationOverrides _animationOverrides;
+
         // 基本移动输入
         private float _inputX;
         private float _inputY;
@@ -45,7 +53,13 @@ namespace Assets.Scripts.Player
 
         private Direction _direction;
 
+        private List<CharacterAttribute> _characterAttributeCustomisationList;
         private float _movementSpeed;
+
+        [SerializeField] private SpriteRenderer _equippedItemSpriteRenderer = null;
+
+        private CharacterAttribute _armsCharacterAttribute;
+        private CharacterAttribute _toolCharacterAttribute;
 
         private bool _isInputDisabled = false;
 
@@ -64,6 +78,11 @@ namespace Assets.Scripts.Player
             base.Awake();
 
             _rigidbody2D = GetComponent<Rigidbody2D>();
+
+            _animationOverrides = GetComponent<AnimationOverrides>();
+            _armsCharacterAttribute = new CharacterAttribute(CharacterPartAnimator.Arms, PartVariantColour.None, PartVariantType.None);
+            _characterAttributeCustomisationList = new List<CharacterAttribute>();
+
             _mainCamera = Camera.main;
         }
 
@@ -178,6 +197,42 @@ namespace Assets.Scripts.Player
         private void DisablePlayerInput()
         {
             IsInputDisabled = true;
+        }
+
+        /// <summary>
+        /// 展示玩家正在使用的物品
+        /// </summary>
+        public void ShowCarriedItem(int itemCode)
+        {
+            ItemDetails itemDetails = InventoryManager.Instance.GetItemDetails(itemCode);
+            if (itemDetails != null)
+            {
+                _equippedItemSpriteRenderer.sprite = itemDetails.itemSprite;
+                _equippedItemSpriteRenderer.color = Color.white;
+
+                _armsCharacterAttribute.partVariantType = PartVariantType.Carry;
+                _characterAttributeCustomisationList.Clear();
+                _characterAttributeCustomisationList.Add(_armsCharacterAttribute);
+                _animationOverrides.ApplyCharacterCustomisationParameters(_characterAttributeCustomisationList);
+
+                _isCarrying = true;
+            }
+        }
+
+        /// <summary>
+        /// 清除玩家正在使用的物品
+        /// </summary>
+        public void ClearCarriedItem()
+        {
+            _equippedItemSpriteRenderer.sprite = null;
+            _equippedItemSpriteRenderer.color = new Color(1f, 1f, 1f, 0f);
+
+            _armsCharacterAttribute.partVariantType = PartVariantType.None;
+            _characterAttributeCustomisationList.Clear();
+            _characterAttributeCustomisationList.Add(_armsCharacterAttribute);
+            _animationOverrides.ApplyCharacterCustomisationParameters(_characterAttributeCustomisationList);
+
+            _isCarrying = false;
         }
 
         private void ResetMovement()
