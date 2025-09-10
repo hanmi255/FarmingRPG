@@ -194,15 +194,24 @@ namespace Assets.Scripts.UI.UIInventory
             isSelected = true;
             _inventoryBar.SetHighlightOnInventorySlots();
             InventoryManager.Instance.SetSelectedInventoryItem(InventoryLocation.Player, itemDetails.itemCode);
+
+            if (itemDetails.canBeCarried)
+            {
+                PlayerUnit.Instance.ShowCarriedItem(itemDetails.itemCode);
+            }
+            else
+            {
+                PlayerUnit.Instance.ClearCarriedItem();
+            }
         }
 
         private void ClearSelectedItem()
         {
             _inventoryBar.ClearHighlightOnInventorySlots();
-
             isSelected = false;
-
             InventoryManager.Instance.ClearSelectedInventoryItem(InventoryLocation.Player);
+
+            PlayerUnit.Instance.ClearCarriedItem();
         }
     }
 }
