@@ -3,7 +3,6 @@ using Assets.Scripts.Enums;
 using Assets.Scripts.Events;
 using Assets.Scripts.Item;
 using Assets.Scripts.Misc;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Assets.Scripts.Inventory
@@ -12,6 +11,7 @@ namespace Assets.Scripts.Inventory
     {
         private Dictionary<int, ItemDetails> _itemDetailsDic;            // 物品详情字典
         private List<InventoryItem>[] _inventoryLists;                   // 背包列表
+        private int[] selectedInventoryItem;                             // index是 inventory_list, value是 item_code
         [HideInInspector] private int[] _inventoryListCapacityIntArray;  // 背包列表容量
         [SerializeField] private SO_ItemList _itemList = null;           // 物品列表
 
@@ -20,6 +20,11 @@ namespace Assets.Scripts.Inventory
             base.Awake();
             CreateInventoryLists();
             CreateItemDetailsDic();
+
+            // 初始化 selectedInventoryItem
+            selectedInventoryItem = new int[(int)InventoryLocation.Count];
+            // 使用-1填充数组，表示没有选中任何物品
+            System.Array.Fill(selectedInventoryItem, -1);
         }
 
         /// <summary>
@@ -125,7 +130,7 @@ namespace Assets.Scripts.Inventory
         /// 查找物品是否在背包中
         /// 返回物品在背包中的位置 或 -1 表示未找到
         /// </summary>
-        private int FindItemInInventory(InventoryLocation inventoryLocation, int itemCode)
+        public int FindItemInInventory(InventoryLocation inventoryLocation, int itemCode)
         {
             List<InventoryItem> inventoryList = _inventoryLists[(int)inventoryLocation];
 
@@ -207,6 +212,22 @@ namespace Assets.Scripts.Inventory
                 _ => itemType.ToString()
             };
             return itemTypeDescription;
+        }
+
+        /// <summary>
+        /// 设置选中的背包物品
+        /// </summary>
+        public void SetSelectedInventoryItem(InventoryLocation inventoryLocation, int itemCode)
+        {
+            selectedInventoryItem[(int)inventoryLocation] = itemCode;
+        }
+
+        /// <summary>
+        /// 清空选中的背包物品
+        /// </summary>
+        public void ClearSelectedInventoryItem(InventoryLocation inventoryLocation)
+        {
+            selectedInventoryItem[(int)inventoryLocation] = -1;
         }
     }
 }

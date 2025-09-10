@@ -72,6 +72,7 @@ namespace Assets.Scripts.UI.UIInventory
                     _inventorySlots[i].textMeshProUGUI.text = inventoryList[i].itemQuantity.ToString();
                     _inventorySlots[i].itemDetails = itemDetails;
                     _inventorySlots[i].itemQuantity = inventoryList[i].itemQuantity;
+                    SetHighlightSlot(_inventorySlots[i]);
                 }
             }
         }
@@ -88,6 +89,7 @@ namespace Assets.Scripts.UI.UIInventory
                 slot.textMeshProUGUI.text = "";
                 slot.itemDetails = null;
                 slot.itemQuantity = 0;
+                SetHighlightSlot(slot);
             }
         }
 
@@ -125,6 +127,48 @@ namespace Assets.Scripts.UI.UIInventory
             _rectTransform.anchoredPosition = new Vector2(0f, -2.5f);
 
             IsInventoryBarPositionAtBottom = false;
+        }
+
+        /// <summary>
+        /// 设置高亮显示
+        /// </summary>
+        public void SetHighlightOnInventorySlots()
+        {
+            if (_inventorySlots == null || _inventorySlots.Length == 0)
+                return;
+
+            foreach (var slot in _inventorySlots)
+            {
+                SetHighlightSlot(slot);
+            }
+        }
+
+        private void SetHighlightSlot(UIInventorySlot slot)
+        {
+            if (slot.isSelected && slot.itemDetails != null)
+            {
+                slot.inventorySlotHighlight.color = Color.white;
+                InventoryManager.Instance.SetSelectedInventoryItem(InventoryLocation.Player, slot.itemDetails.itemCode);
+            }
+        }
+
+        /// <summary>
+        /// 清除高亮显示
+        /// </summary>
+        public void ClearHighlightOnInventorySlots()
+        {
+            if (_inventorySlots == null || _inventorySlots.Length == 0)
+                return;
+
+            foreach (var slot in _inventorySlots)
+            {
+                if (slot.isSelected)
+                {
+                    slot.isSelected = false;
+                    slot.inventorySlotHighlight.color = Color.clear;
+                    InventoryManager.Instance.ClearSelectedInventoryItem(InventoryLocation.Player);
+                }
+            }
         }
     }
 }

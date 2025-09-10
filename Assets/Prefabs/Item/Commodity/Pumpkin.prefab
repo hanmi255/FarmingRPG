@@ -20,6 +20,14 @@ PrefabInstance:
       propertyPath: _itemCode
       value: 10001
       objectReference: {fileID: 0}
+    - target: {fileID: 1252411462005094845, guid: f19a01a67b0b0a344b4ee7d3817b8faa, type: 3}
+      propertyPath: m_Size.y
+      value: 0.946025
+      objectReference: {fileID: 0}
+    - target: {fileID: 1252411462005094845, guid: f19a01a67b0b0a344b4ee7d3817b8faa, type: 3}
+      propertyPath: m_Offset.y
+      value: 0.4730125
+      objectReference: {fileID: 0}
     - target: {fileID: 8184371761940238280, guid: f19a01a67b0b0a344b4ee7d3817b8faa, type: 3}
       propertyPath: m_Name
       value: Pumpkin

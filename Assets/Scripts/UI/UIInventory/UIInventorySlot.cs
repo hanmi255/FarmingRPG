@@ -1,3 +1,4 @@
+using System;
 using Assets.Scripts.Enums;
 using Assets.Scripts.Inventory;
 using Assets.Scripts.Item;
@@ -10,18 +11,19 @@ using UnityEngine.UI;
 
 namespace Assets.Scripts.UI.UIInventory
 {
-    public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler
+    public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
     {
         private Camera _mainCamera;
         private Canvas _parentCanvas;
         private Transform _parentItem;
         private GameObject _draggedItem;
 
-        [SerializeField] private Image _inventorySlotHighlight;
+        public Image inventorySlotHighlight;
         public Image inventorySlotImage;
         public TextMeshProUGUI textMeshProUGUI;
         [SerializeField] private UIInventoryBar _inventoryBar = null;
         [SerializeField] private GameObject _inventoryTextBoxPrefab = null;
+        [HideInInspector] public bool isSelected = false;
         [HideInInspector] public ItemDetails itemDetails;
         [SerializeField] private GameObject _itemPrefab = null;
         [HideInInspector] public int itemQuantity;
@@ -68,6 +70,7 @@ namespace Assets.Scripts.UI.UIInventory
             Image draggedItemImage = _draggedItem.GetComponentInChildren<Image>();
             draggedItemImage.sprite = itemDetails.itemSprite;
 
+            SetSelectedItem();
         }
 
         public void OnDrag(PointerEventData eventData)
@@ -93,6 +96,7 @@ namespace Assets.Scripts.UI.UIInventory
 
                 InventoryManager.Instance.SwapInventoryItems(InventoryLocation.Player, _slotNumber, toSlotNumber);
                 DestoryInventoryTextBox();
+                ClearSelectedItem();
             }
             // 直接放置物品到地面
             else if (itemDetails != null && itemDetails.canBeDropped)
@@ -105,7 +109,7 @@ namespace Assets.Scripts.UI.UIInventory
 
         private void DropSelectedItemAtMousePosition()
         {
-            if (itemDetails == null)
+            if (itemDetails == null && !isSelected)
                 return;
 
             Vector3 worldPosition = _mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -_mainCamera.transform.position.z));
@@ -115,6 +119,11 @@ namespace Assets.Scripts.UI.UIInventory
             item.ItemCode = itemDetails.itemCode;
 
             InventoryManager.Instance.RemoveItem(InventoryLocation.Player, item.ItemCode);
+
+            if (InventoryManager.Instance.FindItemInInventory(InventoryLocation.Player, item.ItemCode) == -1)
+            {
+                ClearSelectedItem();
+            }
         }
 
         public void OnPointerEnter(PointerEventData eventData)
@@ -159,6 +168,41 @@ namespace Assets.Scripts.UI.UIInventory
                 return;
 
             Destroy(_inventoryBar.inventoryTextBoxGameobject);
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            if (eventData.button != PointerEventData.InputButton.Left)
+                return;
+
+            if (isSelected)
+            {
+                ClearSelectedItem();
+            }
+            else
+            {
+                if (itemQuantity > 0)
+                {
+                    SetSelectedItem();
+                }
+            }
+        }
+
+        private void SetSelectedItem()
+        {
+            _inventoryBar.ClearHighlightOnInventorySlots();
+            isSelected = true;
+            _inventoryBar.SetHighlightOnInventorySlots();
+            InventoryManager.Instance.SetSelectedInventoryItem(InventoryLocation.Player, itemDetails.itemCode);
+        }
+
+        private void ClearSelectedItem()
+        {
+            _inventoryBar.ClearHighlightOnInventorySlots();
+
+            isSelected = false;
+
+            InventoryManager.Instance.ClearSelectedInventoryItem(InventoryLocation.Player);
         }
     }
 }
