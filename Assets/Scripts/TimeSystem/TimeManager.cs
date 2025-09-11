@@ -127,15 +127,6 @@ namespace Assets.Scripts.TimeSystem
             };
         }
 
-        // Test
-        public void TestAdvanceGameMinute()
-        {
-            for (int i = 0; i < 60; i++)
-            {
-                UpdateGameSecond();
-            }
-        }
-
         public void TestAdvanceGameDay()
         {
             for (int i = 0; i < 86400; i++)
