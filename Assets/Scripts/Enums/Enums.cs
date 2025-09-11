@@ -87,6 +87,16 @@ namespace Assets.Scripts.Enums
         Count
     }
 
+    public enum Season  // 季节
+    {
+        None,
+        Spring,
+        Summer,
+        Autumn,
+        Winter,
+        Count
+    }
+
     public enum ToolEffect  // 工具效果
     {
         None,

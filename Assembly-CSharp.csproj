@@ -58,6 +58,7 @@
     <Compile Include="Assets\Scripts\Utilities\PropertyDrawers\ItemCodeDescriptionAttribute.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerUnit.cs" />
     <Compile Include="Assets\Scripts\UI\UIInventory\UIInventorySlot.cs" />
+    <Compile Include="Assets\Scripts\TimeSystem\TimeManager.cs" />
     <Compile Include="Assets\Scripts\Animation\AnimationOverrides.cs" />
     <Compile Include="Assets\Scripts\Item\SO_ItemList.cs" />
     <Compile Include="Assets\Scripts\Enums\Enums.cs" />

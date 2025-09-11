@@ -47,6 +47,17 @@ namespace Assets.Scripts.Events
         public bool isIdleRight;
     }
 
+    public struct TimeEventParameters
+    {
+        public int gameYear;
+        public Season gameSeason;
+        public int gameDay;
+        public string gameDayOfWeek;
+        public int gameHour;
+        public int gameMinute;
+        public int gameSecond;
+    }
+
     public delegate void MovementDelegate(MovementParameters movementParams);
 
     public static class EventHandler
@@ -63,6 +74,43 @@ namespace Assets.Scripts.Events
         public static void CallMovementEvent(MovementParameters movementParams)
         {
             MovementEvent?.Invoke(movementParams);
+        }
+
+        // 时间事件
+
+        // Minute
+        public static event Action<TimeEventParameters> AdvanceGameMinuteEvent;
+        public static void CallAdvanceGameMinuteEvent(TimeEventParameters timeEventParams)
+        {
+            AdvanceGameMinuteEvent?.Invoke(timeEventParams);
+        }
+
+        // Hour
+        public static event Action<TimeEventParameters> AdvanceGameHourEvent;
+        public static void CallAdvanceGameHourEvent(TimeEventParameters timeEventParams)
+        {
+            AdvanceGameHourEvent?.Invoke(timeEventParams);
+        }
+
+        // Day
+        public static event Action<TimeEventParameters> AdvanceGameDayEvent;
+        public static void CallAdvanceGameDayEvent(TimeEventParameters timeEventParams)
+        {
+            AdvanceGameDayEvent?.Invoke(timeEventParams);
+        }
+
+        // Season
+        public static event Action<TimeEventParameters> AdvanceGameSeasonEvent;
+        public static void CallAdvanceGameSeasonEvent(TimeEventParameters timeEventParams)
+        {
+            AdvanceGameSeasonEvent?.Invoke(timeEventParams);
+        }
+
+        // Year
+        public static event Action<TimeEventParameters> AdvanceGameYearEvent;
+        public static void CallAdvanceGameYearEvent(TimeEventParameters timeEventParams)
+        {
+            AdvanceGameYearEvent?.Invoke(timeEventParams);
         }
     }
 }
