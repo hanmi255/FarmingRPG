@@ -46,10 +46,9 @@ namespace Assets.Scripts.TimeSystem
         private void UpdateGameSecond()
         {
             _gameSecond++;
-            if (_gameSecond <= 59) 
+            if (_gameSecond <= 59)
             {
                 SetTimeEventParameters();
-                Debug.Log("Time: " + _gameHour + ":" + _gameMinute + ":" + _gameSecond);
                 return;
             }
 
@@ -58,20 +57,16 @@ namespace Assets.Scripts.TimeSystem
             SetTimeEventParameters();
             EventHandler.CallAdvanceGameMinuteEvent(_parameters);
 
-            if (_gameMinute <= 59) {
-                Debug.Log("Time: " + _gameHour + ":" + _gameMinute + ":" + _gameSecond);
+            if (_gameMinute <= 59)
                 return;
-            }
 
             _gameMinute = 0;
             _gameHour++;
             SetTimeEventParameters();
             EventHandler.CallAdvanceGameHourEvent(_parameters);
 
-            if (_gameHour <= 23) {
-                Debug.Log("Time: " + _gameHour + ":" + _gameMinute + ":" + _gameSecond);
+            if (_gameHour <= 23)
                 return;
-            }
 
             _gameHour = 0;
             _gameDay++;
@@ -79,27 +74,26 @@ namespace Assets.Scripts.TimeSystem
             SetTimeEventParameters();
             EventHandler.CallAdvanceGameDayEvent(_parameters);
 
-            if (_gameDay <= 30) {
-                Debug.Log("Time: " + _gameHour + ":" + _gameMinute + ":" + _gameSecond);
+            if (_gameDay <= 30)
                 return;
-            }
 
             _gameDay = 1;
             _gameSeason++;
             SetTimeEventParameters();
             EventHandler.CallAdvanceGameSeasonEvent(_parameters);
 
-            if ((int)_gameSeason <= 3) {
-                Debug.Log("Time: " + _gameHour + ":" + _gameMinute + ":" + _gameSecond);
+            if ((int)_gameSeason <= 3)
                 return;
-            }
 
             _gameSeason = 0;
             _gameYear++;
+            
+            // 重置年
+            if (_gameYear > 9999)
+                _gameYear = 1;
+
             SetTimeEventParameters();
             EventHandler.CallAdvanceGameYearEvent(_parameters);
-            
-            Debug.Log("Time: " + _gameHour + ":" + _gameMinute + ":" + _gameSecond);
         }
 
         private string GetDayOfWeek()
@@ -131,6 +125,14 @@ namespace Assets.Scripts.TimeSystem
                 gameMinute = _gameMinute,
                 gameSecond = _gameSecond
             };
+        }
+
+        public void TestAdvanceGameDay()
+        {
+            for (int i = 0; i < 86400; i++)
+            {
+                UpdateGameSecond();
+            }
         }
     }
 }
