@@ -69,6 +69,8 @@ namespace Assets.Scripts.Misc
             return 0; // 返回默认值，避免错误
         }
 
+        public const float secondsPerGameSecond = 0.012f;  // 游戏时间秒数
+
         static Settings()
         {
             // 初始化基本参数
