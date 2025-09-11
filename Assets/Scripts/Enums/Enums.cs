@@ -87,6 +87,13 @@ namespace Assets.Scripts.Enums
         Count
     }
 
+    public enum SceneName  // 场景名称
+    {
+        Farm,
+        Field,
+        Cabin
+    }
+
     public enum Season  // 季节
     {
         None,

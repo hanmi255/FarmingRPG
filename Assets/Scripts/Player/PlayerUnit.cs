@@ -5,6 +5,7 @@ using Assets.Scripts.Events;
 using Assets.Scripts.Inventory;
 using Assets.Scripts.Item;
 using Assets.Scripts.Misc;
+using Assets.Scripts.Scene;
 using Assets.Scripts.TimeSystem;
 using UnityEngine;
 
@@ -97,6 +98,8 @@ namespace Assets.Scripts.Player
                 PlayerMovementInput();
                 PlayerWalkInput();
 
+                TestInput();
+
                 SetMovementParameters();
                 EventHandler.CallMovementEvent(_parameters);
             }
@@ -107,6 +110,14 @@ namespace Assets.Scripts.Player
         private void FixedUpdate()
         {
             PlayerMovement();
+        }
+
+        private void TestInput()
+        {
+            if (Input.GetKey(KeyCode.L))
+            {
+                SceneControllerManager.Instance.FadeAndLoadScene(SceneName.Farm.ToString(), transform.position);
+            }
         }
 
         public void DisablePlayerInputAndResetMovement()

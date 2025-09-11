@@ -112,5 +112,35 @@ namespace Assets.Scripts.Events
         {
             AdvanceGameYearEvent?.Invoke(timeEventParams);
         }
+
+        // 场景切换事件
+
+        // Before Scene Unload Fade Out
+        public static event Action BeforeSceneUnloadFadeOutEvent;
+        public static void CallBeforeSceneUnloadFadeOutEvent()
+        {
+            BeforeSceneUnloadFadeOutEvent?.Invoke();
+        }
+
+        // Befor Scene Unload
+        public static event Action BeforeSceneUnloadEvent;
+        public static void CallBeforeSceneUnloadEvent()
+        {
+            BeforeSceneUnloadEvent?.Invoke();
+        }
+
+        // After Scene Load
+        public static event Action AfterSceneLoadEvent;
+        public static void CallAfterSceneLoadEvent()
+        {
+            AfterSceneLoadEvent?.Invoke();
+        }
+
+        // After Scene Load Fade In
+        public static event Action AfterSceneLoadFadeInEvent;
+        public static void CallAfterSceneLoadFadeInEvent()
+        {
+            AfterSceneLoadFadeInEvent?.Invoke();
+        }
     }
 }

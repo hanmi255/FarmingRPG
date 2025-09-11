@@ -1,5 +1,5 @@
-using System;
 using Assets.Scripts.Enums;
+using Assets.Scripts.Events;
 using Assets.Scripts.Inventory;
 using Assets.Scripts.Item;
 using Assets.Scripts.Misc;
@@ -37,10 +37,19 @@ namespace Assets.Scripts.UI.UIInventory
             _parentCanvas = GetComponentInParent<Canvas>();
         }
 
+        private void OnEnable()
+        {
+            EventHandler.AfterSceneLoadEvent += SceneLoaded;
+        }
+
+        private void OnDisable()
+        {
+            EventHandler.AfterSceneLoadEvent -= SceneLoaded;
+        }
+
         private void Start()
         {
             _mainCamera = Camera.main;
-            _parentItem = GameObject.FindWithTag(Tags.ItemsParentTransform).transform;
         }
 
         private void SetTextParameters()
@@ -212,6 +221,11 @@ namespace Assets.Scripts.UI.UIInventory
             InventoryManager.Instance.ClearSelectedInventoryItem(InventoryLocation.Player);
 
             PlayerUnit.Instance.ClearCarriedItem();
+        }
+
+        private void SceneLoaded()
+        {
+            _parentItem = GameObject.FindGameObjectWithTag(Tags.ItemsParentTransform).transform;
         }
     }
 }

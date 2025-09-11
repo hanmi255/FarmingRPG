@@ -1,15 +1,19 @@
 using Cinemachine;
 using UnityEngine;
 using Assets.Scripts.Misc;
+using Assets.Scripts.Events;
 
 namespace Assets.Scripts.Scene
 {
     [RequireComponent(typeof(CinemachineConfiner2D))]
     public class SwitchConfineBoundingShape : MonoBehaviour
     {
-        void Start()
-        {
-            SwitchBoundingShape();
+        private void OnEnable() {
+            EventHandler.AfterSceneLoadEvent += SwitchBoundingShape;
+        }
+
+        private void OnDisable() {
+            EventHandler.AfterSceneLoadEvent -= SwitchBoundingShape;
         }
 
         /// <summary>
