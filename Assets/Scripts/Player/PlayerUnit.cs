@@ -97,8 +97,6 @@ namespace Assets.Scripts.Player
                 PlayerMovementInput();
                 PlayerWalkInput();
 
-                TestInput();
-
                 SetMovementParameters();
                 EventHandler.CallMovementEvent(_parameters);
             }
@@ -109,19 +107,6 @@ namespace Assets.Scripts.Player
         private void FixedUpdate()
         {
             PlayerMovement();
-        }
-
-        // Test
-        private void TestInput()
-        {
-            if (Input.GetKey(KeyCode.T))
-            {
-                TimeManager.Instance.TestAdvanceGameMinute();
-            }
-            if (Input.GetKey(KeyCode.G))
-            {
-                TimeManager.Instance.TestAdvanceGameDay();
-            }
         }
 
         public void DisablePlayerInputAndResetMovement()
