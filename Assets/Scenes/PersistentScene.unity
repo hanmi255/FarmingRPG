@@ -1526,7 +1526,7 @@ MonoBehaviour:
   _fadeDuration: 1
   _fadeCanvasGroup: {fileID: 2073877635}
   _fadeImage: {fileID: 2073877632}
-  startingScene: 0
+  startingScene: 1
 --- !u!4 &959767286
 Transform:
   m_ObjectHideFlags: 0
