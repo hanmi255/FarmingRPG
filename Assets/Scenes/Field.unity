@@ -3579,7 +3579,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3956214245367700309, guid: e0bf36b54f3c86941aeb8b0d1e3491d1, type: 3}
       propertyPath: m_Name
-      value: SceneTeleport
+      value: SceneTeleportToFarm
       objectReference: {fileID: 0}
     - target: {fileID: 4976748638014647424, guid: e0bf36b54f3c86941aeb8b0d1e3491d1, type: 3}
       propertyPath: _spawnPosition.x
