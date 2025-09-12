@@ -50,6 +50,7 @@
     <Compile Include="Assets\Scripts\Animation\SO_AnimationType.cs" />
     <Compile Include="Assets\Scripts\Item\ItemDetails.cs" />
     <Compile Include="Assets\Scripts\TimeSystem\GameClock.cs" />
+    <Compile Include="Assets\Scripts\Scene\SceneTeleport.cs" />
     <Compile Include="Assets\Scripts\Player\ItemPickUp.cs" />
     <Compile Include="Assets\Scripts\Inventory\InventoryManager.cs" />
     <Compile Include="Assets\Scripts\Misc\SingletonMonoBehaviour.cs" />

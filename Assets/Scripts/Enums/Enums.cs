@@ -91,7 +91,7 @@ namespace Assets.Scripts.Enums
     {
         Farm,
         Field,
-        Cabin
+        CabinHome
     }
 
     public enum Season  // 季节
