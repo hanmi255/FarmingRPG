@@ -50,9 +50,14 @@
     <Compile Include="Assets\Scripts\Animation\SO_AnimationType.cs" />
     <Compile Include="Assets\Scripts\Item\ItemDetails.cs" />
     <Compile Include="Assets\Scripts\TimeSystem\GameClock.cs" />
+    <Compile Include="Assets\Scripts\SaveSystem\SceneSave.cs" />
     <Compile Include="Assets\Scripts\Scene\SceneTeleport.cs" />
+    <Compile Include="Assets\Scripts\SaveSystem\GameObjectSave.cs" />
     <Compile Include="Assets\Scripts\Player\ItemPickUp.cs" />
+    <Compile Include="Assets\Scripts\SaveSystem\SceneItem.cs" />
     <Compile Include="Assets\Scripts\Inventory\InventoryManager.cs" />
+    <Compile Include="Assets\Scripts\SaveSystem\GenerateGUID.cs" />
+    <Compile Include="Assets\Scripts\SaveSystem\SaveLoadManager.cs" />
     <Compile Include="Assets\Scripts\Misc\SingletonMonoBehaviour.cs" />
     <Compile Include="Assets\Scripts\UI\UIInventory\UIInventoryBar.cs" />
     <Compile Include="Assets\Scripts\Item\ObscuringItemFader.cs" />
@@ -69,12 +74,15 @@
     <Compile Include="Assets\Scripts\Inventory\InventoryItem.cs" />
     <Compile Include="Assets\Scripts\Misc\Tags.cs" />
     <Compile Include="Assets\Scripts\Animation\MovementAnimationParameterControl.cs" />
+    <Compile Include="Assets\Scripts\Scene\SceneItemsManager.cs" />
     <Compile Include="Assets\Scripts\Misc\Settings.cs" />
     <Compile Include="Assets\Scripts\Scene\SwitchConfineBoundingShape.cs" />
     <Compile Include="Assets\Scripts\Item\TriggerObscuringItemFader.cs" />
     <Compile Include="Assets\Scripts\Item\ItemUnit.cs" />
     <Compile Include="Assets\Scripts\Item\ItemNudge.cs" />
     <Compile Include="Assets\Scripts\Animation\CharacterAttribute.cs" />
+    <Compile Include="Assets\Scripts\Misc\Vector3Serializable.cs" />
+    <Compile Include="Assets\Scripts\SaveSystem\ISaveble.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

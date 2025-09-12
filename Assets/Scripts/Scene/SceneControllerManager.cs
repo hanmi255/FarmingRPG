@@ -3,6 +3,7 @@ using Assets.Scripts.Enums;
 using Assets.Scripts.Events;
 using Assets.Scripts.Misc;
 using Assets.Scripts.Player;
+using Assets.Scripts.SaveSystem;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -35,6 +36,9 @@ namespace Assets.Scripts.Scene
             // 调用场景加载完成事件
             EventHandler.CallAfterSceneLoadEvent();
 
+            // 恢复新场景数据
+            SaveLoadManager.Instance.RestoreCurrentSceneData();
+
             // 开始淡出效果
             StartCoroutine(Fade(0f));
         }
@@ -62,6 +66,9 @@ namespace Assets.Scripts.Scene
             // 淡入（屏幕变黑）
             yield return StartCoroutine(Fade(1f));
 
+            // 存储当前场景数据
+            SaveLoadManager.Instance.StoreCurrentSceneData();
+
             // 设置玩家在新场景中的位置
             PlayerUnit.Instance.gameObject.transform.position = spawnPosition;
 
@@ -76,6 +83,9 @@ namespace Assets.Scripts.Scene
 
             // 调用场景加载完成事件
             EventHandler.CallAfterSceneLoadEvent();
+
+            // 恢复新场景数据
+            SaveLoadManager.Instance.RestoreCurrentSceneData();
 
             // 淡出（屏幕变透明）
             yield return StartCoroutine(Fade(0f));
