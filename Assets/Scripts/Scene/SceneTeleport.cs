@@ -12,11 +12,10 @@ namespace Assets.Scripts.Scene
         [SerializeField] private SceneName _sceneNameGoto = SceneName.Farm;
         [SerializeField] private Vector3 _spawnPosition = Vector3.zero;
 
-        private void OnTriggerEnter2D(Collider2D collision)
+        private void OnTriggerStay2D(Collider2D collision)
         {
-            PlayerUnit playerUnit = collision.GetComponent<PlayerUnit>();
-
-            if (playerUnit != null)
+            
+            if (collision.TryGetComponent<PlayerUnit>(out var playerUnit))
             {
                 float xPosition = Mathf.Approximately(_spawnPosition.x, 0f) ? playerUnit.transform.position.x : _spawnPosition.x;
                 float yPosition = Mathf.Approximately(_spawnPosition.y, 0f) ? playerUnit.transform.position.y : _spawnPosition.y;
