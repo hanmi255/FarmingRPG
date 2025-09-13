@@ -17,6 +17,7 @@ namespace Assets.Scripts.UI.UIInventory
         private Camera _mainCamera;
         private Canvas _parentCanvas;
         private Transform _parentItem;
+        private GridCursorHighlight _gridCursorHighlight;
         private GameObject _draggedItem;
 
         public Image inventorySlotHighlight;
@@ -51,6 +52,7 @@ namespace Assets.Scripts.UI.UIInventory
         private void Start()
         {
             _mainCamera = Camera.main;
+            _gridCursorHighlight = FindObjectOfType<GridCursorHighlight>();
         }
 
         private void SetTextParameters()
@@ -122,25 +124,23 @@ namespace Assets.Scripts.UI.UIInventory
             if (itemDetails == null && !isSelected)
                 return;
 
+            // 如果光标位置无效，则返回
+            // 否则放置物品
+            if (!_gridCursorHighlight.CursorPositionIsValid)
+                return;
+
             Vector3 worldPosition = _mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -_mainCamera.transform.position.z));
             Vector3 dropPosition = new(worldPosition.x, worldPosition.y - Settings.gridCellSize / 2f, 0);
 
-            Vector3Int gridPosition = GridPropertyManager.Instance.grid.WorldToCell(worldPosition);
-            GridPropertyDetails gridPropertyDetails = GridPropertyManager.Instance.GetGridPropertyDetails(gridPosition.x, gridPosition.y);
+            GameObject itemGameObject = Instantiate(_itemPrefab, dropPosition, Quaternion.identity, _parentItem);
+            ItemUnit item = itemGameObject.GetComponent<ItemUnit>();
+            item.ItemCode = itemDetails.itemCode;
 
-            // 如果网格上可放置物品
-            if (gridPropertyDetails != null && gridPropertyDetails.canDropItem)
+            InventoryManager.Instance.RemoveItem(InventoryLocation.Player, item.ItemCode);
+
+            if (InventoryManager.Instance.FindItemInInventory(InventoryLocation.Player, item.ItemCode) == -1)
             {
-                GameObject itemGameObject = Instantiate(_itemPrefab, dropPosition, Quaternion.identity, _parentItem);
-                ItemUnit item = itemGameObject.GetComponent<ItemUnit>();
-                item.ItemCode = itemDetails.itemCode;
-
-                InventoryManager.Instance.RemoveItem(InventoryLocation.Player, item.ItemCode);
-
-                if (InventoryManager.Instance.FindItemInInventory(InventoryLocation.Player, item.ItemCode) == -1)
-                {
-                    ClearSelectedItem();
-                }
+                ClearSelectedItem();
             }
         }
 
@@ -211,6 +211,19 @@ namespace Assets.Scripts.UI.UIInventory
             _inventoryBar.ClearHighlightOnInventorySlots();
             isSelected = true;
             _inventoryBar.SetHighlightOnInventorySlots();
+
+            // 设置网格光标高亮
+            _gridCursorHighlight.ItemUseGridRadius = itemDetails.itemUseGridRadius;
+            if (itemDetails.itemUseGridRadius > 0)
+            {
+                _gridCursorHighlight.EnableCursor();
+            }
+            else
+            {
+                _gridCursorHighlight.DisableCursor();
+            }
+            _gridCursorHighlight.SelectedItemType = itemDetails.itemType;
+
             InventoryManager.Instance.SetSelectedInventoryItem(InventoryLocation.Player, itemDetails.itemCode);
 
             if (itemDetails.canBeCarried)
@@ -225,11 +238,19 @@ namespace Assets.Scripts.UI.UIInventory
 
         private void ClearSelectedItem()
         {
+            ClearCusors();
+
             _inventoryBar.ClearHighlightOnInventorySlots();
             isSelected = false;
             InventoryManager.Instance.ClearSelectedInventoryItem(InventoryLocation.Player);
 
             PlayerUnit.Instance.ClearCarriedItem();
+        }
+
+        private void ClearCusors()
+        {
+            _gridCursorHighlight.DisableCursor();
+            _gridCursorHighlight.SelectedItemType = ItemType.None;
         }
 
         private void SceneLoaded()
