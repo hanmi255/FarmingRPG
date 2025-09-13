@@ -62,6 +62,13 @@ namespace Assets.Scripts.Events
 
     public static class EventHandler
     {
+        // 放置选中物品事件
+        public static event Action DropSelectedItemEvent;
+        public static void CallDropSelectedItemEvent()
+        {
+            DropSelectedItemEvent?.Invoke();
+        }
+
         // 背包更新事件
         public static event Action<InventoryLocation, List<InventoryItem>> InventoryUpdatedEvent;
         public static void CallInventoryUpdatedEvent(InventoryLocation inventoryLocation, List<InventoryItem> inventoryList)

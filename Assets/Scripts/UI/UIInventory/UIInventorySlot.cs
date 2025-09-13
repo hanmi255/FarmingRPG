@@ -41,12 +41,14 @@ namespace Assets.Scripts.UI.UIInventory
 
         private void OnEnable()
         {
-            EventHandler.AfterSceneLoadEvent += SceneLoaded;
+            EventHandler.AfterSceneLoadEvent += AfterSceneLoad;
+            EventHandler.DropSelectedItemEvent += DropSelectedItemAtMousePosition;
         }
 
         private void OnDisable()
         {
-            EventHandler.AfterSceneLoadEvent -= SceneLoaded;
+            EventHandler.AfterSceneLoadEvent -= AfterSceneLoad;
+            EventHandler.DropSelectedItemEvent -= DropSelectedItemAtMousePosition;
         }
 
         private void Start()
@@ -121,7 +123,8 @@ namespace Assets.Scripts.UI.UIInventory
 
         private void DropSelectedItemAtMousePosition()
         {
-            if (itemDetails == null && !isSelected)
+            // 只有当选中的物品是当前槽位的物品时才执行放置操作
+            if (itemDetails == null || !isSelected)
                 return;
 
             // 如果光标位置无效，则返回
@@ -253,7 +256,7 @@ namespace Assets.Scripts.UI.UIInventory
             _gridCursorHighlight.SelectedItemType = ItemType.None;
         }
 
-        private void SceneLoaded()
+        private void AfterSceneLoad()
         {
             _parentItem = GameObject.FindGameObjectWithTag(Tags.ItemsParentTransform).transform;
         }
