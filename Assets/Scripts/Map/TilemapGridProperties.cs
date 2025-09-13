@@ -10,7 +10,6 @@ namespace Assets.Scripts.Map
     public class TilemapGridProperties : MonoBehaviour
     {
         private Tilemap _tilemap;
-        private Grid _grid;
         [SerializeField] private SO_GridProperties _gridProperties = null;
         [SerializeField] private GridBoolProperty _gridBoolProperty = GridBoolProperty.Diggable;
 

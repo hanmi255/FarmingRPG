@@ -11,7 +11,7 @@ namespace Assets.Scripts.Map
     [RequireComponent(typeof(GenerateGUID))]
     public class GridPropertyManager : SingletonMonoBehaviour<GridPropertyManager>, ISaveble
     {
-        public Grid grid;
+        [HideInInspector] public Grid grid;
         private Dictionary<string, GridPropertyDetails> _gridPropertyDetailsDictionary;
         [SerializeField] private SO_GridProperties[] _so_gridPropertiesArray = null;
 

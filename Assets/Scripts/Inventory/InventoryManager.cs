@@ -197,6 +197,24 @@ namespace Assets.Scripts.Inventory
         }
 
         /// <summary>
+        /// 获取选中物品详情
+        /// </summary>
+        public ItemDetails GetSelectedInventoryItemDetails(InventoryLocation inventoryLocation)
+        {
+            int itemCode = GetSelectedInventoryItem(inventoryLocation);
+
+            return GetItemDetails(itemCode);
+        }
+
+        /// <summary>
+        /// 获取选中物品
+        /// </summary>
+        private int GetSelectedInventoryItem(InventoryLocation inventoryLocation)
+        {
+            return selectedInventoryItem[(int)inventoryLocation];
+        }
+
+        /// <summary>
         /// 获取物品类型描述
         /// </summary>
         public string GetItemTypeDescription(ItemType itemType)

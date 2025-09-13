@@ -85,6 +85,7 @@
     <Compile Include="Assets\Scripts\Item\TriggerObscuringItemFader.cs" />
     <Compile Include="Assets\Scripts\Item\ItemUnit.cs" />
     <Compile Include="Assets\Scripts\Item\ItemNudge.cs" />
+    <Compile Include="Assets\Scripts\UI\GridCursorHighlight.cs" />
     <Compile Include="Assets\Scripts\Animation\CharacterAttribute.cs" />
     <Compile Include="Assets\Scripts\Map\GridPropertyManager.cs" />
     <Compile Include="Assets\Scripts\Misc\Vector3Serializable.cs" />
