@@ -80,6 +80,15 @@ namespace Assets.Scripts.Enums
         Count
     }
 
+    public enum GridBoolProperty  // 网格 boolean 属性
+    {
+        Diggable,
+        CanDropItem,
+        CanPlaceFurniture,
+        IsPath,
+        IsNPCObstacle
+    }
+
     public enum InventoryLocation  // 背包位置
     {
         Player,

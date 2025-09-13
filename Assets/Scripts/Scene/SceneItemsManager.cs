@@ -84,10 +84,7 @@ namespace Assets.Scripts.Scene
             // 创建场景保存数据对象
             SceneSave sceneSave = new()
             {
-                listSceneItemDictionary = new Dictionary<string, List<SceneItem>>
-                {
-                    { "sceneItems", sceneItems }
-                }
+                listSceneItem = sceneItems
             };
 
             // 将场景数据添加到游戏对象保存数据中
@@ -102,12 +99,11 @@ namespace Assets.Scripts.Scene
             if (!GameObjectSave.sceneData.TryGetValue(sceneName, out SceneSave sceneSave)) 
                 return;
             
-            if (sceneSave.listSceneItemDictionary == null || 
-                !sceneSave.listSceneItemDictionary.TryGetValue("sceneItems", out List<SceneItem> sceneItems)) 
+            if (sceneSave.listSceneItem == null)
                 return;
 
             DestroySceneItems();
-            InstantiateSceneItems(sceneItems);
+            InstantiateSceneItems(sceneSave.listSceneItem);
         }
 
         /// <summary>
