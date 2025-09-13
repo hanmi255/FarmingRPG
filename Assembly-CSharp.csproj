@@ -51,11 +51,14 @@
     <Compile Include="Assets\Scripts\Item\ItemDetails.cs" />
     <Compile Include="Assets\Scripts\TimeSystem\GameClock.cs" />
     <Compile Include="Assets\Scripts\SaveSystem\SceneSave.cs" />
+    <Compile Include="Assets\Scripts\Map\GridProperty.cs" />
+    <Compile Include="Assets\Scripts\Map\TilemapGridProperties.cs" />
     <Compile Include="Assets\Scripts\Scene\SceneTeleport.cs" />
     <Compile Include="Assets\Scripts\SaveSystem\GameObjectSave.cs" />
     <Compile Include="Assets\Scripts\Player\ItemPickUp.cs" />
     <Compile Include="Assets\Scripts\SaveSystem\SceneItem.cs" />
     <Compile Include="Assets\Scripts\Inventory\InventoryManager.cs" />
+    <Compile Include="Assets\Scripts\Map\GridCoordinate.cs" />
     <Compile Include="Assets\Scripts\SaveSystem\GenerateGUID.cs" />
     <Compile Include="Assets\Scripts\SaveSystem\SaveLoadManager.cs" />
     <Compile Include="Assets\Scripts\Misc\SingletonMonoBehaviour.cs" />
@@ -67,6 +70,7 @@
     <Compile Include="Assets\Scripts\Player\PlayerUnit.cs" />
     <Compile Include="Assets\Scripts\UI\UIInventory\UIInventorySlot.cs" />
     <Compile Include="Assets\Scripts\TimeSystem\TimeManager.cs" />
+    <Compile Include="Assets\Scripts\Map\SO_GridProperties.cs" />
     <Compile Include="Assets\Scripts\Animation\AnimationOverrides.cs" />
     <Compile Include="Assets\Scripts\Item\SO_ItemList.cs" />
     <Compile Include="Assets\Scripts\Enums\Enums.cs" />
@@ -76,11 +80,13 @@
     <Compile Include="Assets\Scripts\Animation\MovementAnimationParameterControl.cs" />
     <Compile Include="Assets\Scripts\Scene\SceneItemsManager.cs" />
     <Compile Include="Assets\Scripts\Misc\Settings.cs" />
+    <Compile Include="Assets\Scripts\Map\GridPropertyDetails.cs" />
     <Compile Include="Assets\Scripts\Scene\SwitchConfineBoundingShape.cs" />
     <Compile Include="Assets\Scripts\Item\TriggerObscuringItemFader.cs" />
     <Compile Include="Assets\Scripts\Item\ItemUnit.cs" />
     <Compile Include="Assets\Scripts\Item\ItemNudge.cs" />
     <Compile Include="Assets\Scripts\Animation\CharacterAttribute.cs" />
+    <Compile Include="Assets\Scripts\Map\GridPropertyManager.cs" />
     <Compile Include="Assets\Scripts\Misc\Vector3Serializable.cs" />
     <Compile Include="Assets\Scripts\SaveSystem\ISaveble.cs" />
   </ItemGroup>

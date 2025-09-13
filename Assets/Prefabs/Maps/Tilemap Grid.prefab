@@ -131,8 +131,9 @@ GameObject:
   - component: {fileID: 2847221804587260820}
   - component: {fileID: 909934931376250961}
   - component: {fileID: 8985146544428246036}
+  - component: {fileID: 5324280184737075661}
   m_Layer: 0
-  m_Name: Bool Can Drop Item
+  m_Name: BoolCanDropItem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -240,6 +241,20 @@ TilemapRenderer:
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
   m_MaskInteraction: 0
+--- !u!114 &5324280184737075661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2116207222609307324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b63cd4797426c9543ac02a89a8d95b8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gridProperties: {fileID: 0}
+  _gridBoolProperty: 0
 --- !u!1 &3019521406195898496
 GameObject:
   m_ObjectHideFlags: 0
@@ -251,8 +266,9 @@ GameObject:
   - component: {fileID: 3255691125127114915}
   - component: {fileID: 2420503205589744893}
   - component: {fileID: 821835854715114620}
+  - component: {fileID: 7770354826153729862}
   m_Layer: 0
-  m_Name: Bool NPC Obstacle
+  m_Name: BoolNPCObstacle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -360,6 +376,20 @@ TilemapRenderer:
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
   m_MaskInteraction: 0
+--- !u!114 &7770354826153729862
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3019521406195898496}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b63cd4797426c9543ac02a89a8d95b8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gridProperties: {fileID: 0}
+  _gridBoolProperty: 0
 --- !u!1 &3179519385393634767
 GameObject:
   m_ObjectHideFlags: 0
@@ -371,8 +401,9 @@ GameObject:
   - component: {fileID: 8378171463484135509}
   - component: {fileID: 3415290313509099831}
   - component: {fileID: 2947104879968732927}
+  - component: {fileID: 2646702592067840182}
   m_Layer: 0
-  m_Name: Bool Can Place Furniture
+  m_Name: BoolCanPlaceFurniture
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -480,6 +511,20 @@ TilemapRenderer:
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
   m_MaskInteraction: 0
+--- !u!114 &2646702592067840182
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3179519385393634767}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b63cd4797426c9543ac02a89a8d95b8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gridProperties: {fileID: 0}
+  _gridBoolProperty: 0
 --- !u!1 &3761734474078933275
 GameObject:
   m_ObjectHideFlags: 0
@@ -611,8 +656,9 @@ GameObject:
   - component: {fileID: 2360233314186136928}
   - component: {fileID: 6387901028231402576}
   - component: {fileID: 2963504139448583065}
+  - component: {fileID: 3140131940823300122}
   m_Layer: 0
-  m_Name: Bool Path
+  m_Name: BoolPath
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -720,6 +766,20 @@ TilemapRenderer:
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
   m_MaskInteraction: 0
+--- !u!114 &3140131940823300122
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4110320864742532662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b63cd4797426c9543ac02a89a8d95b8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gridProperties: {fileID: 0}
+  _gridBoolProperty: 0
 --- !u!1 &4498766094522733950
 GameObject:
   m_ObjectHideFlags: 0
@@ -1112,7 +1172,7 @@ GameObject:
   - component: {fileID: 2945370495578330827}
   - component: {fileID: 6949831929871041711}
   m_Layer: 0
-  m_Name: Grid Properties
+  m_Name: GridProperties
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1672,8 +1732,9 @@ GameObject:
   - component: {fileID: 5719143581714743026}
   - component: {fileID: 3906679902266516679}
   - component: {fileID: 969496594887233334}
+  - component: {fileID: 1468720850613072246}
   m_Layer: 0
-  m_Name: Bool Diggable
+  m_Name: BoolDiggable
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1781,6 +1842,20 @@ TilemapRenderer:
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
   m_MaskInteraction: 0
+--- !u!114 &1468720850613072246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5383894751011879663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b63cd4797426c9543ac02a89a8d95b8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gridProperties: {fileID: 0}
+  _gridBoolProperty: 0
 --- !u!1 &5999882236255521342
 GameObject:
   m_ObjectHideFlags: 0

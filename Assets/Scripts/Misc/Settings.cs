@@ -10,6 +10,9 @@ namespace Assets.Scripts.Misc
         public const float fadeOutSeconds = 0.35f;
         public const float targetAlpha = 0.45f;
 
+        // 瓦片地图
+        public const float gridCellSize = 1.0f;
+
         // 玩家数据
         public const float walkingSpeed = 2.666f;
         public const float runningSpeed = 5.333f;

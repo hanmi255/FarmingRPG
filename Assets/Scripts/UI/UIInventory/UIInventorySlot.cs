@@ -2,6 +2,7 @@ using Assets.Scripts.Enums;
 using Assets.Scripts.Events;
 using Assets.Scripts.Inventory;
 using Assets.Scripts.Item;
+using Assets.Scripts.Map;
 using Assets.Scripts.Misc;
 using Assets.Scripts.Player;
 using TMPro;
@@ -122,16 +123,24 @@ namespace Assets.Scripts.UI.UIInventory
                 return;
 
             Vector3 worldPosition = _mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -_mainCamera.transform.position.z));
+            Vector3 dropPosition = new(worldPosition.x, worldPosition.y - Settings.gridCellSize / 2f, 0);
 
-            GameObject itemGameObject = Instantiate(_itemPrefab, worldPosition, Quaternion.identity, _parentItem);
-            ItemUnit item = itemGameObject.GetComponent<ItemUnit>();
-            item.ItemCode = itemDetails.itemCode;
+            Vector3Int gridPosition = GridPropertyManager.Instance.grid.WorldToCell(worldPosition);
+            GridPropertyDetails gridPropertyDetails = GridPropertyManager.Instance.GetGridPropertyDetails(gridPosition.x, gridPosition.y);
 
-            InventoryManager.Instance.RemoveItem(InventoryLocation.Player, item.ItemCode);
-
-            if (InventoryManager.Instance.FindItemInInventory(InventoryLocation.Player, item.ItemCode) == -1)
+            // 如果网格上可放置物品
+            if (gridPropertyDetails != null && gridPropertyDetails.canDropItem)
             {
-                ClearSelectedItem();
+                GameObject itemGameObject = Instantiate(_itemPrefab, dropPosition, Quaternion.identity, _parentItem);
+                ItemUnit item = itemGameObject.GetComponent<ItemUnit>();
+                item.ItemCode = itemDetails.itemCode;
+
+                InventoryManager.Instance.RemoveItem(InventoryLocation.Player, item.ItemCode);
+
+                if (InventoryManager.Instance.FindItemInInventory(InventoryLocation.Player, item.ItemCode) == -1)
+                {
+                    ClearSelectedItem();
+                }
             }
         }
 
