@@ -6,8 +6,9 @@ using Assets.Scripts.Inventory;
 using Assets.Scripts.Item;
 using Assets.Scripts.Misc;
 using Assets.Scripts.Scene;
-using Assets.Scripts.TimeSystem;
+using Assets.Scripts.UI;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Assets.Scripts.Player
 {
@@ -17,6 +18,9 @@ namespace Assets.Scripts.Player
     {
         // 动画覆盖
         private AnimationOverrides _animationOverrides;
+
+        // 网格光标高亮
+        private GridCursorHighlight _gridCursorHighlight;
 
         // 基本移动输入
         private float _inputX;
@@ -88,6 +92,11 @@ namespace Assets.Scripts.Player
             _mainCamera = Camera.main;
         }
 
+        private void Start()
+        {
+            _gridCursorHighlight = FindObjectOfType<GridCursorHighlight>();
+        }
+
         private void Update()
         {
             #region 处理输入
@@ -97,8 +106,7 @@ namespace Assets.Scripts.Player
                 ResetAnimationTriggers();
                 PlayerMovementInput();
                 PlayerWalkInput();
-
-                TestInput();
+                PlayerClickInput();
 
                 SetMovementParameters();
                 EventHandler.CallMovementEvent(_parameters);
@@ -110,14 +118,6 @@ namespace Assets.Scripts.Player
         private void FixedUpdate()
         {
             PlayerMovement();
-        }
-
-        private void TestInput()
-        {
-            if (Input.GetKey(KeyCode.L))
-            {
-                SceneControllerManager.Instance.FadeAndLoadScene(SceneName.Farm.ToString(), transform.position);
-            }
         }
 
         public void DisablePlayerInputAndResetMovement()
@@ -198,6 +198,40 @@ namespace Assets.Scripts.Player
                 _isWalking = true;
                 _isIdle = false;
                 _movementSpeed = Settings.walkingSpeed;
+            }
+        }
+
+        private void PlayerClickInput()
+        {
+            if (Input.GetMouseButton(0) && _gridCursorHighlight.CursorEnabled)
+            {
+                ProcessPlayerClickInput();
+            }
+        }
+
+        private void ProcessPlayerClickInput()
+        {
+            ResetMovement();
+
+            ItemDetails itemDetails = InventoryManager.Instance.GetSelectedInventoryItemDetails(InventoryLocation.Player);
+
+            if (itemDetails == null)
+                return;
+
+            // 只处理Seed和Commodity类型的物品
+            if ((itemDetails.itemType != ItemType.Seed
+                && itemDetails.itemType != ItemType.Commodity)
+                || !Input.GetMouseButtonDown(0))
+                return;
+
+            DropItem(itemDetails);
+        }
+
+        private void DropItem(ItemDetails itemDetails)
+        {
+            if (itemDetails.canBeDropped && _gridCursorHighlight.CursorPositionIsValid)
+            {
+                EventHandler.CallDropSelectedItemEvent();
             }
         }
 

@@ -144,28 +144,13 @@ namespace Assets.Scripts.UI
                 return;
             }
 
-            switch (itemDetails.itemType)
+            // 只处理Seed和Commodity类型的物品
+            if (itemDetails.itemType != ItemType.Seed && itemDetails.itemType != ItemType.Commodity)
+                return;
+
+            if (!IsCursorValidToDropItem(gridPropertyDetails))
             {
-                case ItemType.Seed:
-                    if (!IsCursorValidToDropItem(gridPropertyDetails))
-                    {
-                        SetCursorToInvalid();
-                        return;
-                    }
-                    break;
-                case ItemType.Commodity:
-                    if (!IsCursorValidToDropItem(gridPropertyDetails))
-                    {
-                        SetCursorToInvalid();
-                        return;
-                    }
-                    break;
-                case ItemType.None:
-                    break;
-                case ItemType.Count:
-                    break;
-                default:
-                    break;
+                SetCursorToInvalid();
             }
         }
 
