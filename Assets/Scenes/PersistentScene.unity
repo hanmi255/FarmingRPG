@@ -152,11 +152,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 764e2d087ae288d4dad3813a2efff7cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  grid: {fileID: 0}
   _so_gridPropertiesArray:
   - {fileID: 11400000, guid: 56efa68254622994a943690b47c96f33, type: 2}
   - {fileID: 11400000, guid: aaf6009c044b0124ab3a8c985309fdb1, type: 2}
   - {fileID: 11400000, guid: 8807ae01dd1da7d498c3a012bc4f846d, type: 2}
+  dugGround:
+  - {fileID: 11400000, guid: 1946ccd65d381de44afc6a6a03e17c8b, type: 2}
+  - {fileID: 11400000, guid: 6b17976c424729a4f812e3df549a07a2, type: 2}
+  - {fileID: 11400000, guid: 5f9ee2f2ca53b6349bfc490f83986ee3, type: 2}
+  - {fileID: 11400000, guid: 185c5a8ca44af9647ab97419e9246ed7, type: 2}
+  - {fileID: 11400000, guid: 71ee887264a727547a63dcc6718503cc, type: 2}
+  - {fileID: 11400000, guid: 97b916cc81972c240bba591b6a5dc131, type: 2}
+  - {fileID: 11400000, guid: 412d9be6034e09c48a68abb719e989d7, type: 2}
+  - {fileID: 11400000, guid: 67af7836345eb82488e4a5b16b706974, type: 2}
+  - {fileID: 11400000, guid: fe9a3c0d4af0060408346e016be2a475, type: 2}
+  - {fileID: 11400000, guid: 14485a0891f2dd849b9a2c341ca3141b, type: 2}
+  - {fileID: 11400000, guid: 04405b49ad5922941bbc6174d0122536, type: 2}
+  - {fileID: 11400000, guid: 1a946eb565d8b334dbfbe0339da845fa, type: 2}
+  - {fileID: 11400000, guid: 1adbca46d484baf40972643a16a5bc19, type: 2}
+  - {fileID: 11400000, guid: f9193658716409045b58f23dc7b35547, type: 2}
+  - {fileID: 11400000, guid: 60e713b773034b2408ab9b95fa3499d6, type: 2}
+  - {fileID: 11400000, guid: 7dbea6d890c966c498b7442cc25169ae, type: 2}
 --- !u!114 &64426673
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1661,9 +1677,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fca9576b8c2d7c244ac874f806439af8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _fadeDuration: 1
   _fadeCanvasGroup: {fileID: 2073877635}
   _fadeImage: {fileID: 2073877632}
+  _fadeDuration: 1
   startingScene: 0
 --- !u!4 &959767286
 Transform:

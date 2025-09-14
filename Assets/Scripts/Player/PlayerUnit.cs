@@ -514,6 +514,8 @@ namespace Assets.Scripts.Player
 
             GridPropertyManager.Instance.SetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY, gridPropertyDetails);
 
+            GridPropertyManager.Instance.DisplayDugGround(gridPropertyDetails);
+
             // 等待动画后延迟
             yield return _afterUseToolAnimationPause;
 

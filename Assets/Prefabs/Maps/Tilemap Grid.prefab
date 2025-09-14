@@ -538,7 +538,7 @@ GameObject:
   - component: {fileID: 1971268851975794843}
   m_Layer: 0
   m_Name: Ground Decoration 1
-  m_TagString: Untagged
+  m_TagString: GroundDecoration1
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3202,7 +3202,7 @@ GameObject:
   - component: {fileID: 199344970574606603}
   m_Layer: 0
   m_Name: Ground Decoration 2
-  m_TagString: Untagged
+  m_TagString: GroundDecoration2
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
