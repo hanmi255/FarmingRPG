@@ -7,23 +7,41 @@ namespace Assets.Scripts.Animation
     [RequireComponent(typeof(Animator))]
     public class MovementAnimationParameterControl : MonoBehaviour
     {
+        #region Fields
         private Animator _animator;  // 动画控制器
+        #endregion
 
+        #region Lifecycle Methods
+        /// <summary>
+        /// 在对象初始化时获取Animator组件引用
+        /// </summary>
         private void Awake()
         {
             _animator = GetComponent<Animator>();
         }
 
+        /// <summary>
+        /// 当启用对象时订阅移动事件
+        /// </summary>
         private void OnEnable()
         {
             EventHandler.MovementEvent += SetAnimationParameters;
         }
 
+        /// <summary>
+        /// 当禁用对象时取消订阅移动事件
+        /// </summary>
         private void OnDisable()
         {
             EventHandler.MovementEvent -= SetAnimationParameters;
         }
+        #endregion
 
+        #region Event Handlers
+        /// <summary>
+        /// 设置动画参数以响应移动事件
+        /// </summary>
+        /// <param name="movementParams">移动参数</param>
         private void SetAnimationParameters(MovementParameters movementParams)
         {
             // 基本移动输入
@@ -58,7 +76,18 @@ namespace Assets.Scripts.Animation
                 movementParams.isIdleUp, movementParams.isIdleDown,
                 movementParams.isIdleLeft, movementParams.isIdleRight);
         }
+        #endregion
 
+        #region Private Methods
+        /// <summary>
+        /// 设置方向性触发器
+        /// </summary>
+        /// <param name="movementParams">移动参数</param>
+        /// <param name="actionType">动作类型</param>
+        /// <param name="isUp">是否向上</param>
+        /// <param name="isDown">是否向下</param>
+        /// <param name="isLeft">是否向左</param>
+        /// <param name="isRight">是否向右</param>
         private void SetDirectionalTriggers(MovementParameters movementParams, Settings.ActionType actionType,
             bool isUp, bool isDown, bool isLeft, bool isRight)
         {
@@ -80,9 +109,13 @@ namespace Assets.Scripts.Animation
             }
         }
 
+        /// <summary>
+        /// 动画事件：播放脚步声
+        /// </summary>
         private void AnimationEventPlayFootstepSound()
         {
 
         }
+        #endregion
     }
 }

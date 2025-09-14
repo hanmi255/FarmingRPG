@@ -2,7 +2,6 @@ using Assets.Scripts.Enums;
 using Assets.Scripts.Events;
 using Assets.Scripts.Inventory;
 using Assets.Scripts.Item;
-using Assets.Scripts.Map;
 using Assets.Scripts.Misc;
 using Assets.Scripts.Player;
 using TMPro;
@@ -12,27 +11,38 @@ using UnityEngine.UI;
 
 namespace Assets.Scripts.UI.UIInventory
 {
+    /// <summary>
+    /// UI物品栏插槽类 - 负责处理物品栏中单个插槽的显示和交互逻辑
+    /// </summary>
     public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
     {
+        #region Fields
+
+        [SerializeField] private UIInventoryBar _inventoryBar = null;
+        [SerializeField] private GameObject _inventoryTextBoxPrefab = null;
+        [SerializeField] private GameObject _itemPrefab = null;
+        [SerializeField] private int _slotNumber = 0;
+
+        public Image inventorySlotHighlight;
+        public Image inventorySlotImage;
+        public TextMeshProUGUI textMeshProUGUI;
+
+        [HideInInspector] public bool isSelected = false;
+        [HideInInspector] public ItemDetails itemDetails;
+        [HideInInspector] public int itemQuantity;
+
         private Camera _mainCamera;
         private Canvas _parentCanvas;
         private Transform _parentItem;
         private GridCursorHighlight _gridCursorHighlight;
         private GameObject _draggedItem;
 
-        public Image inventorySlotHighlight;
-        public Image inventorySlotImage;
-        public TextMeshProUGUI textMeshProUGUI;
-        [SerializeField] private UIInventoryBar _inventoryBar = null;
-        [SerializeField] private GameObject _inventoryTextBoxPrefab = null;
-        [HideInInspector] public bool isSelected = false;
-        [HideInInspector] public ItemDetails itemDetails;
-        [SerializeField] private GameObject _itemPrefab = null;
-        [HideInInspector] public int itemQuantity;
-        [SerializeField] private int _slotNumber = 0;
-
         private TextParameters _textParameters;
         private string _itemTypeDescription;
+
+        #endregion
+
+        #region Lifecycle Methods
 
         private void Awake()
         {
@@ -57,21 +67,14 @@ namespace Assets.Scripts.UI.UIInventory
             _gridCursorHighlight = FindObjectOfType<GridCursorHighlight>();
         }
 
-        private void SetTextParameters()
-        {
-            _itemTypeDescription = InventoryManager.Instance.GetItemTypeDescription(itemDetails.itemType);
+        #endregion
 
-            _textParameters = new()
-            {
-                textTop1 = itemDetails.itemName,
-                textTop2 = _itemTypeDescription,
-                textTop3 = "",
-                textBottom1 = itemDetails.itemDescription,
-                textBottom2 = "",
-                textBottom3 = "",
-            };
-        }
+        #region Public Methods
 
+        /// <summary>
+        /// 开始拖拽操作
+        /// </summary>
+        /// <param name="eventData">指针事件数据</param>
         public void OnBeginDrag(PointerEventData eventData)
         {
             if (itemDetails == null)
@@ -87,6 +90,10 @@ namespace Assets.Scripts.UI.UIInventory
             SetSelectedItem();
         }
 
+        /// <summary>
+        /// 拖拽过程中更新物品位置
+        /// </summary>
+        /// <param name="eventData">指针事件数据</param>
         public void OnDrag(PointerEventData eventData)
         {
             if (_draggedItem == null)
@@ -95,6 +102,10 @@ namespace Assets.Scripts.UI.UIInventory
             _draggedItem.transform.position = Input.mousePosition;
         }
 
+        /// <summary>
+        /// 结束拖拽操作
+        /// </summary>
+        /// <param name="eventData">指针事件数据</param>
         public void OnEndDrag(PointerEventData eventData)
         {
             if (_draggedItem == null)
@@ -121,32 +132,10 @@ namespace Assets.Scripts.UI.UIInventory
             PlayerUnit.Instance.EnablePlayerInput();
         }
 
-        private void DropSelectedItemAtMousePosition()
-        {
-            // 只有当选中的物品是当前槽位的物品时才执行放置操作
-            if (itemDetails == null || !isSelected)
-                return;
-
-            // 如果光标位置无效，则返回
-            // 否则放置物品
-            if (!_gridCursorHighlight.CursorPositionIsValid)
-                return;
-
-            Vector3 worldPosition = _mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -_mainCamera.transform.position.z));
-            Vector3 dropPosition = new(worldPosition.x, worldPosition.y - Settings.gridCellSize / 2f, 0);
-
-            GameObject itemGameObject = Instantiate(_itemPrefab, dropPosition, Quaternion.identity, _parentItem);
-            ItemUnit item = itemGameObject.GetComponent<ItemUnit>();
-            item.ItemCode = itemDetails.itemCode;
-
-            InventoryManager.Instance.RemoveItem(InventoryLocation.Player, item.ItemCode);
-
-            if (InventoryManager.Instance.FindItemInInventory(InventoryLocation.Player, item.ItemCode) == -1)
-            {
-                ClearSelectedItem();
-            }
-        }
-
+        /// <summary>
+        /// 鼠标指针进入插槽区域
+        /// </summary>
+        /// <param name="eventData">指针事件数据</param>
         public void OnPointerEnter(PointerEventData eventData)
         {
             if (itemQuantity == 0)
@@ -178,19 +167,19 @@ namespace Assets.Scripts.UI.UIInventory
             _inventoryBar.inventoryTextBoxGameobject.transform.position = textBoxPosition;
         }
 
+        /// <summary>
+        /// 鼠标指针离开插槽区域
+        /// </summary>
+        /// <param name="eventData">指针事件数据</param>
         public void OnPointerExit(PointerEventData eventData)
         {
             DestoryInventoryTextBox();
         }
 
-        private void DestoryInventoryTextBox()
-        {
-            if (_inventoryBar.inventoryTextBoxGameobject == null)
-                return;
-
-            Destroy(_inventoryBar.inventoryTextBoxGameobject);
-        }
-
+        /// <summary>
+        /// 鼠标点击插槽
+        /// </summary>
+        /// <param name="eventData">指针事件数据</param>
         public void OnPointerClick(PointerEventData eventData)
         {
             if (eventData.button != PointerEventData.InputButton.Left)
@@ -209,6 +198,71 @@ namespace Assets.Scripts.UI.UIInventory
             }
         }
 
+        #endregion
+
+        #region Private Methods
+
+        /// <summary>
+        /// 设置文本参数
+        /// </summary>
+        private void SetTextParameters()
+        {
+            _itemTypeDescription = InventoryManager.Instance.GetItemTypeDescription(itemDetails.itemType);
+
+            _textParameters = new()
+            {
+                textTop1 = itemDetails.itemName,
+                textTop2 = _itemTypeDescription,
+                textTop3 = "",
+                textBottom1 = itemDetails.itemDescription,
+                textBottom2 = "",
+                textBottom3 = "",
+            };
+        }
+
+        /// <summary>
+        /// 在鼠标位置放置选中的物品
+        /// </summary>
+        private void DropSelectedItemAtMousePosition()
+        {
+            // 只有当选中的物品是当前槽位的物品时才执行放置操作
+            if (itemDetails == null || !isSelected)
+                return;
+
+            // 如果光标位置无效，则返回
+            // 否则放置物品
+            if (!_gridCursorHighlight.CursorPositionIsValid)
+                return;
+
+            Vector3 worldPosition = _mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -_mainCamera.transform.position.z));
+            Vector3 dropPosition = new(worldPosition.x, worldPosition.y - Settings.gridCellSize / 2f, 0);
+
+            GameObject itemGameObject = Instantiate(_itemPrefab, dropPosition, Quaternion.identity, _parentItem);
+            ItemUnit item = itemGameObject.GetComponent<ItemUnit>();
+            item.ItemCode = itemDetails.itemCode;
+
+            InventoryManager.Instance.RemoveItem(InventoryLocation.Player, item.ItemCode);
+
+            if (InventoryManager.Instance.FindItemInInventory(InventoryLocation.Player, item.ItemCode) == -1)
+            {
+                ClearSelectedItem();
+            }
+        }
+
+        /// <summary>
+        /// 销毁物品信息文本框
+        /// </summary>
+        private void DestoryInventoryTextBox()
+        {
+            if (_inventoryBar.inventoryTextBoxGameobject == null)
+                return;
+
+            Destroy(_inventoryBar.inventoryTextBoxGameobject);
+        }
+
+        /// <summary>
+        /// 设置选中物品
+        /// </summary>
         private void SetSelectedItem()
         {
             _inventoryBar.ClearHighlightOnInventorySlots();
@@ -239,6 +293,9 @@ namespace Assets.Scripts.UI.UIInventory
             }
         }
 
+        /// <summary>
+        /// 清除选中物品
+        /// </summary>
         private void ClearSelectedItem()
         {
             ClearCusors();
@@ -250,15 +307,23 @@ namespace Assets.Scripts.UI.UIInventory
             PlayerUnit.Instance.ClearCarriedItem();
         }
 
+        /// <summary>
+        /// 清除光标显示
+        /// </summary>
         private void ClearCusors()
         {
             _gridCursorHighlight.DisableCursor();
             _gridCursorHighlight.SelectedItemType = ItemType.None;
         }
 
+        /// <summary>
+        /// 场景加载完成后获取物品父级变换组件
+        /// </summary>
         private void AfterSceneLoad()
         {
             _parentItem = GameObject.FindGameObjectWithTag(Tags.ItemsParentTransform).transform;
         }
+
+        #endregion
     }
 }

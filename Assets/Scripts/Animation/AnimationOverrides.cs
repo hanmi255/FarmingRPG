@@ -6,13 +6,25 @@ namespace Assets.Scripts.Animation
 {
     public class AnimationOverrides : MonoBehaviour
     {
+        #region Fields
+
+        #region Serialization Fields
         [SerializeField] private GameObject _character = null;
         [SerializeField] private SO_AnimationType[] so_AnimationTypes = null;
+        #endregion
 
+        #region Private Fields
         private Dictionary<AnimationClip, SO_AnimationType> _animationTypeDictionaryByAnimationClip;
         private Dictionary<string, SO_AnimationType> _animationTypeDictionaryByCompositeAttributeKey;
         private Animator[] _animators;
+        #endregion
 
+        #endregion
+
+        #region Lifecycle Methods
+        /// <summary>
+        /// 初始化动画类型字典和获取角色的所有Animator组件
+        /// </summary>
         private void Start()
         {
             if (so_AnimationTypes == null || so_AnimationTypes.Length == 0) return;
@@ -33,7 +45,13 @@ namespace Assets.Scripts.Animation
             // 预先获取所有Animator以提高查找效率
             _animators = _character.GetComponentsInChildren<Animator>();
         }
+        #endregion
 
+        #region Public Methods
+        /// <summary>
+        /// 应用角色自定义参数到所有指定的角色属性
+        /// </summary>
+        /// <param name="characterAttributes">角色属性列表</param>
         public void ApplyCharacterCustomisationParameters(List<CharacterAttribute> characterAttributes)
         {
             foreach (var attribute in characterAttributes)
@@ -41,7 +59,13 @@ namespace Assets.Scripts.Animation
                 ApplyAttributeCustomisation(attribute);
             }
         }
+        #endregion
 
+        #region Private Methods
+        /// <summary>
+        /// 应用单个属性的自定义设置
+        /// </summary>
+        /// <param name="attribute">角色属性</param>
         private void ApplyAttributeCustomisation(CharacterAttribute attribute)
         {
             Animator currentAnimator = FindAnimator(attribute.characterPartAnimator);
@@ -61,6 +85,11 @@ namespace Assets.Scripts.Animation
             currentAnimator.runtimeAnimatorController = controller;
         }
 
+        /// <summary>
+        /// 根据角色部位查找对应的Animator组件
+        /// </summary>
+        /// <param name="characterPartAnimator">角色部位动画器枚举</param>
+        /// <returns>找到的Animator组件，未找到则返回null</returns>
         private Animator FindAnimator(CharacterPartAnimator characterPartAnimator)
         {
             string animationSOAssetName = characterPartAnimator.ToString();
@@ -77,6 +106,12 @@ namespace Assets.Scripts.Animation
             return null;
         }
 
+        /// <summary>
+        /// 生成动画覆盖键值对列表
+        /// </summary>
+        /// <param name="attribute">角色属性</param>
+        /// <param name="controller">动画控制器</param>
+        /// <returns>动画覆盖键值对列表</returns>
         private List<KeyValuePair<AnimationClip, AnimationClip>> GenerateAnimationOverrides(
             CharacterAttribute attribute, AnimatorOverrideController controller)
         {
@@ -105,5 +140,6 @@ namespace Assets.Scripts.Animation
 
             return animsKeyValuePairs;
         }
+        #endregion
     }
 }

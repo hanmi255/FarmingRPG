@@ -5,8 +5,14 @@ using UnityEngine;
 
 namespace Assets.Scripts.TimeSystem
 {
+    /// <summary>
+    /// 时间管理器 - 负责游戏内时间的推进和管理
+    /// </summary>
     public class TimeManager : SingletonMonoBehaviour<TimeManager>
     {
+        #region Fields
+
+        // 游戏时间相关字段
         private int _gameYear = 1;
         private Season _gameSeason = Season.Spring;
         private int _gameDay = 1;
@@ -18,6 +24,10 @@ namespace Assets.Scripts.TimeSystem
         private float _gameTick = 0f;
 
         private TimeEventParameters _parameters;
+
+        #endregion
+
+        #region Lifecycle Methods
 
         private void Start()
         {
@@ -33,6 +43,13 @@ namespace Assets.Scripts.TimeSystem
             GameTick();
         }
 
+        #endregion
+
+        #region Private Methods
+
+        /// <summary>
+        /// 游戏时间滴答更新
+        /// </summary>
         private void GameTick()
         {
             _gameTick += Time.deltaTime;
@@ -43,6 +60,9 @@ namespace Assets.Scripts.TimeSystem
             }
         }
 
+        /// <summary>
+        /// 更新游戏秒数
+        /// </summary>
         private void UpdateGameSecond()
         {
             _gameSecond++;
@@ -96,8 +116,13 @@ namespace Assets.Scripts.TimeSystem
             EventHandler.CallAdvanceGameYearEvent(_parameters);
         }
 
+        /// <summary>
+        /// 获取当前星期几
+        /// </summary>
+        /// <returns>星期几的字符串表示</returns>
         private string GetDayOfWeek()
         {
+            // 计算总天数并取模得到星期几
             int totalDays = (((int)_gameSeason) * 30) + _gameDay;
             int dayOfWeek = totalDays % 7;
             return dayOfWeek switch
@@ -113,6 +138,9 @@ namespace Assets.Scripts.TimeSystem
             };
         }
 
+        /// <summary>
+        /// 设置时间事件参数
+        /// </summary>
         private void SetTimeEventParameters()
         {
             _parameters = new TimeEventParameters
@@ -127,12 +155,6 @@ namespace Assets.Scripts.TimeSystem
             };
         }
 
-        public void TestAdvanceGameDay()
-        {
-            for (int i = 0; i < 86400; i++)
-            {
-                UpdateGameSecond();
-            }
-        }
+        #endregion
     }
 }

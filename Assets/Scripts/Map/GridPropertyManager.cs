@@ -8,18 +8,61 @@ using UnityEngine;
 
 namespace Assets.Scripts.Map
 {
+    /// <summary>
+    /// 网格属性管理器，负责管理游戏场景中网格的各种属性，如可挖掘、可放置家具等
+    /// </summary>
     [RequireComponent(typeof(GenerateGUID))]
     public class GridPropertyManager : SingletonMonoBehaviour<GridPropertyManager>, ISaveble
     {
+        #region Fields
+
         [HideInInspector] public Grid grid;
+
+        /// <summary>
+        /// 网格属性详情字典，用于存储场景中各个网格的属性信息
+        /// </summary>
         private Dictionary<string, GridPropertyDetails> _gridPropertyDetailsDictionary;
+
+        /// <summary>
+        /// 网格属性配置数组，包含各个场景的网格属性配置
+        /// </summary>
         [SerializeField] private SO_GridProperties[] _so_gridPropertiesArray = null;
 
-        private string _iSaveableUniqueID;
-        public string ISaveableUniqueID { get => _iSaveableUniqueID; set => _iSaveableUniqueID = value; }
+        /// <summary>
+        /// 可保存对象的唯一ID
+        /// </summary>
+        private string _ISaveableUniqueID;
 
+        /// <summary>
+        /// 游戏对象保存数据
+        /// </summary>
         private GameObjectSave _gameObjectSave;
-        public GameObjectSave GameObjectSave { get => _gameObjectSave; set => _gameObjectSave = value; }
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// ISaveable接口的唯一ID属性
+        /// </summary>
+        public string ISaveableUniqueID 
+        { 
+            get => _ISaveableUniqueID; 
+            set => _ISaveableUniqueID = value; 
+        }
+
+        /// <summary>
+        /// ISaveable接口的游戏对象保存数据属性
+        /// </summary>
+        public GameObjectSave GameObjectSave 
+        { 
+            get => _gameObjectSave; 
+            set => _gameObjectSave = value; 
+        }
+
+        #endregion
+
+        #region Lifecycle Methods
 
         protected override void Awake()
         {
@@ -45,15 +88,30 @@ namespace Assets.Scripts.Map
             InitialiseGridProperties();
         }
 
+        #endregion
+
+        #region ISaveable Interface Methods
+
+        /// <summary>
+        /// 注册可保存对象到保存管理器
+        /// </summary>
         public void ISaveableRegister()
         {
             SaveLoadManager.Instance.iSaveableObjectList.Add(this);
         }
+
+        /// <summary>
+        /// 从保存管理器中注销可保存对象
+        /// </summary>
         public void ISaveableDeregister()
         {
             SaveLoadManager.Instance.iSaveableObjectList.Remove(this);
         }
 
+        /// <summary>
+        /// 存储场景数据
+        /// </summary>
+        /// <param name="sceneName">场景名称</param>
         public void ISaveableStoreScene(string sceneName)
         {
             GameObjectSave.sceneData.Remove(sceneName);
@@ -66,6 +124,10 @@ namespace Assets.Scripts.Map
             GameObjectSave.sceneData.Add(sceneName, sceneSave);
         }
 
+        /// <summary>
+        /// 恢复场景数据
+        /// </summary>
+        /// <param name="sceneName">场景名称</param>
         public void ISaveableRestoreScene(string sceneName)
         {
             if (!GameObjectSave.sceneData.TryGetValue(sceneName, out var sceneSave))
@@ -77,10 +139,21 @@ namespace Assets.Scripts.Map
             _gridPropertyDetailsDictionary = sceneSave.gridPropertyDetailsDictionary;
         }
 
+        #endregion
+
+        #region Event Handlers
+
+        /// <summary>
+        /// 场景加载完成后的处理函数
+        /// </summary>
         private void AfterSceneLoad()
         {
             grid = FindObjectOfType<Grid>();
         }
+
+        #endregion
+
+        #region Grid Property Management Methods
 
         /// <summary>
         /// 初始化网格属性字典，将SO_GridProperties中的数据转换为可保存的字典格式
@@ -149,6 +222,13 @@ namespace Assets.Scripts.Map
             }
         }
 
+        /// <summary>
+        /// 获取指定坐标的网格属性详情（从指定字典中获取）
+        /// </summary>
+        /// <param name="gridX">网格X坐标</param>
+        /// <param name="gridY">网格Y坐标</param>
+        /// <param name="gridPropertyDetailsDictionary">网格属性详情字典</param>
+        /// <returns>网格属性详情对象，如果不存在则返回null</returns>
         public GridPropertyDetails GetGridPropertyDetails(int gridX, int gridY, Dictionary<string, GridPropertyDetails> gridPropertyDetailsDictionary)
         {
             string key = "x" + gridX + "y" + gridY;
@@ -163,11 +243,24 @@ namespace Assets.Scripts.Map
             }
         }
 
+        /// <summary>
+        /// 获取指定坐标的网格属性详情（从当前场景字典中获取）
+        /// </summary>
+        /// <param name="gridX">网格X坐标</param>
+        /// <param name="gridY">网格Y坐标</param>
+        /// <returns>网格属性详情对象</returns>
         public GridPropertyDetails GetGridPropertyDetails(int gridX, int gridY)
         {
             return GetGridPropertyDetails(gridX, gridY, _gridPropertyDetailsDictionary);
         }
 
+        /// <summary>
+        /// 设置指定坐标的网格属性详情（到指定字典中设置）
+        /// </summary>
+        /// <param name="gridX">网格X坐标</param>
+        /// <param name="gridY">网格Y坐标</param>
+        /// <param name="gridPropertyDetails">网格属性详情对象</param>
+        /// <param name="gridPropertyDetailsDictionary">网格属性详情字典</param>
         public void SetGridPropertyDetails(int gridX, int gridY, GridPropertyDetails gridPropertyDetails, Dictionary<string, GridPropertyDetails> gridPropertyDetailsDictionary)
         {
             string key = "x" + gridX + "y" + gridY;
@@ -178,9 +271,17 @@ namespace Assets.Scripts.Map
             gridPropertyDetailsDictionary[key] = gridPropertyDetails;
         }
 
+        /// <summary>
+        /// 设置指定坐标的网格属性详情（到当前场景字典中设置）
+        /// </summary>
+        /// <param name="gridX">网格X坐标</param>
+        /// <param name="gridY">网格Y坐标</param>
+        /// <param name="gridPropertyDetails">网格属性详情对象</param>
         public void SetGridPropertyDetails(int gridX, int gridY, GridPropertyDetails gridPropertyDetails)
         {
             SetGridPropertyDetails(gridX, gridY, gridPropertyDetails, _gridPropertyDetailsDictionary);
         }
+
+        #endregion
     }
 }

@@ -1,6 +1,9 @@
 namespace Assets.Scripts.Enums
 {
-    public enum AnimationName  // 动画名称
+    /// <summary>
+    /// 动画名称枚举，定义角色的所有可能动画状态
+    /// </summary>
+    public enum AnimationName
     {
         // 空闲动画
         IdleUp,
@@ -49,9 +52,13 @@ namespace Assets.Scripts.Enums
         PickDown,
         PickLeft,
         PickRight,
+
         Count
     }
 
+    /// <summary>
+    /// 角色部位动画器枚举，定义角色的各个可动画部位
+    /// </summary>
     public enum CharacterPartAnimator
     {
         Hat,
@@ -62,25 +69,36 @@ namespace Assets.Scripts.Enums
         Count
     }
 
+    /// <summary>
+    /// 部位变体颜色枚举，定义角色部位的颜色变体
+    /// </summary>
     public enum PartVariantColour
     {
         None,
         Count
     }
 
+    /// <summary>
+    /// 部位变体类型枚举，定义角色部位的类型变体
+    /// </summary>
     public enum PartVariantType
     {
         None,
+
         Carry,
         Hoe,
         Pickaxe,
         Axe,
         Scythe,
         WateringCan,
+
         Count
     }
 
-    public enum GridBoolProperty  // 网格 boolean 属性
+    /// <summary>
+    /// 网格布尔属性枚举，定义网格单元格的布尔属性类型
+    /// </summary>
+    public enum GridBoolProperty
     {
         Diggable,
         CanDropItem,
@@ -89,37 +107,54 @@ namespace Assets.Scripts.Enums
         IsNPCObstacle
     }
 
-    public enum InventoryLocation  // 背包位置
+    /// <summary>
+    /// 背包位置枚举，定义物品存储的位置
+    /// </summary>
+    public enum InventoryLocation
     {
         Player,
         Chest,
+
         Count
     }
 
-    public enum SceneName  // 场景名称
+    /// <summary>
+    /// 场景名称枚举，定义游戏中的场景
+    /// </summary>
+    public enum SceneName
     {
         Farm,
         Field,
         CabinHome
     }
 
-    public enum Season  // 季节
+    /// <summary>
+    /// 季节枚举，定义游戏中的季节
+    /// </summary>
+    public enum Season
     {
         None,
         Spring,
         Summer,
         Autumn,
         Winter,
+
         Count
     }
 
-    public enum ToolEffect  // 工具效果
+    /// <summary>
+    /// 工具效果枚举，定义工具使用时的效果类型
+    /// </summary>
+    public enum ToolEffect
     {
         None,
         Watering
     }
 
-    public enum Direction  // 方向
+    /// <summary>
+    /// 方向枚举，定义游戏中的基本方向
+    /// </summary>
+    public enum Direction
     {
         Up,
         Down,
@@ -127,9 +162,13 @@ namespace Assets.Scripts.Enums
         Right
     }
 
-    public enum ItemType  // 物品类型
+    /// <summary>
+    /// 物品类型枚举，定义游戏中物品的类型分类
+    /// </summary>
+    public enum ItemType
     {
         None,
+
         Seed,
         Commodity,
         WateringTool,
@@ -140,6 +179,7 @@ namespace Assets.Scripts.Enums
         CollectingTool,
         ReapableScenary,
         Furniture,
+
         Count
     }
 }
