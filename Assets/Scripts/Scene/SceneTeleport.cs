@@ -14,7 +14,6 @@ namespace Assets.Scripts.Scene
 
         private void OnTriggerStay2D(Collider2D collision)
         {
-            
             if (collision.TryGetComponent<PlayerUnit>(out var playerUnit))
             {
                 float xPosition = Mathf.Approximately(_spawnPosition.x, 0f) ? playerUnit.transform.position.x : _spawnPosition.x;

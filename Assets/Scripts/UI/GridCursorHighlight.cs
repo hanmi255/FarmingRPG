@@ -4,20 +4,29 @@ using Assets.Scripts.Inventory;
 using Assets.Scripts.Item;
 using Assets.Scripts.Map;
 using Assets.Scripts.Player;
+using Assets.Scripts.HelperClasses;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
+using Assets.Scripts.Misc;
 
 namespace Assets.Scripts.UI
 {
+    /// <summary>
+    /// 网格光标高亮类 - 负责在游戏场景中显示光标位置并验证光标位置的有效性
+    /// </summary>
     public class GridCursorHighlight : MonoBehaviour
     {
-        private Canvas _canvas;
-        private Grid _grid;
-        private Camera _mainCamera;
+        #region Fields
+
         [SerializeField] private Image _cursorImage = null;
         [SerializeField] private RectTransform _cursorRectTransform = null;
         [SerializeField] private Sprite _greenCursor = null;
         [SerializeField] private Sprite _redCursor = null;
+
+        private Canvas _canvas;
+        private Grid _grid;
+        private Camera _mainCamera;
 
         private bool _cursorPositionIsValid = false;
         public bool CursorPositionIsValid
@@ -47,6 +56,10 @@ namespace Assets.Scripts.UI
             set => _cursorEnabled = value;
         }
 
+        #endregion
+
+        #region Lifecycle Methods
+
         private void OnEnable()
         {
             EventHandler.AfterSceneLoadEvent += AfterSceneLoad;
@@ -71,23 +84,64 @@ namespace Assets.Scripts.UI
             DisplayCursor();
         }
 
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// 启用光标显示
+        /// </summary>
         public void EnableCursor()
         {
             _cursorImage.color = Color.white;
             _cursorEnabled = true;
         }
 
+        /// <summary>
+        /// 禁用光标显示
+        /// </summary>
         public void DisableCursor()
         {
             _cursorImage.color = Color.clear;
             _cursorEnabled = false;
         }
 
+        /// <summary>
+        /// 获取光标所在的网格位置
+        /// </summary>
+        /// <returns>光标所在的网格坐标</returns>
+        public Vector3Int GetGridPositionForCursor()
+        {
+            Vector3 worldPosition = _mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -_mainCamera.transform.position.z));
+
+            return _grid.WorldToCell(worldPosition);
+        }
+
+        /// <summary>
+        /// 获取玩家所在的网格位置
+        /// </summary>
+        /// <returns>玩家所在的网格坐标</returns>
+        public Vector3Int GetGridPositionForPlayer()
+        {
+            return _grid.WorldToCell(PlayerUnit.Instance.transform.position);
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        /// <summary>
+        /// 场景加载完成后获取网格组件
+        /// </summary>
         private void AfterSceneLoad()
         {
             _grid = FindObjectOfType<Grid>();
         }
 
+        /// <summary>
+        /// 显示光标并验证光标位置的有效性
+        /// </summary>
+        /// <returns>光标所在的网格坐标</returns>
         private Vector3Int DisplayCursor()
         {
             if (_grid == null)
@@ -104,18 +158,11 @@ namespace Assets.Scripts.UI
             return cursorGridPosition;
         }
 
-        private Vector3Int GetGridPositionForCursor()
-        {
-            Vector3 worldPosition = _mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -_mainCamera.transform.position.z));
-
-            return _grid.WorldToCell(worldPosition);
-        }
-
-        private Vector3Int GetGridPositionForPlayer()
-        {
-            return _grid.WorldToCell(PlayerUnit.Instance.transform.position);
-        }
-
+        /// <summary>
+        /// 设置光标有效性 - 根据物品类型和网格属性验证光标位置是否有效
+        /// </summary>
+        /// <param name="cursorGridPosition">光标网格位置</param>
+        /// <param name="playerGridPosition">玩家网格位置</param>
         private void SetCursorValidity(Vector3Int cursorGridPosition, Vector3Int playerGridPosition)
         {
             SetCursorToValid();
@@ -144,16 +191,43 @@ namespace Assets.Scripts.UI
                 return;
             }
 
-            // 只处理Seed和Commodity类型的物品
-            if (itemDetails.itemType != ItemType.Seed && itemDetails.itemType != ItemType.Commodity)
-                return;
-
-            if (!IsCursorValidToDropItem(gridPropertyDetails))
+            switch (itemDetails.itemType)
             {
-                SetCursorToInvalid();
+                case ItemType.Seed:
+                    if (!IsCursorValidToDropItem(gridPropertyDetails))
+                    {
+                        SetCursorToInvalid();
+                        return;
+                    }
+                    break;
+                case ItemType.Commodity:
+                    if (!IsCursorValidToDropItem(gridPropertyDetails))
+                    {
+                        SetCursorToInvalid();
+                        return;
+                    }
+                    break;
+                case ItemType.HoeingTool:
+                    if (!IsCursorValidToUseTool(gridPropertyDetails, itemDetails))
+                    {
+                        SetCursorToInvalid();
+                        return;
+                    }
+                    break;
+                case ItemType.None:
+                    break;
+                case ItemType.Count:
+                    break;
+                default:
+                    break;
             }
         }
 
+        /// <summary>
+        /// 获取光标在屏幕上的RectTransform位置
+        /// </summary>
+        /// <param name="gridPosition">网格位置</param>
+        /// <returns>光标在屏幕上的位置</returns>
         private Vector3 GetRectTransformPositionForCursor(Vector3Int gridPosition)
         {
             Vector3 gridWorldPosition = _grid.CellToWorld(gridPosition);
@@ -162,21 +236,77 @@ namespace Assets.Scripts.UI
             return RectTransformUtility.PixelAdjustPoint(gridScreenPosition, _cursorRectTransform, _canvas);
         }
 
+        /// <summary>
+        /// 设置光标为有效状态（绿色）
+        /// </summary>
         private void SetCursorToValid()
         {
             _cursorImage.sprite = _greenCursor;
             CursorPositionIsValid = true;
         }
 
+        /// <summary>
+        /// 设置光标为无效状态（红色）
+        /// </summary>
         private void SetCursorToInvalid()
         {
             _cursorImage.sprite = _redCursor;
             CursorPositionIsValid = false;
         }
 
+        /// <summary>
+        /// 检查光标位置是否可以放置物品
+        /// </summary>
+        /// <param name="gridPropertyDetails">网格属性详情</param>
+        /// <returns>是否可以放置物品</returns>
         private bool IsCursorValidToDropItem(GridPropertyDetails gridPropertyDetails)
         {
             return gridPropertyDetails.canDropItem;
         }
+
+        /// <summary>
+        /// 检查光标位置是否可以使用工具
+        /// </summary>
+        /// <param name="gridPropertyDetails">网格属性详情</param>
+        /// <param name="itemDetails">物品详情</param>
+        /// <returns>是否可以使用工具</returns>
+        private bool IsCursorValidToUseTool(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails)
+        {
+            switch (itemDetails.itemType)
+            {
+                case ItemType.HoeingTool:
+                    // 检查地块是否可挖掘且未被挖掘过
+                    if (!gridPropertyDetails.isDiggable || gridPropertyDetails.daysSinceLastDig != -1)
+                        return false;
+
+                    Vector3 cursorWorldPosition = new(GetWorldPositionForCursor().x + 0.5f, GetWorldPositionForCursor().y + 0.5f, 0f);
+                    HelperMethods.GetComponentsAtBoxLocation(out List<ItemUnit> itemList, cursorWorldPosition, Settings.cursorSize, 0f);
+
+                    // 检查区域内是否有可收割的物品
+                    foreach (ItemUnit itemUnit in itemList)
+                    {
+                        ItemDetails itemDetail = InventoryManager.Instance.GetItemDetails(itemUnit.ItemCode);
+                        if (itemDetail != null && itemDetail.itemType == ItemType.ReapableScenary)
+                        {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// 获取光标的屏幕世界坐标
+        /// </summary>
+        /// <returns>光标的屏幕世界坐标</returns>
+        private Vector3 GetWorldPositionForCursor()
+        {
+            return _grid.CellToWorld(GetGridPositionForCursor());
+        }
+
+        #endregion
     }
 }

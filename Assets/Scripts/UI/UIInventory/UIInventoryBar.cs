@@ -8,9 +8,14 @@ using UnityEngine;
 
 namespace Assets.Scripts.UI.UIInventory
 {
+    /// <summary>
+    /// UI物品栏类 - 负责管理玩家物品栏的显示和交互
+    /// </summary>
     [RequireComponent(typeof(RectTransform))]
     public class UIInventoryBar : MonoBehaviour
     {
+        #region Fields
+
         [SerializeField] private Sprite _blank16x16Sprite = null;
         [SerializeField] private UIInventorySlot[] _inventorySlots = null;
         public GameObject inventoryDraggedItem;
@@ -22,6 +27,10 @@ namespace Assets.Scripts.UI.UIInventory
             get => _isInventoryBarPositionAtBottom;
             set => _isInventoryBarPositionAtBottom = value;
         }
+
+        #endregion
+
+        #region Lifecycle Methods
 
         private void Awake()
         {
@@ -43,9 +52,52 @@ namespace Assets.Scripts.UI.UIInventory
             SwitchInventoryBarPosition();
         }
 
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// 设置物品栏插槽的高亮显示
+        /// </summary>
+        public void SetHighlightOnInventorySlots()
+        {
+            if (_inventorySlots == null || _inventorySlots.Length == 0)
+                return;
+
+            foreach (var slot in _inventorySlots)
+            {
+                SetHighlightSlot(slot);
+            }
+        }
+
+        /// <summary>
+        /// 清除物品栏插槽的高亮显示
+        /// </summary>
+        public void ClearHighlightOnInventorySlots()
+        {
+            if (_inventorySlots == null || _inventorySlots.Length == 0)
+                return;
+
+            foreach (var slot in _inventorySlots)
+            {
+                if (slot.isSelected)
+                {
+                    slot.isSelected = false;
+                    slot.inventorySlotHighlight.color = Color.clear;
+                    InventoryManager.Instance.ClearSelectedInventoryItem(InventoryLocation.Player);
+                }
+            }
+        }
+
+        #endregion
+
+        #region Private Methods
+
         /// <summary>
         /// 更新物品栏显示
         /// </summary>
+        /// <param name="inventoryLocation">物品栏位置</param>
+        /// <param name="inventoryList">物品列表</param>
         private void UpdateInventoryBar(InventoryLocation inventoryLocation, List<InventoryItem> inventoryList)
         {
             // 只更新玩家物品栏
@@ -93,6 +145,9 @@ namespace Assets.Scripts.UI.UIInventory
             }
         }
 
+        /// <summary>
+        /// 切换物品栏位置（顶部或底部）
+        /// </summary>
         private void SwitchInventoryBarPosition()
         {
             Vector3 playerViewportPosition = PlayerUnit.Instance.GetPlayerViewporPosition();
@@ -109,6 +164,9 @@ namespace Assets.Scripts.UI.UIInventory
             }
         }
 
+        /// <summary>
+        /// 将物品栏设置到底部位置
+        /// </summary>
         private void SetInventoryBarToBottom()
         {
             _rectTransform.pivot = new Vector2(0.5f, 0f);
@@ -119,6 +177,9 @@ namespace Assets.Scripts.UI.UIInventory
             IsInventoryBarPositionAtBottom = true;
         }
 
+        /// <summary>
+        /// 将物品栏设置到顶部位置
+        /// </summary>
         private void SetInventoryBarToTop()
         {
             _rectTransform.pivot = new Vector2(0.5f, 1f);
@@ -130,19 +191,9 @@ namespace Assets.Scripts.UI.UIInventory
         }
 
         /// <summary>
-        /// 设置高亮显示
+        /// 设置指定插槽的高亮显示
         /// </summary>
-        public void SetHighlightOnInventorySlots()
-        {
-            if (_inventorySlots == null || _inventorySlots.Length == 0)
-                return;
-
-            foreach (var slot in _inventorySlots)
-            {
-                SetHighlightSlot(slot);
-            }
-        }
-
+        /// <param name="slot">要设置高亮的插槽</param>
         private void SetHighlightSlot(UIInventorySlot slot)
         {
             if (slot.isSelected && slot.itemDetails != null)
@@ -152,23 +203,6 @@ namespace Assets.Scripts.UI.UIInventory
             }
         }
 
-        /// <summary>
-        /// 清除高亮显示
-        /// </summary>
-        public void ClearHighlightOnInventorySlots()
-        {
-            if (_inventorySlots == null || _inventorySlots.Length == 0)
-                return;
-
-            foreach (var slot in _inventorySlots)
-            {
-                if (slot.isSelected)
-                {
-                    slot.isSelected = false;
-                    slot.inventorySlotHighlight.color = Color.clear;
-                    InventoryManager.Instance.ClearSelectedInventoryItem(InventoryLocation.Player);
-                }
-            }
-        }
+        #endregion
     }
 }

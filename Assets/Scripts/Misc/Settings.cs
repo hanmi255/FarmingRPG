@@ -12,10 +12,13 @@ namespace Assets.Scripts.Misc
 
         // 瓦片地图
         public const float gridCellSize = 1.0f;
+        public static Vector2 cursorSize = Vector2.one;
 
         // 玩家数据
         public const float walkingSpeed = 2.666f;
         public const float runningSpeed = 5.333f;
+        public static float useToolAnimationPause = 0.25f;
+        public static float afterUseToolAnimationPause = 0.2f;
 
         // 背包容量
         public static int playerInitialInventoryCapacity = 24;

@@ -15,11 +15,17 @@ namespace Assets.Scripts.Scene
     /// </summary>
     public class SceneControllerManager : SingletonMonoBehaviour<SceneControllerManager>
     {
-        private bool _isFading;
-        [SerializeField] private float _fadeDuration = 1f;
+        #region Fields
+
         [SerializeField] private CanvasGroup _fadeCanvasGroup = null;
         [SerializeField] private Image _fadeImage = null;
+        [SerializeField] private float _fadeDuration = 1f;
         public SceneName startingScene;
+        private bool _isFading;
+
+        #endregion
+
+        #region Lifecycle Methods
 
         /// <summary>
         /// 初始化场景 - 在游戏开始时加载起始场景
@@ -43,9 +49,15 @@ namespace Assets.Scripts.Scene
             StartCoroutine(Fade(0f));
         }
 
+        #endregion
+
+        #region Public Methods
+
         /// <summary>
         /// 淡出并加载新场景
         /// </summary>
+        /// <param name="sceneName">要加载的场景名称</param>
+        /// <param name="spawnPosition">玩家在新场景中的生成位置</param>
         public void FadeAndLoadScene(string sceneName, Vector3 spawnPosition)
         {
             // 如果正在淡入淡出，则不执行新的场景切换
@@ -55,9 +67,15 @@ namespace Assets.Scripts.Scene
             StartCoroutine(FadeAndSwitchScenes(sceneName, spawnPosition));
         }
 
+        #endregion
+
+        #region Private Methods
+
         /// <summary>
         /// 淡入淡出并切换场景的核心逻辑
         /// </summary>
+        /// <param name="sceneName">要切换到的场景名称</param>
+        /// <param name="spawnPosition">玩家在新场景中的生成位置</param>
         private IEnumerator FadeAndSwitchScenes(string sceneName, Vector3 spawnPosition)
         {
             // 调用场景卸载前淡出事件
@@ -97,6 +115,7 @@ namespace Assets.Scripts.Scene
         /// <summary>
         /// 加载场景并设为激活状态
         /// </summary>
+        /// <param name="sceneName">要加载的场景名称</param>
         private IEnumerator LoadSceneAndSetActive(string sceneName)
         {
             // 异步加载场景（使用Additive模式）
@@ -112,6 +131,7 @@ namespace Assets.Scripts.Scene
         /// <summary>
         /// 淡入淡出效果实现
         /// </summary>
+        /// <param name="finalAlpha">淡入淡出的目标透明度</param>
         private IEnumerator Fade(float finalAlpha)
         {
             // 标记正在进行淡入淡出操作
@@ -136,5 +156,7 @@ namespace Assets.Scripts.Scene
             // 恢复射线检测（允许用户交互）
             _fadeCanvasGroup.blocksRaycasts = false;
         }
+
+        #endregion
     }
 }

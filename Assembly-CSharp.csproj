@@ -63,6 +63,7 @@
     <Compile Include="Assets\Scripts\SaveSystem\SaveLoadManager.cs" />
     <Compile Include="Assets\Scripts\Misc\SingletonMonoBehaviour.cs" />
     <Compile Include="Assets\Scripts\UI\UIInventory\UIInventoryBar.cs" />
+    <Compile Include="Assets\Scripts\HelperClasses\HelperMethods.cs" />
     <Compile Include="Assets\Scripts\Item\ObscuringItemFader.cs" />
     <Compile Include="Assets\Scripts\Scene\SceneControllerManager.cs" />
     <Compile Include="Assets\Scripts\Events\EventHandler.cs" />

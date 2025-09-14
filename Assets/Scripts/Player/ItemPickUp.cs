@@ -9,7 +9,6 @@ namespace Assets.Scripts.Player
     {
         private void OnTriggerEnter2D(Collider2D collision)
         {
-
             if (collision.TryGetComponent<ItemUnit>(out var item))
             {
                 // 获取物品详情
