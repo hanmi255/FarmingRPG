@@ -194,12 +194,6 @@ namespace Assets.Scripts.UI
             switch (itemDetails.itemType)
             {
                 case ItemType.Seed:
-                    if (!IsCursorValidToDropItem(gridPropertyDetails))
-                    {
-                        SetCursorToInvalid();
-                        return;
-                    }
-                    break;
                 case ItemType.Commodity:
                     if (!IsCursorValidToDropItem(gridPropertyDetails))
                     {
@@ -208,6 +202,7 @@ namespace Assets.Scripts.UI
                     }
                     break;
                 case ItemType.HoeingTool:
+                case ItemType.WateringTool:
                     if (!IsCursorValidToUseTool(gridPropertyDetails, itemDetails))
                     {
                         SetCursorToInvalid();
@@ -279,7 +274,8 @@ namespace Assets.Scripts.UI
                     if (!gridPropertyDetails.isDiggable || gridPropertyDetails.daysSinceLastDig != -1)
                         return false;
 
-                    Vector3 cursorWorldPosition = new(GetWorldPositionForCursor().x + 0.5f, GetWorldPositionForCursor().y + 0.5f, 0f);
+                    Vector3 cursorWorldPosition = GetWorldPositionForCursor();
+                    cursorWorldPosition = new Vector3(cursorWorldPosition.x + 0.5f, cursorWorldPosition.y + 0.5f, 0f);
                     HelperMethods.GetComponentsAtBoxLocation(out List<ItemUnit> itemList, cursorWorldPosition, Settings.cursorSize, 0f);
 
                     // 检查区域内是否有可收割的物品
@@ -293,6 +289,8 @@ namespace Assets.Scripts.UI
                     }
 
                     return true;
+                case ItemType.WateringTool:
+                    return gridPropertyDetails.daysSinceLastDig > -1 && gridPropertyDetails.daysSinceLastWater == -1;
                 default:
                     return false;
             }

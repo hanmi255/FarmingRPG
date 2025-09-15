@@ -26,6 +26,8 @@ namespace Assets.Scripts.Player
         // 使用工具动画
         private WaitForSeconds _useToolAnimationPause;
         private WaitForSeconds _afterUseToolAnimationPause;
+        private WaitForSeconds _liftToolAnimationPause;
+        private WaitForSeconds _afterLiftToolAnimationPause;
         private bool _toolUseDisabled = false;
 
         // 动画覆盖
@@ -125,6 +127,8 @@ namespace Assets.Scripts.Player
             _gridCursorHighlight = FindObjectOfType<GridCursorHighlight>();
             _useToolAnimationPause = new WaitForSeconds(Settings.useToolAnimationPause);
             _afterUseToolAnimationPause = new WaitForSeconds(Settings.afterUseToolAnimationPause);
+            _liftToolAnimationPause = new WaitForSeconds(Settings.liftToolAnimationPause);
+            _afterLiftToolAnimationPause = new WaitForSeconds(Settings.afterLiftToolAnimationPause);
         }
 
         /// <summary>
@@ -132,7 +136,7 @@ namespace Assets.Scripts.Player
         /// </summary>
         private void Update()
         {
-            if (!IsInputDisabled)
+            if (!_isInputDisabled)
             {
                 ResetAnimationTriggers();
                 PlayerMovementInput();
@@ -207,7 +211,7 @@ namespace Assets.Scripts.Player
         /// </summary>
         public void EnablePlayerInput()
         {
-            IsInputDisabled = false;
+            _isInputDisabled = false;
         }
 
         /// <summary>
@@ -261,7 +265,7 @@ namespace Assets.Scripts.Player
             _movementSpeed = hasInput ? Settings.runningSpeed : 0f;
 
             // 如果有输入，则更新玩家方向
-            if (!hasInput) 
+            if (!hasInput)
                 return;
 
             // 根据输入确定玩家方向
@@ -310,15 +314,15 @@ namespace Assets.Scripts.Player
         private void PlayerClickInput()
         {
             // 如果工具使用被禁用，则不处理点击输入
-            if (_toolUseDisabled) 
+            if (_toolUseDisabled)
                 return;
-            
+
             // 如果没有按下鼠标左键，则不处理点击输入
-            if (!Input.GetMouseButton(0)) 
+            if (!Input.GetMouseButton(0))
                 return;
-            
+
             // 如果光标未启用，则不处理点击输入
-            if (!_gridCursorHighlight.CursorEnabled) 
+            if (!_gridCursorHighlight.CursorEnabled)
                 return;
 
             Vector3Int cursorGridPosition = _gridCursorHighlight.GetGridPositionForCursor();
@@ -353,9 +357,11 @@ namespace Assets.Scripts.Player
                 {
                     DropItem(itemDetails);
                 }
+                return;
             }
+            
             // 处理工具类型物品
-            else if (itemDetails.itemType == ItemType.HoeingTool)
+            if (itemDetails.itemType == ItemType.HoeingTool || itemDetails.itemType == ItemType.WateringTool)
             {
                 UseTool(gridPropertyDetails, itemDetails, playerDirection);
             }
@@ -431,7 +437,7 @@ namespace Assets.Scripts.Player
 
         #region Private Methods - Actions
         /// <summary>
-        /// 丢弃选中的物品
+        /// 放置选中的物品
         /// </summary>
         /// <param name="itemDetails">物品详情</param>
         private void DropItem(ItemDetails itemDetails)
@@ -450,10 +456,22 @@ namespace Assets.Scripts.Player
         /// <param name="playerDirection">玩家方向</param>
         private void UseTool(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails, Vector3Int playerDirection)
         {
-            // 只有锄头工具且光标位置有效时才处理
-            if (itemDetails.itemType == ItemType.HoeingTool && _gridCursorHighlight.CursorPositionIsValid)
+            switch (itemDetails.itemType)
             {
-                HoeGroundAtCursor(gridPropertyDetails, playerDirection);
+                case ItemType.HoeingTool:
+                    if (_gridCursorHighlight.CursorPositionIsValid)
+                    {
+                        HoeGroundAtCursor(gridPropertyDetails, playerDirection);
+                    }
+                    return;
+                case ItemType.WateringTool:
+                    if (_gridCursorHighlight.CursorPositionIsValid)
+                    {
+                        WaterGroundAtCursor(gridPropertyDetails, playerDirection);
+                    }
+                    return;
+                default:
+                    return;
             }
         }
 
@@ -464,65 +482,129 @@ namespace Assets.Scripts.Player
         /// <param name="playerDirection">玩家方向</param>
         private void HoeGroundAtCursor(GridPropertyDetails gridPropertyDetails, Vector3Int playerDirection)
         {
-            StartCoroutine(HoeGroundAtCursorCoroutine(gridPropertyDetails, playerDirection));
+            StartCoroutine(UseToolAtCursorCoroutine(
+                gridPropertyDetails, 
+                playerDirection, 
+                PartVariantType.Hoe, 
+                ToolEffect.None, 
+                true, 
+                _useToolAnimationPause, 
+                _afterUseToolAnimationPause,
+                (details) => {
+                    if (details.daysSinceLastDig == -1)
+                    {
+                        details.daysSinceLastDig = 0;
+                    }
+                    GridPropertyManager.Instance.DisplayDugGround(details);
+                }));
         }
 
         /// <summary>
-        /// 锄地协程，处理动画和网格属性更新
+        /// 在光标位置浇水
         /// </summary>
         /// <param name="gridPropertyDetails">网格属性详情</param>
         /// <param name="playerDirection">玩家方向</param>
+        private void WaterGroundAtCursor(GridPropertyDetails gridPropertyDetails, Vector3Int playerDirection)
+        {
+            StartCoroutine(UseToolAtCursorCoroutine(
+                gridPropertyDetails, 
+                playerDirection, 
+                PartVariantType.WateringCan, 
+                ToolEffect.Watering, 
+                false, 
+                _liftToolAnimationPause, 
+                _afterLiftToolAnimationPause,
+                (details) =>
+                {
+                    if (details.daysSinceLastWater == -1)
+                    {
+                        details.daysSinceLastWater = 0;
+                    }
+                    GridPropertyManager.Instance.DisplayWateredGround(details);
+                }));
+        }
+
+        /// <summary>
+        /// 通用工具使用协程，处理动画和网格属性更新
+        /// </summary>
+        /// <param name="gridPropertyDetails">网格属性详情</param>
+        /// <param name="playerDirection">玩家方向</param>
+        /// <param name="toolType">工具类型</param>
+        /// <param name="toolEffect">工具效果</param>
+        /// <param name="isHoeingAnimation">是否使用锄地动画</param>
+        /// <param name="animationPause">动画暂停时间</param>
+        /// <param name="afterAnimationPause">动画后暂停时间</param>
+        /// <param name="updateGridProperty">更新网格属性的回调函数</param>
         /// <returns>IEnumerator用于协程</returns>
-        private IEnumerator HoeGroundAtCursorCoroutine(GridPropertyDetails gridPropertyDetails, Vector3Int playerDirection)
+        private IEnumerator UseToolAtCursorCoroutine(
+            GridPropertyDetails gridPropertyDetails, 
+            Vector3Int playerDirection, 
+            PartVariantType toolType, 
+            ToolEffect toolEffect,
+            bool isHoeingAnimation,
+            WaitForSeconds animationPause, 
+            WaitForSeconds afterAnimationPause,
+            System.Action<GridPropertyDetails> updateGridProperty)
         {
             // 禁用输入和工具使用，防止重复操作
-            IsInputDisabled = true;
+            _isInputDisabled = true;
             _toolUseDisabled = true;
 
             // 设置工具动画参数
-            _toolCharacterAttribute.partVariantType = PartVariantType.Hoe;
+            _toolCharacterAttribute.partVariantType = toolType;
             _characterAttributeCustomisationList.Clear();
             _characterAttributeCustomisationList.Add(_toolCharacterAttribute);
             _animationOverrides.ApplyCharacterCustomisationParameters(_characterAttributeCustomisationList);
 
+            // 设置工具效果
+            _toolEffect = toolEffect;
+
             // 根据玩家方向设置对应的动画状态
             if (playerDirection == Vector3Int.right)
             {
-                _isUsingToolRight = true;
+                if (isHoeingAnimation)
+                    _isUsingToolRight = true;
+                else
+                    _isLiftingToolRight = true;
             }
             else if (playerDirection == Vector3Int.left)
             {
-                _isUsingToolLeft = true;
+                if (isHoeingAnimation)
+                    _isUsingToolLeft = true;
+                else
+                    _isLiftingToolLeft = true;
             }
             else if (playerDirection == Vector3Int.up)
             {
-                _isUsingToolUp = true;
+                if (isHoeingAnimation)
+                    _isUsingToolUp = true;
+                else
+                    _isLiftingToolUp = true;
             }
             else if (playerDirection == Vector3Int.down)
             {
-                _isUsingToolDown = true;
+                if (isHoeingAnimation)
+                    _isUsingToolDown = true;
+                else
+                    _isLiftingToolDown = true;
             }
 
             // 等待工具使用动画播放
-            yield return _useToolAnimationPause;
+            yield return animationPause;
 
-            // 更新网格属性，标记为已锄地
-            if (gridPropertyDetails.daysSinceLastDig == -1)
-            {
-                gridPropertyDetails.daysSinceLastDig = 0;
-            }
+            // 更新网格属性
+            updateGridProperty(gridPropertyDetails);
 
             GridPropertyManager.Instance.SetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY, gridPropertyDetails);
 
-            GridPropertyManager.Instance.DisplayDugGround(gridPropertyDetails);
-
             // 等待动画后延迟
-            yield return _afterUseToolAnimationPause;
+            yield return afterAnimationPause;
 
             // 重新启用输入和工具使用
-            IsInputDisabled = false;
+            _isInputDisabled = false;
             _toolUseDisabled = false;
         }
+
         #endregion
 
         #region Private Methods - Utilities
@@ -559,7 +641,7 @@ namespace Assets.Scripts.Player
         /// </summary>
         private void DisablePlayerInput()
         {
-            IsInputDisabled = true;
+            _isInputDisabled = true;
         }
         #endregion
     }

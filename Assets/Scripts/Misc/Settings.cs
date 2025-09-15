@@ -19,6 +19,8 @@ namespace Assets.Scripts.Misc
         public const float runningSpeed = 5.333f;
         public static float useToolAnimationPause = 0.25f;
         public static float afterUseToolAnimationPause = 0.2f;
+        public static float liftToolAnimationPause = 0.4f;
+        public static float afterLiftToolAnimationPause = 0.4f;
 
         // 背包容量
         public static int playerInitialInventoryCapacity = 24;
