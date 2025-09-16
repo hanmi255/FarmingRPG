@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Assets.Scripts.Enums;
 using Assets.Scripts.Events;
 using Assets.Scripts.Misc;
@@ -21,25 +22,25 @@ namespace Assets.Scripts.Map
         private Tilemap _groundDecoration1;
         private Tilemap _groundDecoration2;
 
-        // 创建位掩码查找表，索引是位掩码值，值是dugGround数组的索引
+        // 创建位掩码查找表，索引是位掩码值，值是Ground数组的索引
         private static readonly int[] TileMaskToIndex = new int[]
         {
-            0,  // 0000: 没有挖掘
-            13, // 0001: 只有右边挖掘
-            15, // 0010: 只有左边挖掘  
-            14, // 0011: 左右挖掘
-            4,  // 0100: 只有下面挖掘
-            1,  // 0101: 下面和右边挖掘
-            3,  // 0110: 下面和左边挖掘
-            2,  // 0111: 下面、左边、右边挖掘
-            12, // 1000: 只有上面挖掘
-            9,  // 1001: 上面和右边挖掘
-            11, // 1010: 上面和左边挖掘
-            10, // 1011: 上面、左边、右边挖掘
-            8,  // 1100: 上下挖掘
-            5,  // 1101: 上下右挖掘
-            7,  // 1110: 上下左挖掘
-            6   // 1111: 四个方向都挖掘
+            0,  // 0000: 没有使用
+            13, // 0001: 只有右边使用
+            15, // 0010: 只有左边使用
+            14, // 0011: 左右使用
+            4,  // 0100: 只有下面使用
+            1,  // 0101: 下面和右边使用
+            3,  // 0110: 下面和左边使用
+            2,  // 0111: 下面、左边、右边使用
+            12, // 1000: 只有上面使用
+            9,  // 1001: 上面和右边使用
+            11, // 1010: 上面和左边使用
+            10, // 1011: 上面、左边、右边使用
+            8,  // 1100: 上下使用
+            5,  // 1101: 上下右使用
+            7,  // 1110: 上下左使用
+            6   // 1111: 四个方向都使用
         };
 
         /// <summary>
@@ -52,10 +53,8 @@ namespace Assets.Scripts.Map
         /// </summary>
         [SerializeField] private SO_GridProperties[] _so_gridPropertiesArray = null;
 
-        /// <summary>
-        /// 被挖掘的地面
-        /// </summary>
-        [SerializeField] private Tile[] dugGround = null;
+        [SerializeField] private Tile[] _dugGround = null;
+        [SerializeField] private Tile[] _wateredGround = null;
 
         /// <summary>
         /// 可保存对象的唯一ID
@@ -104,12 +103,14 @@ namespace Assets.Scripts.Map
         {
             ISaveableRegister();
             EventHandler.AfterSceneLoadEvent += AfterSceneLoad;
+            EventHandler.AdvanceGameDayEvent += AdvanceGameDay;
         }
 
         private void OnDisable()
         {
             ISaveableDeregister();
             EventHandler.AfterSceneLoadEvent -= AfterSceneLoad;
+            EventHandler.AdvanceGameDayEvent -= AdvanceGameDay;
         }
 
         private void Start()
@@ -188,6 +189,35 @@ namespace Assets.Scripts.Map
 
             _groundDecoration1 = GameObject.FindGameObjectWithTag(Tags.GroundDecoration1).GetComponent<Tilemap>();
             _groundDecoration2 = GameObject.FindGameObjectWithTag(Tags.GroundDecoration2).GetComponent<Tilemap>();
+        }
+
+        /// <summary>
+        /// 游戏天数增加后的处理函数
+        /// </summary>
+        private void AdvanceGameDay(TimeEventParameters parameters)
+        {
+            ClearDisplayGridPropertyDetails();
+
+            foreach (var so_GridProperties in _so_gridPropertiesArray)
+            {
+                if (!GameObjectSave.sceneData.TryGetValue(so_GridProperties.sceneName.ToString(), out var sceneSave))
+                    continue;
+
+                if (sceneSave.gridPropertyDetailsDictionary == null)
+                    continue;
+
+                foreach (var item in sceneSave.gridPropertyDetailsDictionary)
+                {
+                    var gridPropertyDetails = item.Value;
+
+                    if (gridPropertyDetails.daysSinceLastWater > -1)
+                    {
+                        gridPropertyDetails.daysSinceLastWater = -1;
+                    }
+                }
+            }
+
+            DisplayGridPropertyDetails();
         }
 
         #endregion
@@ -333,7 +363,19 @@ namespace Assets.Scripts.Map
         {
             if (gridPropertyDetails.daysSinceLastDig > -1)
             {
-                ConnectDugGround(gridPropertyDetails);
+                ConnectGround(GridPropertyDetailsType.Diggable, gridPropertyDetails);
+            }
+        }
+
+        /// <summary>
+        /// 显示已 water 的地面装饰
+        /// <param name="gridPropertyDetails"></param>
+        /// </summary>
+        public void DisplayWateredGround(GridPropertyDetails gridPropertyDetails)
+        {
+            if (gridPropertyDetails.daysSinceLastWater > -1)
+            {
+                ConnectGround(GridPropertyDetailsType.Waterable, gridPropertyDetails);
             }
         }
 
@@ -344,6 +386,8 @@ namespace Assets.Scripts.Map
                 GridPropertyDetails gridPropertyDetails = item.Value;
 
                 DisplayDugGround(gridPropertyDetails);
+
+                DisplayWateredGround(gridPropertyDetails);
             }
         }
 
@@ -364,11 +408,17 @@ namespace Assets.Scripts.Map
             ClearDisplayGroundDecorations();
         }
 
-        private void ConnectDugGround(GridPropertyDetails gridPropertyDetails)
+        /// <summary>
+        /// 连接地面装饰（通用方法处理挖掘和浇水）
+        /// </summary>
+        /// <param name="type">地面类型（挖掘或浇水）</param>
+        /// <param name="gridPropertyDetails">网格属性详情</param>
+        private void ConnectGround(GridPropertyDetailsType type, GridPropertyDetails gridPropertyDetails)
         {
-            // 设置当前格子的挖掘贴图
-            Tile dugTile0 = SetDugTile(gridPropertyDetails.gridX, gridPropertyDetails.gridY);
-            _groundDecoration1.SetTile(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY, 0), dugTile0);
+            // 设置当前格子的贴图
+            Tile tile0 = SetGroundTile(type, gridPropertyDetails.gridX, gridPropertyDetails.gridY);
+            Tilemap tilemap = type == GridPropertyDetailsType.Diggable ? _groundDecoration1 : _groundDecoration2;
+            tilemap.SetTile(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY, 0), tile0);
 
             // 定义四个相邻方向的偏移量：上、下、左、右
             Vector2Int[] adjacentOffsets = {
@@ -385,46 +435,56 @@ namespace Assets.Scripts.Map
                 int adjacentY = gridPropertyDetails.gridY + offset.y;
 
                 GridPropertyDetails adjacentGridPropertyDetails = GetGridPropertyDetails(adjacentX, adjacentY);
-                if (adjacentGridPropertyDetails != null && adjacentGridPropertyDetails.daysSinceLastDig > -1)
+                if (adjacentGridPropertyDetails != null && IsGridSquareModified(type, adjacentX, adjacentY))
                 {
-                    Tile adjacentDugTile = SetDugTile(adjacentX, adjacentY);
-                    _groundDecoration1.SetTile(new Vector3Int(adjacentX, adjacentY, 0), adjacentDugTile);
+                    Tile adjacentTile = SetGroundTile(type, adjacentX, adjacentY);
+                    tilemap.SetTile(new Vector3Int(adjacentX, adjacentY, 0), adjacentTile);
                 }
             }
         }
 
         /// <summary>
-        /// 根据相邻格子的挖掘状态设置当前格子的挖掘贴图
+        /// 根据相邻格子的状态设置当前格子的贴图（通用方法处理挖掘和浇水）
         /// </summary>
+        /// <param name="type">地面类型（挖掘或浇水）</param>
         /// <param name="gridX">当前格子X坐标</param>
         /// <param name="gridY">当前格子Y坐标</param>
-        /// <returns>对应的挖掘贴图</returns>
-        private Tile SetDugTile(int gridX, int gridY)
+        /// <returns>对应的贴图</returns>
+        private Tile SetGroundTile(GridPropertyDetailsType type, int gridX, int gridY)
         {
-            bool upDug = IsGridSquareDug(gridX, gridY + 1);
-            bool downDug = IsGridSquareDug(gridX, gridY - 1);
-            bool leftDug = IsGridSquareDug(gridX - 1, gridY);
-            bool rightDug = IsGridSquareDug(gridX + 1, gridY);
+            bool upModified = IsGridSquareModified(type, gridX, gridY + 1);
+            bool downModified = IsGridSquareModified(type, gridX, gridY - 1);
+            bool leftModified = IsGridSquareModified(type, gridX - 1, gridY);
+            bool rightModified = IsGridSquareModified(type, gridX + 1, gridY);
 
             // 构建位掩码：右(bit0) + 左(bit1) + 下(bit2) + 上(bit3)
-            int mask = (rightDug ? 1 : 0) |
-                       (leftDug ? 2 : 0) |
-                       (downDug ? 4 : 0) |
-                       (upDug ? 8 : 0);
+            int mask = (rightModified ? 1 : 0) |
+                       (leftModified ? 2 : 0) |
+                       (downModified ? 4 : 0) |
+                       (upModified ? 8 : 0);
 
-            return dugGround[TileMaskToIndex[mask]];
+            Tile[] groundTiles = type == GridPropertyDetailsType.Diggable ? _dugGround : _wateredGround;
+            return groundTiles[TileMaskToIndex[mask]];
         }
 
         /// <summary>
-        /// 检查指定坐标的格子是否已被挖掘
+        /// 检查指定坐标的格子是否已被修改（通用方法处理挖掘和浇水）
         /// </summary>
+        /// <param name="type">地面类型（挖掘或浇水）</param>
         /// <param name="gridX">格子X坐标</param>
         /// <param name="gridY">格子Y坐标</param>
-        /// <returns>如果已被挖掘返回true，否则返回false</returns>
-        private bool IsGridSquareDug(int gridX, int gridY)
+        /// <returns>如果已被修改返回true，否则返回false</returns>
+        private bool IsGridSquareModified(GridPropertyDetailsType type, int gridX, int gridY)
         {
             GridPropertyDetails gridPropertyDetails = GetGridPropertyDetails(gridX, gridY);
-            return gridPropertyDetails != null && gridPropertyDetails.daysSinceLastDig > -1;
+            if (gridPropertyDetails == null) return false;
+
+            return type switch
+            {
+                GridPropertyDetailsType.Diggable => gridPropertyDetails.daysSinceLastDig > -1,
+                GridPropertyDetailsType.Waterable => gridPropertyDetails.daysSinceLastWater > -1,
+                _ => false
+            };
         }
 
         #endregion

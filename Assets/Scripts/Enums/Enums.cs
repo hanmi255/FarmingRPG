@@ -107,6 +107,16 @@ namespace Assets.Scripts.Enums
         IsNPCObstacle
     }
 
+
+    /// <summary>
+    /// 网格属性详情类型枚举
+    /// </summary>
+    public enum GridPropertyDetailsType
+    {
+        Diggable,
+        Waterable
+    }
+
     /// <summary>
     /// 背包位置枚举，定义物品存储的位置
     /// </summary>

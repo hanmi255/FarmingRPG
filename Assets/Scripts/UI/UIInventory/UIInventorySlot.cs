@@ -35,6 +35,7 @@ namespace Assets.Scripts.UI.UIInventory
         private Canvas _parentCanvas;
         private Transform _parentItem;
         private GridCursorHighlight _gridCursorHighlight;
+        private CursorHighlight _cursorHighlight;
         private GameObject _draggedItem;
 
         private TextParameters _textParameters;
@@ -65,6 +66,7 @@ namespace Assets.Scripts.UI.UIInventory
         {
             _mainCamera = Camera.main;
             _gridCursorHighlight = FindObjectOfType<GridCursorHighlight>();
+            _cursorHighlight = FindObjectOfType<CursorHighlight>();
         }
 
         #endregion
@@ -269,8 +271,11 @@ namespace Assets.Scripts.UI.UIInventory
             isSelected = true;
             _inventoryBar.SetHighlightOnInventorySlots();
 
-            // 设置网格光标高亮
+            // 设置光标高亮
             _gridCursorHighlight.ItemUseGridRadius = itemDetails.itemUseGridRadius;
+            _cursorHighlight.ItemUseRadius = itemDetails.itemUseRadius;
+
+            // 设置是否启用光标高亮
             if (itemDetails.itemUseGridRadius > 0)
             {
                 _gridCursorHighlight.EnableCursor();
@@ -279,7 +284,19 @@ namespace Assets.Scripts.UI.UIInventory
             {
                 _gridCursorHighlight.DisableCursor();
             }
+
+            if (itemDetails.itemUseRadius > 0f)
+            {
+                _cursorHighlight.EnableCursor();
+            }
+            else
+            {
+                _cursorHighlight.DisableCursor();
+            }
+
+            // 设置选中的物品类型
             _gridCursorHighlight.SelectedItemType = itemDetails.itemType;
+            _cursorHighlight.SelectedItemType = itemDetails.itemType;
 
             InventoryManager.Instance.SetSelectedInventoryItem(InventoryLocation.Player, itemDetails.itemCode);
 
@@ -314,6 +331,9 @@ namespace Assets.Scripts.UI.UIInventory
         {
             _gridCursorHighlight.DisableCursor();
             _gridCursorHighlight.SelectedItemType = ItemType.None;
+
+            _cursorHighlight.DisableCursor();
+            _cursorHighlight.SelectedItemType = ItemType.None;
         }
 
         /// <summary>

@@ -15,10 +15,13 @@ namespace Assets.Scripts.Misc
         public static Vector2 cursorSize = Vector2.one;
 
         // 玩家数据
+        public static float playerCenterYOffset = 0.875f;
         public const float walkingSpeed = 2.666f;
         public const float runningSpeed = 5.333f;
         public static float useToolAnimationPause = 0.25f;
         public static float afterUseToolAnimationPause = 0.2f;
+        public static float liftToolAnimationPause = 0.4f;
+        public static float afterLiftToolAnimationPause = 0.4f;
 
         // 背包容量
         public static int playerInitialInventoryCapacity = 24;
@@ -39,6 +42,10 @@ namespace Assets.Scripts.Misc
         public const string BreakingTool = "Pickaxe";
         public const string ReapingTool = "Scythe";
         public const string CollectingTool = "Basket";
+
+        // 收割
+        public const int maxCollidersToTestPerReapSwing = 15;
+        public const int maxTargetCompnentsToDestroyPerReapSwing = 2;
 
         // 方向枚举
         public enum Direction

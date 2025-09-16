@@ -194,12 +194,6 @@ namespace Assets.Scripts.UI
             switch (itemDetails.itemType)
             {
                 case ItemType.Seed:
-                    if (!IsCursorValidToDropItem(gridPropertyDetails))
-                    {
-                        SetCursorToInvalid();
-                        return;
-                    }
-                    break;
                 case ItemType.Commodity:
                     if (!IsCursorValidToDropItem(gridPropertyDetails))
                     {
@@ -207,7 +201,12 @@ namespace Assets.Scripts.UI
                         return;
                     }
                     break;
+                case ItemType.WateringTool:
                 case ItemType.HoeingTool:
+                case ItemType.ChoppingTool:
+                case ItemType.BreakingTool:
+                case ItemType.ReapingTool:
+                case ItemType.CollectingTool:
                     if (!IsCursorValidToUseTool(gridPropertyDetails, itemDetails))
                     {
                         SetCursorToInvalid();
@@ -221,19 +220,6 @@ namespace Assets.Scripts.UI
                 default:
                     break;
             }
-        }
-
-        /// <summary>
-        /// 获取光标在屏幕上的RectTransform位置
-        /// </summary>
-        /// <param name="gridPosition">网格位置</param>
-        /// <returns>光标在屏幕上的位置</returns>
-        private Vector3 GetRectTransformPositionForCursor(Vector3Int gridPosition)
-        {
-            Vector3 gridWorldPosition = _grid.CellToWorld(gridPosition);
-            Vector2 gridScreenPosition = _mainCamera.WorldToScreenPoint(gridWorldPosition);
-
-            return RectTransformUtility.PixelAdjustPoint(gridScreenPosition, _cursorRectTransform, _canvas);
         }
 
         /// <summary>
@@ -279,7 +265,8 @@ namespace Assets.Scripts.UI
                     if (!gridPropertyDetails.isDiggable || gridPropertyDetails.daysSinceLastDig != -1)
                         return false;
 
-                    Vector3 cursorWorldPosition = new(GetWorldPositionForCursor().x + 0.5f, GetWorldPositionForCursor().y + 0.5f, 0f);
+                    Vector3 cursorWorldPosition = GetWorldPositionForCursor();
+                    cursorWorldPosition = new Vector3(cursorWorldPosition.x + 0.5f, cursorWorldPosition.y + 0.5f, 0f);
                     HelperMethods.GetComponentsAtBoxLocation(out List<ItemUnit> itemList, cursorWorldPosition, Settings.cursorSize, 0f);
 
                     // 检查区域内是否有可收割的物品
@@ -293,6 +280,8 @@ namespace Assets.Scripts.UI
                     }
 
                     return true;
+                case ItemType.WateringTool:
+                    return gridPropertyDetails.daysSinceLastDig > -1 && gridPropertyDetails.daysSinceLastWater == -1;
                 default:
                     return false;
             }
@@ -307,6 +296,18 @@ namespace Assets.Scripts.UI
             return _grid.CellToWorld(GetGridPositionForCursor());
         }
 
+        /// <summary>
+        /// 获取光标在屏幕上的RectTransform位置
+        /// </summary>
+        /// <param name="gridPosition">网格位置</param>
+        /// <returns>光标在屏幕上的位置</returns>
+        private Vector3 GetRectTransformPositionForCursor(Vector3Int gridPosition)
+        {
+            Vector3 gridWorldPosition = _grid.CellToWorld(gridPosition);
+            Vector2 gridScreenPosition = _mainCamera.WorldToScreenPoint(gridWorldPosition);
+
+            return RectTransformUtility.PixelAdjustPoint(gridScreenPosition, _cursorRectTransform, _canvas);
+        }
         #endregion
     }
 }

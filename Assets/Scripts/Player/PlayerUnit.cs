@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Assets.Scripts.Animation;
 using Assets.Scripts.Enums;
 using Assets.Scripts.Events;
+using Assets.Scripts.HelperClasses;
 using Assets.Scripts.Inventory;
 using Assets.Scripts.Item;
 using Assets.Scripts.Map;
@@ -26,6 +27,8 @@ namespace Assets.Scripts.Player
         // 使用工具动画
         private WaitForSeconds _useToolAnimationPause;
         private WaitForSeconds _afterUseToolAnimationPause;
+        private WaitForSeconds _liftToolAnimationPause;
+        private WaitForSeconds _afterLiftToolAnimationPause;
         private bool _toolUseDisabled = false;
 
         // 动画覆盖
@@ -72,8 +75,9 @@ namespace Assets.Scripts.Player
         #endregion
 
         #region Private Fields - Components
-        // 网格光标高亮
+        // 光标高亮
         private GridCursorHighlight _gridCursorHighlight;
+        private CursorHighlight _cursorHighlight;
         private Camera _mainCamera;
         #endregion
 
@@ -111,10 +115,25 @@ namespace Assets.Scripts.Player
             _rigidbody2D = GetComponent<Rigidbody2D>();
 
             _animationOverrides = GetComponent<AnimationOverrides>();
+
             _armsCharacterAttribute = new CharacterAttribute(CharacterPartAnimator.Arms, PartVariantColour.None, PartVariantType.None);
+            _toolCharacterAttribute = new CharacterAttribute(CharacterPartAnimator.Tool, PartVariantColour.None, PartVariantType.None);
+
             _characterAttributeCustomisationList = new List<CharacterAttribute>();
 
             _mainCamera = Camera.main;
+        }
+
+        private void OnEnable()
+        {
+            EventHandler.BeforeSceneUnloadFadeOutEvent += DisablePlayerInputAndResetMovement;
+            EventHandler.AfterSceneLoadFadeInEvent += EnablePlayerInput;
+        }
+
+        private void OnDisable()
+        {
+            EventHandler.BeforeSceneUnloadFadeOutEvent -= DisablePlayerInputAndResetMovement;
+            EventHandler.AfterSceneLoadFadeInEvent -= EnablePlayerInput;
         }
 
         /// <summary>
@@ -123,8 +142,11 @@ namespace Assets.Scripts.Player
         private void Start()
         {
             _gridCursorHighlight = FindObjectOfType<GridCursorHighlight>();
+            _cursorHighlight = FindObjectOfType<CursorHighlight>();
             _useToolAnimationPause = new WaitForSeconds(Settings.useToolAnimationPause);
             _afterUseToolAnimationPause = new WaitForSeconds(Settings.afterUseToolAnimationPause);
+            _liftToolAnimationPause = new WaitForSeconds(Settings.liftToolAnimationPause);
+            _afterLiftToolAnimationPause = new WaitForSeconds(Settings.afterLiftToolAnimationPause);
         }
 
         /// <summary>
@@ -132,7 +154,7 @@ namespace Assets.Scripts.Player
         /// </summary>
         private void Update()
         {
-            if (!IsInputDisabled)
+            if (!_isInputDisabled)
             {
                 ResetAnimationTriggers();
                 PlayerMovementInput();
@@ -207,7 +229,7 @@ namespace Assets.Scripts.Player
         /// </summary>
         public void EnablePlayerInput()
         {
-            IsInputDisabled = false;
+            _isInputDisabled = false;
         }
 
         /// <summary>
@@ -217,6 +239,15 @@ namespace Assets.Scripts.Player
         public Vector3 GetPlayerViewporPosition()
         {
             return _mainCamera.WorldToViewportPoint(transform.position);
+        }
+
+        /// <summary>
+        /// 获取玩家中心位置
+        /// </summary>
+        /// <returns>玩家中心位置</returns>
+        public Vector3 GetPlayerCenterPosition()
+        {
+            return new Vector3(transform.position.x, transform.position.y + Settings.playerCenterYOffset, transform.position.z);
         }
         #endregion
 
@@ -261,7 +292,7 @@ namespace Assets.Scripts.Player
             _movementSpeed = hasInput ? Settings.runningSpeed : 0f;
 
             // 如果有输入，则更新玩家方向
-            if (!hasInput) 
+            if (!hasInput)
                 return;
 
             // 根据输入确定玩家方向
@@ -310,15 +341,15 @@ namespace Assets.Scripts.Player
         private void PlayerClickInput()
         {
             // 如果工具使用被禁用，则不处理点击输入
-            if (_toolUseDisabled) 
+            if (_toolUseDisabled)
                 return;
-            
+
             // 如果没有按下鼠标左键，则不处理点击输入
-            if (!Input.GetMouseButton(0)) 
+            if (!Input.GetMouseButton(0))
                 return;
-            
+
             // 如果光标未启用，则不处理点击输入
-            if (!_gridCursorHighlight.CursorEnabled) 
+            if (!_gridCursorHighlight.CursorEnabled && !_cursorHighlight.CursorEnabled)
                 return;
 
             Vector3Int cursorGridPosition = _gridCursorHighlight.GetGridPositionForCursor();
@@ -353,9 +384,11 @@ namespace Assets.Scripts.Player
                 {
                     DropItem(itemDetails);
                 }
+                return;
             }
+
             // 处理工具类型物品
-            else if (itemDetails.itemType == ItemType.HoeingTool)
+            if (itemDetails.itemType == ItemType.HoeingTool || itemDetails.itemType == ItemType.WateringTool || itemDetails.itemType == ItemType.ReapingTool)
             {
                 UseTool(gridPropertyDetails, itemDetails, playerDirection);
             }
@@ -431,7 +464,7 @@ namespace Assets.Scripts.Player
 
         #region Private Methods - Actions
         /// <summary>
-        /// 丢弃选中的物品
+        /// 放置选中的物品
         /// </summary>
         /// <param name="itemDetails">物品详情</param>
         private void DropItem(ItemDetails itemDetails)
@@ -450,79 +483,172 @@ namespace Assets.Scripts.Player
         /// <param name="playerDirection">玩家方向</param>
         private void UseTool(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails, Vector3Int playerDirection)
         {
-            // 只有锄头工具且光标位置有效时才处理
-            if (itemDetails.itemType == ItemType.HoeingTool && _gridCursorHighlight.CursorPositionIsValid)
+            switch (itemDetails.itemType)
             {
-                HoeGroundAtCursor(gridPropertyDetails, playerDirection);
+                case ItemType.HoeingTool:
+                    if (_gridCursorHighlight.CursorPositionIsValid)
+                    {
+                        StartCoroutine(UseToolAtCursorCoroutine(
+                            gridPropertyDetails,
+                            playerDirection,
+                            PartVariantType.Hoe,
+                            ToolEffect.None,
+                            true,  // use hoeing animation
+                            false, // not swinging animation
+                            _useToolAnimationPause,
+                            _afterUseToolAnimationPause,
+                            (details) =>
+                            {
+                                if (details.daysSinceLastDig == -1)
+                                {
+                                    details.daysSinceLastDig = 0;
+                                }
+                                GridPropertyManager.Instance.DisplayDugGround(details);
+                            }));
+                    }
+                    return;
+                case ItemType.WateringTool:
+                    if (_gridCursorHighlight.CursorPositionIsValid)
+                    {
+                        StartCoroutine(UseToolAtCursorCoroutine(
+                            gridPropertyDetails,
+                            playerDirection,
+                            PartVariantType.WateringCan,
+                            ToolEffect.Watering,
+                            false, // not hoeing animation
+                            false, // not swinging animation
+                            _liftToolAnimationPause,
+                            _afterLiftToolAnimationPause,
+                            (details) =>
+                            {
+                                if (details.daysSinceLastWater == -1)
+                                {
+                                    details.daysSinceLastWater = 0;
+                                }
+                                GridPropertyManager.Instance.DisplayWateredGround(details);
+                            }));
+                    }
+                    return;
+                case ItemType.ReapingTool:
+                    if (_cursorHighlight.CursorPositionIsValid)
+                    {
+                        playerDirection = GetPlayerDirection(_cursorHighlight.GetWorldPositionForCursor(), GetPlayerCenterPosition());
+                        StartCoroutine(UseToolAtCursorCoroutine(
+                            null, // gridPropertyDetails not needed for reaping
+                            playerDirection,
+                            PartVariantType.Scythe,
+                            ToolEffect.None,
+                            false, // not hoeing animation
+                            true,  // use swinging animation
+                            _useToolAnimationPause,
+                            new WaitForSeconds(0f), // no after animation pause for reaping
+                            null,  // no grid property update needed
+                            (details, direction) => ExecuteReapingLogic(itemDetails, direction)));
+                    }
+                    return;
+                default:
+                    return;
             }
         }
 
         /// <summary>
-        /// 在光标位置锄地
+        /// 通用工具使用协程，处理动画和网格属性更新
         /// </summary>
         /// <param name="gridPropertyDetails">网格属性详情</param>
         /// <param name="playerDirection">玩家方向</param>
-        private void HoeGroundAtCursor(GridPropertyDetails gridPropertyDetails, Vector3Int playerDirection)
-        {
-            StartCoroutine(HoeGroundAtCursorCoroutine(gridPropertyDetails, playerDirection));
-        }
-
-        /// <summary>
-        /// 锄地协程，处理动画和网格属性更新
-        /// </summary>
-        /// <param name="gridPropertyDetails">网格属性详情</param>
-        /// <param name="playerDirection">玩家方向</param>
+        /// <param name="toolType">工具类型</param>
+        /// <param name="toolEffect">工具效果</param>
+        /// <param name="isHoeingAnimation">是否使用锄地动画（use/lift动画）</param>
+        /// <param name="isSwingingAnimation">是否使用挥舞动画</param>
+        /// <param name="animationPause">动画暂停时间</param>
+        /// <param name="afterAnimationPause">动画后暂停时间</param>
+        /// <param name="updateGridProperty">更新网格属性的回调函数</param>
+        /// <param name="customToolAction">自定义工具逻辑回调函数</param>
         /// <returns>IEnumerator用于协程</returns>
-        private IEnumerator HoeGroundAtCursorCoroutine(GridPropertyDetails gridPropertyDetails, Vector3Int playerDirection)
+        private IEnumerator UseToolAtCursorCoroutine(
+            GridPropertyDetails gridPropertyDetails,
+            Vector3Int playerDirection,
+            PartVariantType toolType,
+            ToolEffect toolEffect,
+            bool isHoeingAnimation,
+            bool isSwingingAnimation,
+            WaitForSeconds animationPause,
+            WaitForSeconds afterAnimationPause,
+            System.Action<GridPropertyDetails> updateGridProperty,
+            System.Action<GridPropertyDetails, Vector3Int> customToolAction = null)
         {
             // 禁用输入和工具使用，防止重复操作
-            IsInputDisabled = true;
+            _isInputDisabled = true;
             _toolUseDisabled = true;
 
             // 设置工具动画参数
-            _toolCharacterAttribute.partVariantType = PartVariantType.Hoe;
+            _toolCharacterAttribute.partVariantType = toolType;
             _characterAttributeCustomisationList.Clear();
             _characterAttributeCustomisationList.Add(_toolCharacterAttribute);
             _animationOverrides.ApplyCharacterCustomisationParameters(_characterAttributeCustomisationList);
 
+            // 设置工具效果
+            _toolEffect = toolEffect;
+
             // 根据玩家方向设置对应的动画状态
             if (playerDirection == Vector3Int.right)
             {
-                _isUsingToolRight = true;
+                if (isSwingingAnimation)
+                    _isSwingingToolRight = true;
+                else if (isHoeingAnimation)
+                    _isUsingToolRight = true;
+                else
+                    _isLiftingToolRight = true;
             }
             else if (playerDirection == Vector3Int.left)
             {
-                _isUsingToolLeft = true;
+                if (isSwingingAnimation)
+                    _isSwingingToolLeft = true;
+                else if (isHoeingAnimation)
+                    _isUsingToolLeft = true;
+                else
+                    _isLiftingToolLeft = true;
             }
             else if (playerDirection == Vector3Int.up)
             {
-                _isUsingToolUp = true;
+                if (isSwingingAnimation)
+                    _isSwingingToolUp = true;
+                else if (isHoeingAnimation)
+                    _isUsingToolUp = true;
+                else
+                    _isLiftingToolUp = true;
             }
             else if (playerDirection == Vector3Int.down)
             {
-                _isUsingToolDown = true;
+                if (isSwingingAnimation)
+                    _isSwingingToolDown = true;
+                else if (isHoeingAnimation)
+                    _isUsingToolDown = true;
+                else
+                    _isLiftingToolDown = true;
             }
 
             // 等待工具使用动画播放
-            yield return _useToolAnimationPause;
+            yield return animationPause;
 
-            // 更新网格属性，标记为已锄地
-            if (gridPropertyDetails.daysSinceLastDig == -1)
+            // 执行自定义工具逻辑（如收割逻辑）
+            customToolAction?.Invoke(gridPropertyDetails, playerDirection);
+
+            // 更新网格属性（如果需要）
+            if (updateGridProperty != null && gridPropertyDetails != null)
             {
-                gridPropertyDetails.daysSinceLastDig = 0;
+                updateGridProperty(gridPropertyDetails);
+                GridPropertyManager.Instance.SetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY, gridPropertyDetails);
             }
 
-            GridPropertyManager.Instance.SetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY, gridPropertyDetails);
-
-            GridPropertyManager.Instance.DisplayDugGround(gridPropertyDetails);
-
             // 等待动画后延迟
-            yield return _afterUseToolAnimationPause;
+            yield return afterAnimationPause;
 
             // 重新启用输入和工具使用
-            IsInputDisabled = false;
+            _isInputDisabled = false;
             _toolUseDisabled = false;
         }
+
         #endregion
 
         #region Private Methods - Utilities
@@ -555,11 +681,142 @@ namespace Assets.Scripts.Player
         }
 
         /// <summary>
+        /// 获取玩家与鼠标之间的方向
+        /// </summary>
+        /// <param name="cursorPosition"></param>
+        /// <param name="playerPosition"></param>
+        /// <returns>玩家方向</returns>
+        private Vector3Int GetPlayerDirection(Vector3 cursorPosition, Vector3 playerPosition)
+        {
+            if (cursorPosition.x > playerPosition.x
+                && cursorPosition.y < (playerPosition.y + _cursorHighlight.ItemUseRadius / 2f)
+                && cursorPosition.y > (playerPosition.y - _cursorHighlight.ItemUseRadius / 2f))
+            {
+                return Vector3Int.right;
+            }
+
+            if (cursorPosition.x < playerPosition.x
+                && cursorPosition.y < (playerPosition.y + _cursorHighlight.ItemUseRadius / 2f)
+                && cursorPosition.y > (playerPosition.y - _cursorHighlight.ItemUseRadius / 2f))
+            {
+                return Vector3Int.left;
+            }
+
+            if (cursorPosition.y > playerPosition.y)
+            {
+                return Vector3Int.up;
+            }
+
+            return Vector3Int.down;
+        }
+
+        /// <summary>
         /// 禁用玩家输入
         /// </summary>
         private void DisablePlayerInput()
         {
-            IsInputDisabled = true;
+            _isInputDisabled = true;
+        }
+        
+        /// <summary>
+        /// 执行收割逻辑
+        /// </summary>
+        /// <param name="itemDetails">物品详情</param>
+        /// <param name="playerDirection">玩家方向</param>
+        private void ExecuteReapingLogic(ItemDetails itemDetails, Vector3Int playerDirection)
+        {
+            // 验证输入参数
+            if (itemDetails == null)
+                return;
+
+            // 计算收割区域
+            Vector2 reapPoint = CalculateReapingPoint(playerDirection, itemDetails.itemUseRadius);
+            Vector2 reapSize = new(itemDetails.itemUseRadius, itemDetails.itemUseRadius);
+
+            // 获取可收割的物品
+            ItemUnit[] itemsInRange = HelperMethods.GetComponentsAtBoxLocationNonAlloc<ItemUnit>(
+                Settings.maxCollidersToTestPerReapSwing, reapPoint, reapSize, 0f);
+
+            // 执行收割操作
+            ProcessReapableItems(itemsInRange);
+        }
+
+        /// <summary>
+        /// 计算收割点位置
+        /// </summary>
+        /// <param name="playerDirection">玩家方向</param>
+        /// <param name="itemUseRadius">物品使用半径</param>
+        /// <returns>收割点位置</returns>
+        private Vector2 CalculateReapingPoint(Vector3Int playerDirection, float itemUseRadius)
+        {
+            Vector3 playerCenter = GetPlayerCenterPosition();
+            float offset = itemUseRadius * 0.5f;
+            
+            return new Vector2(
+                playerCenter.x + (playerDirection.x * offset),
+                playerCenter.y + (playerDirection.y * offset)
+            );
+        }
+
+        /// <summary>
+        /// 处理可收割物品
+        /// </summary>
+        /// <param name="itemsInRange">范围内的物品数组</param>
+        private void ProcessReapableItems(ItemUnit[] itemsInRange)
+        {
+            if (itemsInRange == null || itemsInRange.Length == 0)
+                return;
+
+            int reapedCount = 0;
+            int maxReapCount = Settings.maxTargetCompnentsToDestroyPerReapSwing;
+
+            // 从后往前遍历，避免数组修改时的索引问题
+            for (int i = itemsInRange.Length - 1; i >= 0 && reapedCount < maxReapCount; i--)
+            {
+                ItemUnit currentItem = itemsInRange[i];
+                if (currentItem == null)
+                    continue;
+
+                if (IsItemReapable(currentItem))
+                {
+                    ReapItem(currentItem);
+                    reapedCount++;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 检查物品是否可收割
+        /// </summary>
+        /// <param name="item">要检查的物品</param>
+        /// <returns>是否可收割</returns>
+        private bool IsItemReapable(ItemUnit item)
+        {
+            if (item == null)
+                return false;
+
+            ItemDetails itemDetails = InventoryManager.Instance.GetItemDetails(item.ItemCode);
+            return itemDetails != null && itemDetails.itemType == ItemType.ReapableScenary;
+        }
+
+        /// <summary>
+        /// 收割单个物品
+        /// </summary>
+        /// <param name="item">要收割的物品</param>
+        private void ReapItem(ItemUnit item)
+        {
+            if (item == null || item.gameObject == null)
+                return;
+
+            // TODO: 添加粒子效果
+            // Vector3 effectPosition = new Vector3(
+            //     item.transform.position.x, 
+            //     item.transform.position.y + Settings.gridCellSize * 0.5f, 
+            //     item.transform.position.z
+            // );
+            // 在这里可以调用粒子效果系统
+
+            Destroy(item.gameObject);
         }
         #endregion
     }
