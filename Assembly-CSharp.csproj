@@ -79,6 +79,7 @@
     <Compile Include="Assets\Scripts\Inventory\InventoryItem.cs" />
     <Compile Include="Assets\Scripts\Misc\Tags.cs" />
     <Compile Include="Assets\Scripts\Animation\MovementAnimationParameterControl.cs" />
+    <Compile Include="Assets\Scripts\UI\CursorHighlight.cs" />
     <Compile Include="Assets\Scripts\Scene\SceneItemsManager.cs" />
     <Compile Include="Assets\Scripts\Misc\Settings.cs" />
     <Compile Include="Assets\Scripts\Map\GridPropertyDetails.cs" />

@@ -201,8 +201,12 @@ namespace Assets.Scripts.UI
                         return;
                     }
                     break;
-                case ItemType.HoeingTool:
                 case ItemType.WateringTool:
+                case ItemType.HoeingTool:
+                case ItemType.ChoppingTool:
+                case ItemType.BreakingTool:
+                case ItemType.ReapingTool:
+                case ItemType.CollectingTool:
                     if (!IsCursorValidToUseTool(gridPropertyDetails, itemDetails))
                     {
                         SetCursorToInvalid();
@@ -216,19 +220,6 @@ namespace Assets.Scripts.UI
                 default:
                     break;
             }
-        }
-
-        /// <summary>
-        /// 获取光标在屏幕上的RectTransform位置
-        /// </summary>
-        /// <param name="gridPosition">网格位置</param>
-        /// <returns>光标在屏幕上的位置</returns>
-        private Vector3 GetRectTransformPositionForCursor(Vector3Int gridPosition)
-        {
-            Vector3 gridWorldPosition = _grid.CellToWorld(gridPosition);
-            Vector2 gridScreenPosition = _mainCamera.WorldToScreenPoint(gridWorldPosition);
-
-            return RectTransformUtility.PixelAdjustPoint(gridScreenPosition, _cursorRectTransform, _canvas);
         }
 
         /// <summary>
@@ -305,6 +296,18 @@ namespace Assets.Scripts.UI
             return _grid.CellToWorld(GetGridPositionForCursor());
         }
 
+        /// <summary>
+        /// 获取光标在屏幕上的RectTransform位置
+        /// </summary>
+        /// <param name="gridPosition">网格位置</param>
+        /// <returns>光标在屏幕上的位置</returns>
+        private Vector3 GetRectTransformPositionForCursor(Vector3Int gridPosition)
+        {
+            Vector3 gridWorldPosition = _grid.CellToWorld(gridPosition);
+            Vector2 gridScreenPosition = _mainCamera.WorldToScreenPoint(gridWorldPosition);
+
+            return RectTransformUtility.PixelAdjustPoint(gridScreenPosition, _cursorRectTransform, _canvas);
+        }
         #endregion
     }
 }
