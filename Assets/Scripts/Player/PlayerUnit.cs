@@ -717,7 +717,7 @@ namespace Assets.Scripts.Player
         {
             _isInputDisabled = true;
         }
-        
+
         /// <summary>
         /// 执行收割逻辑
         /// </summary>
@@ -751,7 +751,7 @@ namespace Assets.Scripts.Player
         {
             Vector3 playerCenter = GetPlayerCenterPosition();
             float offset = itemUseRadius * 0.5f;
-            
+
             return new Vector2(
                 playerCenter.x + (playerDirection.x * offset),
                 playerCenter.y + (playerDirection.y * offset)

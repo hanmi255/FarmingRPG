@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Animation\SO_AnimationType.cs" />
     <Compile Include="Assets\Scripts\Item\ItemDetails.cs" />
+    <Compile Include="Assets\Scripts\VFX\PoolManager.cs" />
     <Compile Include="Assets\Scripts\TimeSystem\GameClock.cs" />
     <Compile Include="Assets\Scripts\SaveSystem\SceneSave.cs" />
     <Compile Include="Assets\Scripts\Map\GridProperty.cs" />
