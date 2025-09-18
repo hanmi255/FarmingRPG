@@ -479,6 +479,51 @@ MonoBehaviour:
   - {fileID: 1657816505}
   inventoryDraggedItem: {fileID: 547938520191750782, guid: ec84865c844d24347a896f8486e47e44, type: 3}
   inventoryTextBoxGameobject: {fileID: 0}
+--- !u!1 &320044630
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 320044632}
+  - component: {fileID: 320044631}
+  m_Layer: 0
+  m_Name: VFXManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &320044631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 320044630}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8db7e87cf9c30894abf4916a5f333fdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _reapingPrefab: {fileID: 7397576376567721588, guid: e236c31543159684ca25220d34043c82, type: 3}
+--- !u!4 &320044632
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 320044630}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &374879632
 GameObject:
   m_ObjectHideFlags: 0
@@ -2629,7 +2674,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02e2aaa58bd403346a552a943f8d3701, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pool: []
+  pool:
+  - poolSize: 10
+    prefab: {fileID: 7397576376567721588, guid: e236c31543159684ca25220d34043c82, type: 3}
   objectPoolTransform: {fileID: 1178761851}
 --- !u!4 &1178761851
 Transform:
@@ -4855,3 +4902,4 @@ SceneRoots:
   - {fileID: 1314904388}
   - {fileID: 64426674}
   - {fileID: 1178761851}
+  - {fileID: 320044632}

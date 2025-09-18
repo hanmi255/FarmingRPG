@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using Assets.Scripts.Enums;
 using Assets.Scripts.Inventory;
 
@@ -86,41 +87,44 @@ namespace Assets.Scripts.Events
         #region Events
         // 放置选中物品事件
         public static event Action DropSelectedItemEvent;
-        
+
         // 背包更新事件
         public static event Action<InventoryLocation, List<InventoryItem>> InventoryUpdatedEvent;
-        
+
+        // 收割动作效果事件
+        public static event Action<Vector3, HarvestActionEffect> HarvestActionEffectEvent;
+
         // 移动事件
         public static event MovementDelegate MovementEvent;
-        
+
         // 时间事件
 
         // Minute
         public static event Action<TimeEventParameters> AdvanceGameMinuteEvent;
-        
+
         // Hour
         public static event Action<TimeEventParameters> AdvanceGameHourEvent;
-        
+
         // Day
         public static event Action<TimeEventParameters> AdvanceGameDayEvent;
-        
+
         // Season
         public static event Action<TimeEventParameters> AdvanceGameSeasonEvent;
-        
+
         // Year
         public static event Action<TimeEventParameters> AdvanceGameYearEvent;
-        
+
         // 场景切换事件
 
         // Before Scene Unload Fade Out
         public static event Action BeforeSceneUnloadFadeOutEvent;
-        
+
         // Befor Scene Unload
         public static event Action BeforeSceneUnloadEvent;
-        
+
         // After Scene Load
         public static event Action AfterSceneLoadEvent;
-        
+
         // After Scene Load Fade In
         public static event Action AfterSceneLoadFadeInEvent;
         #endregion
@@ -142,6 +146,16 @@ namespace Assets.Scripts.Events
         public static void CallInventoryUpdatedEvent(InventoryLocation inventoryLocation, List<InventoryItem> inventoryList)
         {
             InventoryUpdatedEvent?.Invoke(inventoryLocation, inventoryList);
+        }
+
+        /// <summary>
+        /// 触发收获动作效果事件
+        /// </summary>
+        /// <param name="position">收割位置</param>
+        /// <param name="harvestActionEffect">收获动作效果</param>
+        public static void CallHarvestActionEffectEvent(Vector3 position, HarvestActionEffect harvestActionEffect)
+        {
+            HarvestActionEffectEvent?.Invoke(position, harvestActionEffect);
         }
 
         /// <summary>

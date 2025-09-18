@@ -808,13 +808,13 @@ namespace Assets.Scripts.Player
             if (item == null || item.gameObject == null)
                 return;
 
-            // TODO: 添加粒子效果
-            // Vector3 effectPosition = new Vector3(
-            //     item.transform.position.x, 
-            //     item.transform.position.y + Settings.gridCellSize * 0.5f, 
-            //     item.transform.position.z
-            // );
-            // 在这里可以调用粒子效果系统
+            Vector3 effectPosition = new(
+                item.transform.position.x, 
+                item.transform.position.y + Settings.gridCellSize * 0.5f, 
+                item.transform.position.z
+            );
+
+            EventHandler.CallHarvestActionEffectEvent(effectPosition, HarvestActionEffect.Reaping);
 
             Destroy(item.gameObject);
         }

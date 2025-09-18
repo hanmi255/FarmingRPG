@@ -57,6 +57,7 @@
     <Compile Include="Assets\Scripts\Scene\SceneTeleport.cs" />
     <Compile Include="Assets\Scripts\SaveSystem\GameObjectSave.cs" />
     <Compile Include="Assets\Scripts\Player\ItemPickUp.cs" />
+    <Compile Include="Assets\Scripts\VFX\VFXManager.cs" />
     <Compile Include="Assets\Scripts\SaveSystem\SceneItem.cs" />
     <Compile Include="Assets\Scripts\Inventory\InventoryManager.cs" />
     <Compile Include="Assets\Scripts\Map\GridCoordinate.cs" />
