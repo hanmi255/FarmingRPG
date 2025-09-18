@@ -162,6 +162,19 @@ namespace Assets.Scripts.Enums
     }
 
     /// <summary>
+    /// 收获动作效果枚举，定义收获动作效果类型
+    /// </summary>
+    public enum HarvestActionEffect
+    {
+        None,
+        DeciduousLeavesFalling,
+        PineConesFalling,
+        ChoppingTreeTrunk,
+        BreakingStone,
+        Reaping
+    }
+
+    /// <summary>
     /// 方向枚举，定义游戏中的基本方向
     /// </summary>
     public enum Direction
