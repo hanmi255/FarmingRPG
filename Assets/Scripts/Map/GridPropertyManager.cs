@@ -460,16 +460,14 @@ namespace Assets.Scripts.Map
             // 计算当前生长阶段
             int growthStages = cropDetails.growthDays.Length;
             int currentGrowthStage = 0;
-            int accumulatedDays = cropDetails.totalGrowthDays;
 
             for (int i = growthStages - 1; i >= 0; i--)
             {
-                if (gridPropertyDetails.growthDays >= accumulatedDays)
+                if (gridPropertyDetails.growthDays >= cropDetails.growthDays[i])
                 {
                     currentGrowthStage = i;
                     break;
                 }
-                accumulatedDays -= cropDetails.growthDays[i];
             }
 
             // 获取对应的预制体和精灵图

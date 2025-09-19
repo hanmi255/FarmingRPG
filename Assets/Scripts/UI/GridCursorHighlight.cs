@@ -286,6 +286,7 @@ namespace Assets.Scripts.UI
                 case ItemType.WateringTool:
                     return gridPropertyDetails.daysSinceLastDig > -1 && gridPropertyDetails.daysSinceLastWater == -1;
 
+                case ItemType.ChoppingTool:
                 case ItemType.CollectingTool:
                     if (gridPropertyDetails.seedItemCode == -1)
                         return false;
@@ -295,7 +296,7 @@ namespace Assets.Scripts.UI
                     if (cropDetails == null)
                         return false;
 
-                    if (gridPropertyDetails.growthDays < cropDetails.totalGrowthDays)
+                    if (gridPropertyDetails.growthDays < cropDetails.growthDays[^1])
                         return false;
 
                     return cropDetails.CanUseToolToHarvestCrop(itemDetails.itemCode);
