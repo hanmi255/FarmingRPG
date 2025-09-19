@@ -405,7 +405,8 @@ namespace Assets.Scripts.Player
                 return;
 
             // 处理需要鼠标按下事件的物品类型
-            if (itemDetails.itemType == ItemType.Seed || itemDetails.itemType == ItemType.Commodity)
+            if (itemDetails.itemType == ItemType.Seed
+                || itemDetails.itemType == ItemType.Commodity)
             {
                 if (Input.GetMouseButtonDown(0))
                 {
@@ -415,7 +416,11 @@ namespace Assets.Scripts.Player
             }
 
             // 处理工具类型物品
-            if (itemDetails.itemType == ItemType.HoeingTool || itemDetails.itemType == ItemType.WateringTool || itemDetails.itemType == ItemType.ReapingTool || itemDetails.itemType == ItemType.CollectingTool)
+            if (itemDetails.itemType == ItemType.HoeingTool
+                || itemDetails.itemType == ItemType.WateringTool
+                || itemDetails.itemType == ItemType.ReapingTool
+                || itemDetails.itemType == ItemType.CollectingTool
+                || itemDetails.itemType == ItemType.ChoppingTool)
             {
                 UseTool(gridPropertyDetails, itemDetails, playerDirection);
             }
@@ -539,7 +544,7 @@ namespace Assets.Scripts.Player
                             playerDirection,
                             PartVariantType.Hoe,
                             ToolEffect.None,
-                            true,  // use hoeing animation
+                            true,  // use general animation
                             false, // not swinging animation
                             false, // not picking animation
                             _useToolAnimationPause,
@@ -562,7 +567,7 @@ namespace Assets.Scripts.Player
                             playerDirection,
                             PartVariantType.WateringCan,
                             ToolEffect.Watering,
-                            false, // not hoeing animation
+                            false, // not general animation
                             false, // not swinging animation
                             false, // not picking animation
                             _liftToolAnimationPause,
@@ -586,7 +591,7 @@ namespace Assets.Scripts.Player
                             playerDirection,
                             PartVariantType.Scythe,
                             ToolEffect.None,
-                            false, // not hoeing animation
+                            false, // not general animation
                             true,  // use swinging animation
                             false, // not picking animation
                             _useToolAnimationPause,
@@ -603,13 +608,30 @@ namespace Assets.Scripts.Player
                             playerDirection,
                             PartVariantType.None, // No specific tool variant for collecting
                             ToolEffect.None,
-                            false, // not hoeing animation
+                            false, // not general animation
                             false, // not swinging animation
                             true,  // use picking animation
                             _pickUpAnimationPause,
                             _afterPickUpAnimationPause,
                             null,  // no grid property update needed
                             (details, direction) => ExecuteCollectingLogic(details, itemDetails)));
+                    }
+                    return;
+                case ItemType.ChoppingTool:
+                    if (_gridCursorHighlight.CursorPositionIsValid)
+                    {
+                        StartCoroutine(UseToolAtCursorCoroutine(
+                            gridPropertyDetails,
+                            playerDirection,
+                            PartVariantType.Axe,
+                            ToolEffect.None,
+                            true, // use general animation
+                            false,  // not swinging animation
+                            false, // not picking animation
+                            _useToolAnimationPause,
+                            _afterUseToolAnimationPause,
+                            null,  // no grid property update needed
+                            (details, direction) => ExecuteChoppingLogic(details, itemDetails)));
                     }
                     return;
                 default:
@@ -637,7 +659,7 @@ namespace Assets.Scripts.Player
             Vector3Int playerDirection,
             PartVariantType toolType,
             ToolEffect toolEffect,
-            bool isHoeingAnimation,
+            bool isGeneralAnimation,
             bool isSwingingAnimation,
             bool isPickingAnimation,
             WaitForSeconds animationPause,
@@ -648,6 +670,8 @@ namespace Assets.Scripts.Player
             // 禁用输入和工具使用，防止重复操作
             _isInputDisabled = true;
             _toolUseDisabled = true;
+
+            ResetAnimationTriggers();
 
             // 设置工具动画参数
             _toolCharacterAttribute.partVariantType = toolType;
@@ -661,10 +685,10 @@ namespace Assets.Scripts.Player
             // 根据玩家方向设置对应的动画状态
             if (playerDirection == Vector3Int.right)
             {
-                if (isSwingingAnimation)
-                    _isSwingingToolRight = true;
-                else if (isHoeingAnimation)
+                if (isGeneralAnimation)
                     _isUsingToolRight = true;
+                else if (isSwingingAnimation)
+                    _isSwingingToolRight = true;
                 else if (isPickingAnimation)
                     _isPickingRight = true;
                 else
@@ -672,10 +696,10 @@ namespace Assets.Scripts.Player
             }
             else if (playerDirection == Vector3Int.left)
             {
-                if (isSwingingAnimation)
-                    _isSwingingToolLeft = true;
-                else if (isHoeingAnimation)
+                if (isGeneralAnimation)
                     _isUsingToolLeft = true;
+                else if (isSwingingAnimation)
+                    _isSwingingToolLeft = true;
                 else if (isPickingAnimation)
                     _isPickingLeft = true;
                 else
@@ -683,10 +707,10 @@ namespace Assets.Scripts.Player
             }
             else if (playerDirection == Vector3Int.up)
             {
-                if (isSwingingAnimation)
-                    _isSwingingToolUp = true;
-                else if (isHoeingAnimation)
+                if (isGeneralAnimation)
                     _isUsingToolUp = true;
+                else if (isSwingingAnimation)
+                    _isSwingingToolUp = true;
                 else if (isPickingAnimation)
                     _isPickingUp = true;
                 else
@@ -694,10 +718,10 @@ namespace Assets.Scripts.Player
             }
             else if (playerDirection == Vector3Int.down)
             {
-                if (isSwingingAnimation)
-                    _isSwingingToolDown = true;
-                else if (isHoeingAnimation)
+                if (isGeneralAnimation)
                     _isUsingToolDown = true;
+                else if (isSwingingAnimation)
+                    _isSwingingToolDown = true;
                 else if (isPickingAnimation)
                     _isPickingDown = true;
                 else
@@ -930,6 +954,26 @@ namespace Assets.Scripts.Player
             {
                 // 处理收集工具对作物的作用
                 cropUnit.ProcessToolAction(itemDetails, _isPickingRight, _isPickingLeft, _isPickingUp, _isPickingDown);
+            }
+        }
+
+        /// <summary>
+        /// 执行砍伐逻辑
+        /// </summary>
+        /// <param name="gridPropertyDetails">网格属性详情</param>
+        /// <param name="itemDetails">物品详情</param>
+        private void ExecuteChoppingLogic(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails)
+        {
+            if (gridPropertyDetails == null || itemDetails == null)
+                return;
+
+            // 获取网格位置的作物单元
+            CropUnit cropUnit = GridPropertyManager.Instance.GetCropUnitAtGridLocation(gridPropertyDetails);
+
+            if (cropUnit != null)
+            {
+                // 处理砍伐工具对作物的作用
+                cropUnit.ProcessToolAction(itemDetails, _isUsingToolRight, _isUsingToolLeft, _isUsingToolUp, _isUsingToolDown);
             }
         }
         #endregion

@@ -13,7 +13,6 @@ namespace Assets.Scripts.Crop
         [ItemCodeDescription]
         public int seedItemCode; // 种子物品代码
         public int[] growthDays; // 每个生长阶段所需的天数
-        public int totalGrowthDays; // 总生长天数
         public GameObject[] growthPrefabs; // 每个生长阶段的预制体
         public Sprite[] growthSprites; // 每个生长阶段的精灵图
         public Season[] seasons; // 作物可生长的季节
