@@ -31,8 +31,16 @@ namespace Assets.Scripts.UI
         public float ItemUseRadius
         {
             get => _itemUseRadius;
-            set => _itemUseRadius = value;
+            set 
+            {
+                _itemUseRadius = value;
+                // 同时更新缓存的一半值，避免重复计算
+                _itemUseRadiusHalfValue = value * 0.5f;
+            }
         }
+        
+        // 缓存ItemUseRadius的一半值，避免重复计算
+        private float _itemUseRadiusHalfValue = 0f;
 
         private ItemType _selectedItemType;
         public ItemType SelectedItemType
@@ -116,27 +124,27 @@ namespace Assets.Scripts.UI
         }
 
         /// <summary>
-        /// 设置光标有效性 - 根据物品类型和网格属性验证光标位置是否有效
+        /// 设置光标有效性
         /// </summary>
-        /// <param name="cursorGridPosition">光标网格位置</param>
-        /// <param name="playerGridPosition">玩家网格位置</param>
+        /// <param name="cursorWorldPosition">光标世界坐标</param>
+        /// <param name="playerCenterPosition">玩家中心坐标</param>
         private void SetCursorValidity(Vector3 cursorWorldPosition, Vector3 playerCenterPosition)
         {
             SetCursorToValid();
 
             // 检查物品使用范围角落
-            if (cursorWorldPosition.x > (playerCenterPosition.x + ItemUseRadius / 2f) && cursorWorldPosition.y > (playerCenterPosition.y + ItemUseRadius / 2f)
-                || cursorWorldPosition.x < (playerCenterPosition.x - ItemUseRadius / 2f) && cursorWorldPosition.y > (playerCenterPosition.y + ItemUseRadius / 2f)
-                || cursorWorldPosition.x < (playerCenterPosition.x - ItemUseRadius / 2f) && cursorWorldPosition.y < (playerCenterPosition.y - ItemUseRadius / 2f)
-                || cursorWorldPosition.x > (playerCenterPosition.x + ItemUseRadius / 2f) && cursorWorldPosition.y < (playerCenterPosition.y - ItemUseRadius / 2f))
+            if (cursorWorldPosition.x > (playerCenterPosition.x + _itemUseRadiusHalfValue) && cursorWorldPosition.y > (playerCenterPosition.y + _itemUseRadiusHalfValue)
+                || cursorWorldPosition.x < (playerCenterPosition.x - _itemUseRadiusHalfValue) && cursorWorldPosition.y > (playerCenterPosition.y + _itemUseRadiusHalfValue)
+                || cursorWorldPosition.x < (playerCenterPosition.x - _itemUseRadiusHalfValue) && cursorWorldPosition.y < (playerCenterPosition.y - _itemUseRadiusHalfValue)
+                || cursorWorldPosition.x > (playerCenterPosition.x + _itemUseRadiusHalfValue) && cursorWorldPosition.y < (playerCenterPosition.y - _itemUseRadiusHalfValue))
             {
                 SetCursorToInvalid();
                 return;
             }
 
             // 检查物品使用范围
-            if (Mathf.Abs(cursorWorldPosition.x - playerCenterPosition.x) > ItemUseRadius
-                || Mathf.Abs(cursorWorldPosition.y - playerCenterPosition.y) > ItemUseRadius)
+            if (Mathf.Abs(cursorWorldPosition.x - playerCenterPosition.x) > _itemUseRadius
+                || Mathf.Abs(cursorWorldPosition.y - playerCenterPosition.y) > _itemUseRadius)
             {
                 SetCursorToInvalid();
                 return;

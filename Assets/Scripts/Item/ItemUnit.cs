@@ -63,7 +63,7 @@ namespace Assets.Scripts.Item
                 // 设置物品精灵
                 _spriteRenderer.sprite = itemDetails.itemSprite;
 
-                // 如果是可收割的场景物品，添加扰动效果组件
+                // 如果是可收获的场景物品，添加扰动效果组件
                 if (itemDetails.itemType == Enums.ItemType.ReapableScenary)
                 {
                     gameObject.AddComponent<ItemNudge>();

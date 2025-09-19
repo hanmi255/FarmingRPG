@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using Assets.Scripts.Misc;
+using Assets.Scripts.Crop;
 
 namespace Assets.Scripts.UI
 {
@@ -23,6 +24,7 @@ namespace Assets.Scripts.UI
         [SerializeField] private RectTransform _cursorRectTransform = null;
         [SerializeField] private Sprite _greenCursor = null;
         [SerializeField] private Sprite _redCursor = null;
+        [SerializeField] private SO_CropDetailsList _so_cropDetailsList = null;
 
         private Canvas _canvas;
         private Grid _grid;
@@ -269,7 +271,7 @@ namespace Assets.Scripts.UI
                     cursorWorldPosition = new Vector3(cursorWorldPosition.x + 0.5f, cursorWorldPosition.y + 0.5f, 0f);
                     HelperMethods.GetComponentsAtBoxLocation(out List<ItemUnit> itemList, cursorWorldPosition, Settings.cursorSize, 0f);
 
-                    // 检查区域内是否有可收割的物品
+                    // 检查区域内是否有可收获的物品
                     foreach (ItemUnit itemUnit in itemList)
                     {
                         ItemDetails itemDetail = InventoryManager.Instance.GetItemDetails(itemUnit.ItemCode);
@@ -280,8 +282,24 @@ namespace Assets.Scripts.UI
                     }
 
                     return true;
+
                 case ItemType.WateringTool:
                     return gridPropertyDetails.daysSinceLastDig > -1 && gridPropertyDetails.daysSinceLastWater == -1;
+
+                case ItemType.CollectingTool:
+                    if (gridPropertyDetails.seedItemCode == -1)
+                        return false;
+
+                    CropDetails cropDetails = _so_cropDetailsList.GetCropDetails(gridPropertyDetails.seedItemCode);
+
+                    if (cropDetails == null)
+                        return false;
+
+                    if (gridPropertyDetails.growthDays < cropDetails.totalGrowthDays)
+                        return false;
+
+                    return cropDetails.CanUseToolToHarvestCrop(itemDetails.itemCode);
+
                 default:
                     return false;
             }

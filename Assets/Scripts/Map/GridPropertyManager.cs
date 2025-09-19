@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Assets.Scripts.Crop;
 using Assets.Scripts.Enums;
 using Assets.Scripts.Events;
 using Assets.Scripts.Misc;
@@ -18,6 +19,7 @@ namespace Assets.Scripts.Map
     {
         #region Fields
 
+        private Transform _cropsParentTransform;
         private Grid _grid;
         private Tilemap _groundDecoration1;
         private Tilemap _groundDecoration2;
@@ -48,11 +50,8 @@ namespace Assets.Scripts.Map
         /// </summary>
         private Dictionary<string, GridPropertyDetails> _gridPropertyDetailsDictionary;
 
-        /// <summary>
-        /// 网格属性配置数组，包含各个场景的网格属性配置
-        /// </summary>
         [SerializeField] private SO_GridProperties[] _so_gridPropertiesArray = null;
-
+        [SerializeField] private SO_CropDetailsList _so_cropDetailsList = null;
         [SerializeField] private Tile[] _dugGround = null;
         [SerializeField] private Tile[] _wateredGround = null;
 
@@ -185,10 +184,22 @@ namespace Assets.Scripts.Map
         /// </summary>
         private void AfterSceneLoad()
         {
+            GameObject cropsParentObject = GameObject.FindGameObjectWithTag(Tags.CropsParentTransform);
+            _cropsParentTransform = cropsParentObject != null ? cropsParentObject.transform : null;
+
             _grid = FindObjectOfType<Grid>();
 
-            _groundDecoration1 = GameObject.FindGameObjectWithTag(Tags.GroundDecoration1).GetComponent<Tilemap>();
-            _groundDecoration2 = GameObject.FindGameObjectWithTag(Tags.GroundDecoration2).GetComponent<Tilemap>();
+            GameObject groundDecoration1Object = GameObject.FindGameObjectWithTag(Tags.GroundDecoration1);
+            if (groundDecoration1Object != null)
+            {
+                _groundDecoration1 = groundDecoration1Object.GetComponent<Tilemap>();
+            }
+
+            GameObject groundDecoration2Object = GameObject.FindGameObjectWithTag(Tags.GroundDecoration2);
+            if (groundDecoration2Object != null)
+            {
+                _groundDecoration2 = groundDecoration2Object.GetComponent<Tilemap>();
+            }
         }
 
         /// <summary>
@@ -210,6 +221,13 @@ namespace Assets.Scripts.Map
                 {
                     var gridPropertyDetails = item.Value;
 
+                    // 已经种植作物则增加成长天数
+                    if (gridPropertyDetails.growthDays > -1)
+                    {
+                        gridPropertyDetails.growthDays += 1;
+                    }
+
+                    // 已经浇水则清除浇水地块
                     if (gridPropertyDetails.daysSinceLastWater > -1)
                     {
                         gridPropertyDetails.daysSinceLastWater = -1;
@@ -351,6 +369,54 @@ namespace Assets.Scripts.Map
             SetGridPropertyDetails(gridX, gridY, gridPropertyDetails, _gridPropertyDetailsDictionary);
         }
 
+        /// <summary>
+        /// 获取作物单位
+        /// </summary>
+        /// <param name="gridPropertyDetails"></param>
+        /// <returns>如果碰撞体检测正确则返回作物单位</returns>
+        public CropUnit GetCropUnitAtGridLocation(GridPropertyDetails gridPropertyDetails)
+        {
+            Vector3 worldPosition = _grid.GetCellCenterWorld(new(gridPropertyDetails.gridX, gridPropertyDetails.gridY, 0));
+            Collider2D[] colliders = Physics2D.OverlapPointAll(worldPosition);
+
+            // 遍历所有碰撞体，查找匹配的作物单元
+            foreach (Collider2D collider in colliders)
+            {
+                // 检查碰撞体的游戏对象本身是否包含CropUnit组件
+                // 如果没有在当前对象上找到CropUnit，则检查父级和子级
+                // 原因：作物预制体可能有不同的结构，CropUnit组件可能在:
+                // 1. 碰撞体所在的同一对象上
+                // 2. 父级对象上（当碰撞体在子对象上时）
+                // 3. 子级对象上（当碰撞体在父对象上时）
+                if (!collider.gameObject.TryGetComponent<CropUnit>(out var cropUnit))
+                {
+                    cropUnit = collider.gameObject.GetComponentInParent<CropUnit>();
+                }
+
+                if (cropUnit == null)
+                {
+                    cropUnit = collider.gameObject.GetComponentInChildren<CropUnit>();
+                }
+
+                // 如果找到了CropUnit并且位置匹配，则返回该作物单元
+                if (cropUnit != null && cropUnit.cropGridPosition == new Vector2Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY))
+                {
+                    return cropUnit;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// 获取指定种子的作物单元详细信息
+        /// </summary>
+        /// <param name="seedItemCode"></param>
+        /// <returns></returns>
+        public CropDetails GetCropDetails(int seedItemCode)
+        {
+            return _so_cropDetailsList.GetCropDetails(seedItemCode);
+        }
         #endregion
 
         #region Ground Decoration Management
@@ -379,6 +445,57 @@ namespace Assets.Scripts.Map
             }
         }
 
+        /// <summary>
+        /// 显示所有已 plant 的作物
+        /// </summary>
+        public void DisplayPlantedCrops(GridPropertyDetails gridPropertyDetails)
+        {
+            if (gridPropertyDetails.seedItemCode <= -1)
+                return;
+
+            var cropDetails = _so_cropDetailsList.GetCropDetails(gridPropertyDetails.seedItemCode);
+            if (cropDetails == null)
+                return;
+
+            // 计算当前生长阶段
+            int growthStages = cropDetails.growthDays.Length;
+            int currentGrowthStage = 0;
+            int accumulatedDays = cropDetails.totalGrowthDays;
+
+            for (int i = growthStages - 1; i >= 0; i--)
+            {
+                if (gridPropertyDetails.growthDays >= accumulatedDays)
+                {
+                    currentGrowthStage = i;
+                    break;
+                }
+                accumulatedDays -= cropDetails.growthDays[i];
+            }
+
+            // 获取对应的预制体和精灵图
+            var cropPrefab = cropDetails.growthPrefabs[currentGrowthStage];
+            var growthSprite = cropDetails.growthSprites[currentGrowthStage];
+
+            // 计算世界坐标位置
+            var cellPosition = new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY, 0);
+            var worldPosition = _groundDecoration2.CellToWorld(cellPosition);
+            worldPosition = new Vector3(worldPosition.x + Settings.halfGridCellSize, worldPosition.y, worldPosition.z);
+
+            // 创建作物实例并配置
+            var cropInstance = Instantiate(cropPrefab, worldPosition, Quaternion.identity, _cropsParentTransform);
+
+            // 设置精灵图和网格位置
+            var spriteRenderer = cropInstance.GetComponentInChildren<SpriteRenderer>();
+            if (spriteRenderer != null)
+                spriteRenderer.sprite = growthSprite;
+
+            if (cropInstance.TryGetComponent<CropUnit>(out var cropUnit))
+                cropUnit.cropGridPosition = new Vector2Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY);
+        }
+
+        /// <summary>
+        /// 显示所有属性详情
+        /// </summary>
         private void DisplayGridPropertyDetails()
         {
             foreach (var item in _gridPropertyDetailsDictionary)
@@ -388,6 +505,8 @@ namespace Assets.Scripts.Map
                 DisplayDugGround(gridPropertyDetails);
 
                 DisplayWateredGround(gridPropertyDetails);
+
+                DisplayPlantedCrops(gridPropertyDetails);
             }
         }
 
@@ -401,11 +520,26 @@ namespace Assets.Scripts.Map
         }
 
         /// <summary>
+        /// 清除显示的所有种植作物
+        /// </summary>
+        private void ClearDisplayAllPlantedCrops()
+        {
+            // 查找场景中所有CropUnit对象并销毁
+            CropUnit[] cropUnits = FindObjectsOfType<CropUnit>();
+            foreach (var cropUnit in cropUnits)
+            {
+                Destroy(cropUnit.gameObject);
+            }
+        }
+
+        /// <summary>
         /// 清除显示的属性
         /// </summary>
         private void ClearDisplayGridPropertyDetails()
         {
             ClearDisplayGroundDecorations();
+
+            ClearDisplayAllPlantedCrops();
         }
 
         /// <summary>

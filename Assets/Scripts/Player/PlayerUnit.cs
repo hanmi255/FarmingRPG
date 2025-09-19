@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Assets.Scripts.Animation;
+using Assets.Scripts.Crop;
 using Assets.Scripts.Enums;
 using Assets.Scripts.Events;
 using Assets.Scripts.HelperClasses;
@@ -8,6 +9,7 @@ using Assets.Scripts.Inventory;
 using Assets.Scripts.Item;
 using Assets.Scripts.Map;
 using Assets.Scripts.Misc;
+using Assets.Scripts.TimeSystem;
 using Assets.Scripts.UI;
 using UnityEngine;
 
@@ -29,6 +31,8 @@ namespace Assets.Scripts.Player
         private WaitForSeconds _afterUseToolAnimationPause;
         private WaitForSeconds _liftToolAnimationPause;
         private WaitForSeconds _afterLiftToolAnimationPause;
+        private WaitForSeconds _pickUpAnimationPause;
+        private WaitForSeconds _afterPickUpAnimationPause;
         private bool _toolUseDisabled = false;
 
         // 动画覆盖
@@ -79,6 +83,9 @@ namespace Assets.Scripts.Player
         private GridCursorHighlight _gridCursorHighlight;
         private CursorHighlight _cursorHighlight;
         private Camera _mainCamera;
+
+        // 优化：缓存ItemUseRadius的一半值，避免重复计算
+        private float _itemUseRadiusHalfValue = 0f;
         #endregion
 
         #region Private Fields - Character Customization
@@ -147,6 +154,8 @@ namespace Assets.Scripts.Player
             _afterUseToolAnimationPause = new WaitForSeconds(Settings.afterUseToolAnimationPause);
             _liftToolAnimationPause = new WaitForSeconds(Settings.liftToolAnimationPause);
             _afterLiftToolAnimationPause = new WaitForSeconds(Settings.afterLiftToolAnimationPause);
+            _pickUpAnimationPause = new WaitForSeconds(Settings.pickUpAnimationPause);
+            _afterPickUpAnimationPause = new WaitForSeconds(Settings.afterPickUpAnimationPause);
         }
 
         /// <summary>
@@ -161,6 +170,8 @@ namespace Assets.Scripts.Player
                 PlayerWalkInput();
                 PlayerClickInput();
 
+                TestInput();
+
                 SetMovementParameters();
                 EventHandler.CallMovementEvent(_parameters);
             }
@@ -172,6 +183,19 @@ namespace Assets.Scripts.Player
         private void FixedUpdate()
         {
             PlayerMovement();
+        }
+
+        // Test
+        private void TestInput()
+        {
+            if (Input.GetKey(KeyCode.T))
+            {
+                TimeManager.Instance.TestAdvanceGameMinute();
+            }
+            if (Input.GetKey(KeyCode.G))
+            {
+                TimeManager.Instance.TestAdvanceGameDay();
+            }
         }
         #endregion
 
@@ -205,6 +229,9 @@ namespace Assets.Scripts.Player
                 _animationOverrides.ApplyCharacterCustomisationParameters(_characterAttributeCustomisationList);
 
                 _isCarrying = true;
+
+                // 更新缓存的ItemUseRadius一半值
+                _itemUseRadiusHalfValue = itemDetails.itemUseRadius * 0.5f;
             }
         }
 
@@ -382,13 +409,13 @@ namespace Assets.Scripts.Player
             {
                 if (Input.GetMouseButtonDown(0))
                 {
-                    DropItem(itemDetails);
+                    DropItem(gridPropertyDetails, itemDetails);
                 }
                 return;
             }
 
             // 处理工具类型物品
-            if (itemDetails.itemType == ItemType.HoeingTool || itemDetails.itemType == ItemType.WateringTool || itemDetails.itemType == ItemType.ReapingTool)
+            if (itemDetails.itemType == ItemType.HoeingTool || itemDetails.itemType == ItemType.WateringTool || itemDetails.itemType == ItemType.ReapingTool || itemDetails.itemType == ItemType.CollectingTool)
             {
                 UseTool(gridPropertyDetails, itemDetails, playerDirection);
             }
@@ -467,11 +494,30 @@ namespace Assets.Scripts.Player
         /// 放置选中的物品
         /// </summary>
         /// <param name="itemDetails">物品详情</param>
-        private void DropItem(ItemDetails itemDetails)
+        private void DropItem(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails)
         {
-            if (itemDetails.canBeDropped && _gridCursorHighlight.CursorPositionIsValid)
+            // 检查基本放置条件：物品可以被放置且光标位置有效
+            if (!itemDetails.canBeDropped || !_gridCursorHighlight.CursorPositionIsValid)
+                return;
+
+            switch (itemDetails.itemType)
             {
-                EventHandler.CallDropSelectedItemEvent();
+                case ItemType.Seed:
+                    // 种子特殊条件：地块必须已挖掘且未种植其他作物
+                    if (gridPropertyDetails.daysSinceLastDig > -1 && gridPropertyDetails.seedItemCode == -1)
+                    {
+                        PlantSeedAtCursor(gridPropertyDetails, itemDetails);
+                    }
+                    else
+                    {
+                        EventHandler.CallDropSelectedItemEvent();
+                    }
+                    break;
+
+                case ItemType.Commodity:
+                    // 商品可以直接放置
+                    EventHandler.CallDropSelectedItemEvent();
+                    break;
             }
         }
 
@@ -495,6 +541,7 @@ namespace Assets.Scripts.Player
                             ToolEffect.None,
                             true,  // use hoeing animation
                             false, // not swinging animation
+                            false, // not picking animation
                             _useToolAnimationPause,
                             _afterUseToolAnimationPause,
                             (details) =>
@@ -517,6 +564,7 @@ namespace Assets.Scripts.Player
                             ToolEffect.Watering,
                             false, // not hoeing animation
                             false, // not swinging animation
+                            false, // not picking animation
                             _liftToolAnimationPause,
                             _afterLiftToolAnimationPause,
                             (details) =>
@@ -540,10 +588,28 @@ namespace Assets.Scripts.Player
                             ToolEffect.None,
                             false, // not hoeing animation
                             true,  // use swinging animation
+                            false, // not picking animation
                             _useToolAnimationPause,
                             new WaitForSeconds(0f), // no after animation pause for reaping
                             null,  // no grid property update needed
                             (details, direction) => ExecuteReapingLogic(itemDetails, direction)));
+                    }
+                    return;
+                case ItemType.CollectingTool:
+                    if (_gridCursorHighlight.CursorPositionIsValid)
+                    {
+                        StartCoroutine(UseToolAtCursorCoroutine(
+                            gridPropertyDetails,
+                            playerDirection,
+                            PartVariantType.None, // No specific tool variant for collecting
+                            ToolEffect.None,
+                            false, // not hoeing animation
+                            false, // not swinging animation
+                            true,  // use picking animation
+                            _pickUpAnimationPause,
+                            _afterPickUpAnimationPause,
+                            null,  // no grid property update needed
+                            (details, direction) => ExecuteCollectingLogic(details, itemDetails)));
                     }
                     return;
                 default:
@@ -560,6 +626,7 @@ namespace Assets.Scripts.Player
         /// <param name="toolEffect">工具效果</param>
         /// <param name="isHoeingAnimation">是否使用锄地动画（use/lift动画）</param>
         /// <param name="isSwingingAnimation">是否使用挥舞动画</param>
+        /// <param name="isPickingAnimation">是否使用拾取动画</param>
         /// <param name="animationPause">动画暂停时间</param>
         /// <param name="afterAnimationPause">动画后暂停时间</param>
         /// <param name="updateGridProperty">更新网格属性的回调函数</param>
@@ -572,6 +639,7 @@ namespace Assets.Scripts.Player
             ToolEffect toolEffect,
             bool isHoeingAnimation,
             bool isSwingingAnimation,
+            bool isPickingAnimation,
             WaitForSeconds animationPause,
             WaitForSeconds afterAnimationPause,
             System.Action<GridPropertyDetails> updateGridProperty,
@@ -597,6 +665,8 @@ namespace Assets.Scripts.Player
                     _isSwingingToolRight = true;
                 else if (isHoeingAnimation)
                     _isUsingToolRight = true;
+                else if (isPickingAnimation)
+                    _isPickingRight = true;
                 else
                     _isLiftingToolRight = true;
             }
@@ -606,6 +676,8 @@ namespace Assets.Scripts.Player
                     _isSwingingToolLeft = true;
                 else if (isHoeingAnimation)
                     _isUsingToolLeft = true;
+                else if (isPickingAnimation)
+                    _isPickingLeft = true;
                 else
                     _isLiftingToolLeft = true;
             }
@@ -615,6 +687,8 @@ namespace Assets.Scripts.Player
                     _isSwingingToolUp = true;
                 else if (isHoeingAnimation)
                     _isUsingToolUp = true;
+                else if (isPickingAnimation)
+                    _isPickingUp = true;
                 else
                     _isLiftingToolUp = true;
             }
@@ -624,6 +698,8 @@ namespace Assets.Scripts.Player
                     _isSwingingToolDown = true;
                 else if (isHoeingAnimation)
                     _isUsingToolDown = true;
+                else if (isPickingAnimation)
+                    _isPickingDown = true;
                 else
                     _isLiftingToolDown = true;
             }
@@ -631,7 +707,7 @@ namespace Assets.Scripts.Player
             // 等待工具使用动画播放
             yield return animationPause;
 
-            // 执行自定义工具逻辑（如收割逻辑）
+            // 执行自定义工具逻辑（如收获逻辑）
             customToolAction?.Invoke(gridPropertyDetails, playerDirection);
 
             // 更新网格属性（如果需要）
@@ -689,15 +765,15 @@ namespace Assets.Scripts.Player
         private Vector3Int GetPlayerDirection(Vector3 cursorPosition, Vector3 playerPosition)
         {
             if (cursorPosition.x > playerPosition.x
-                && cursorPosition.y < (playerPosition.y + _cursorHighlight.ItemUseRadius / 2f)
-                && cursorPosition.y > (playerPosition.y - _cursorHighlight.ItemUseRadius / 2f))
+                && cursorPosition.y < (playerPosition.y + _itemUseRadiusHalfValue)
+                && cursorPosition.y > (playerPosition.y - _itemUseRadiusHalfValue))
             {
                 return Vector3Int.right;
             }
 
             if (cursorPosition.x < playerPosition.x
-                && cursorPosition.y < (playerPosition.y + _cursorHighlight.ItemUseRadius / 2f)
-                && cursorPosition.y > (playerPosition.y - _cursorHighlight.ItemUseRadius / 2f))
+                && cursorPosition.y < (playerPosition.y + _itemUseRadiusHalfValue)
+                && cursorPosition.y > (playerPosition.y - _itemUseRadiusHalfValue))
             {
                 return Vector3Int.left;
             }
@@ -719,7 +795,25 @@ namespace Assets.Scripts.Player
         }
 
         /// <summary>
-        /// 执行收割逻辑
+        /// 在光标位置种植
+        /// </summary>
+        /// <param name="gridPropertyDetails"></param>
+        /// <param name="itemDetails"></param>
+        private void PlantSeedAtCursor(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails)
+        {
+            if (GridPropertyManager.Instance.GetCropDetails(itemDetails.itemCode) != null)
+            {
+                gridPropertyDetails.seedItemCode = itemDetails.itemCode;
+                gridPropertyDetails.growthDays = 0;
+
+                GridPropertyManager.Instance.DisplayPlantedCrops(gridPropertyDetails);
+
+                EventHandler.CallRemoveSelectedItemFromInventoryEvent();
+            }
+        }
+
+        /// <summary>
+        /// 执行收获逻辑
         /// </summary>
         /// <param name="itemDetails">物品详情</param>
         /// <param name="playerDirection">玩家方向</param>
@@ -729,24 +823,24 @@ namespace Assets.Scripts.Player
             if (itemDetails == null)
                 return;
 
-            // 计算收割区域
+            // 计算收获区域
             Vector2 reapPoint = CalculateReapingPoint(playerDirection, itemDetails.itemUseRadius);
             Vector2 reapSize = new(itemDetails.itemUseRadius, itemDetails.itemUseRadius);
 
-            // 获取可收割的物品
+            // 获取可收获的物品
             ItemUnit[] itemsInRange = HelperMethods.GetComponentsAtBoxLocationNonAlloc<ItemUnit>(
                 Settings.maxCollidersToTestPerReapSwing, reapPoint, reapSize, 0f);
 
-            // 执行收割操作
+            // 执行收获操作
             ProcessReapableItems(itemsInRange);
         }
 
         /// <summary>
-        /// 计算收割点位置
+        /// 计算收获点位置
         /// </summary>
         /// <param name="playerDirection">玩家方向</param>
         /// <param name="itemUseRadius">物品使用半径</param>
-        /// <returns>收割点位置</returns>
+        /// <returns>收获点位置</returns>
         private Vector2 CalculateReapingPoint(Vector3Int playerDirection, float itemUseRadius)
         {
             Vector3 playerCenter = GetPlayerCenterPosition();
@@ -759,7 +853,7 @@ namespace Assets.Scripts.Player
         }
 
         /// <summary>
-        /// 处理可收割物品
+        /// 处理可收获物品
         /// </summary>
         /// <param name="itemsInRange">范围内的物品数组</param>
         private void ProcessReapableItems(ItemUnit[] itemsInRange)
@@ -786,10 +880,10 @@ namespace Assets.Scripts.Player
         }
 
         /// <summary>
-        /// 检查物品是否可收割
+        /// 检查物品是否可收获
         /// </summary>
         /// <param name="item">要检查的物品</param>
-        /// <returns>是否可收割</returns>
+        /// <returns>是否可收获</returns>
         private bool IsItemReapable(ItemUnit item)
         {
             if (item == null)
@@ -800,23 +894,43 @@ namespace Assets.Scripts.Player
         }
 
         /// <summary>
-        /// 收割单个物品
+        /// 收获单个物品
         /// </summary>
-        /// <param name="item">要收割的物品</param>
+        /// <param name="item">要收获的物品</param>
         private void ReapItem(ItemUnit item)
         {
             if (item == null || item.gameObject == null)
                 return;
 
             Vector3 effectPosition = new(
-                item.transform.position.x, 
-                item.transform.position.y + Settings.gridCellSize * 0.5f, 
+                item.transform.position.x,
+                item.transform.position.y + Settings.halfGridCellSize,
                 item.transform.position.z
             );
 
             EventHandler.CallHarvestActionEffectEvent(effectPosition, HarvestActionEffect.Reaping);
 
             Destroy(item.gameObject);
+        }
+
+        /// <summary>
+        /// 执行收集逻辑
+        /// </summary>
+        /// <param name="gridPropertyDetails">网格属性详情</param>
+        /// <param name="itemDetails">物品详情</param>
+        private void ExecuteCollectingLogic(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails)
+        {
+            if (gridPropertyDetails == null || itemDetails == null)
+                return;
+
+            // 获取网格位置的作物单元
+            CropUnit cropUnit = GridPropertyManager.Instance.GetCropUnitAtGridLocation(gridPropertyDetails);
+
+            if (cropUnit != null)
+            {
+                // 处理收集工具对作物的作用
+                cropUnit.ProcessToolAction(itemDetails, _isPickingRight, _isPickingLeft, _isPickingUp, _isPickingDown);
+            }
         }
         #endregion
     }
