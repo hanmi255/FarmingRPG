@@ -57,7 +57,7 @@ namespace Assets.Scripts.Inventory
         /// <param name="gameObjectToDestroy">要销毁的游戏对象</param>
         public void AddItem(InventoryLocation inventoryLocation, ItemUnit item, GameObject gameObjectToDestroy)
         {
-            AddItem(inventoryLocation, item);
+            AddItem(inventoryLocation, item.ItemCode);
             Destroy(gameObjectToDestroy);
         }
 
@@ -68,11 +68,18 @@ namespace Assets.Scripts.Inventory
         /// <param name="item">物品单元</param>
         public void AddItem(InventoryLocation inventoryLocation, ItemUnit item)
         {
-            int itemCode = item.ItemCode;
+            AddItem(inventoryLocation, item.ItemCode);
+        }
+
+        /// <summary>
+        /// 添加物品到背包
+        /// </summary>
+        /// <param name="inventoryLocation">背包位置</param>
+        /// <param name="itemCode">物品代码</param>
+        public void AddItem(InventoryLocation inventoryLocation, int itemCode)
+        {
             List<InventoryItem> inventoryList = _inventoryLists[(int)inventoryLocation];
 
-            // 如果已经存在该物品则增加数量
-            // 否则添加物品
             int itemPosition = FindItemInInventory(inventoryLocation, itemCode);
             if (itemPosition != -1)
             {

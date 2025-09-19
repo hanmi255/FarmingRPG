@@ -54,12 +54,14 @@ namespace Assets.Scripts.UI.UIInventory
         {
             EventHandler.AfterSceneLoadEvent += AfterSceneLoad;
             EventHandler.DropSelectedItemEvent += DropSelectedItemAtMousePosition;
+            EventHandler.RemoveSelectedItemFromInventoryEvent += RemoveSelectedItemFromInventory;
         }
 
         private void OnDisable()
         {
             EventHandler.AfterSceneLoadEvent -= AfterSceneLoad;
             EventHandler.DropSelectedItemEvent -= DropSelectedItemAtMousePosition;
+            EventHandler.RemoveSelectedItemFromInventoryEvent -= RemoveSelectedItemFromInventory;
         }
 
         private void Start()
@@ -237,7 +239,7 @@ namespace Assets.Scripts.UI.UIInventory
                 return;
 
             Vector3 worldPosition = _mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -_mainCamera.transform.position.z));
-            Vector3 dropPosition = new(worldPosition.x, worldPosition.y - Settings.gridCellSize / 2f, 0);
+            Vector3 dropPosition = new(worldPosition.x, worldPosition.y - Settings.halfGridCellSize, 0);
 
             GameObject itemGameObject = Instantiate(_itemPrefab, dropPosition, Quaternion.identity, _parentItem);
             ItemUnit item = itemGameObject.GetComponent<ItemUnit>();
@@ -246,6 +248,24 @@ namespace Assets.Scripts.UI.UIInventory
             InventoryManager.Instance.RemoveItem(InventoryLocation.Player, item.ItemCode);
 
             if (InventoryManager.Instance.FindItemInInventory(InventoryLocation.Player, item.ItemCode) == -1)
+            {
+                ClearSelectedItem();
+            }
+        }
+
+        /// <summary>
+        /// 从背包中移除选中的道具
+        /// </summary>
+        private void RemoveSelectedItemFromInventory()
+        {
+            if (itemDetails == null || !isSelected)
+                return;
+
+            int itemCode = itemDetails.itemCode;
+
+            InventoryManager.Instance.RemoveItem(InventoryLocation.Player, itemCode);
+
+            if (InventoryManager.Instance.FindItemInInventory(InventoryLocation.Player, itemCode) == -1)
             {
                 ClearSelectedItem();
             }

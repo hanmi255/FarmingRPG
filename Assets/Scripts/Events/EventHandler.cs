@@ -91,7 +91,10 @@ namespace Assets.Scripts.Events
         // 背包更新事件
         public static event Action<InventoryLocation, List<InventoryItem>> InventoryUpdatedEvent;
 
-        // 收割动作效果事件
+        // 移除选中物品事件
+        public static event Action RemoveSelectedItemFromInventoryEvent;
+
+        // 收获动作效果事件
         public static event Action<Vector3, HarvestActionEffect> HarvestActionEffectEvent;
 
         // 移动事件
@@ -149,9 +152,17 @@ namespace Assets.Scripts.Events
         }
 
         /// <summary>
+        /// 触发移除选中物品事件
+        /// </summary>
+        public static void CallRemoveSelectedItemFromInventoryEvent()
+        {
+            RemoveSelectedItemFromInventoryEvent?.Invoke();
+        }
+
+        /// <summary>
         /// 触发收获动作效果事件
         /// </summary>
-        /// <param name="position">收割位置</param>
+        /// <param name="position">收获位置</param>
         /// <param name="harvestActionEffect">收获动作效果</param>
         public static void CallHarvestActionEffectEvent(Vector3 position, HarvestActionEffect harvestActionEffect)
         {

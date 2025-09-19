@@ -107,7 +107,7 @@ namespace Assets.Scripts.TimeSystem
 
             _gameSeason = 0;
             _gameYear++;
-            
+
             // 重置年
             if (_gameYear > 9999)
                 _gameYear = 1;
@@ -156,5 +156,22 @@ namespace Assets.Scripts.TimeSystem
         }
 
         #endregion
+
+        // Test
+        public void TestAdvanceGameMinute()
+        {
+            for (int i = 0; i < 60; i++)
+            {
+                UpdateGameSecond();
+            }
+        }
+
+        public void TestAdvanceGameDay()
+        {
+            for (int i = 0; i < 86400; i++)
+            {
+                UpdateGameSecond();
+            }
+        }
     }
 }
