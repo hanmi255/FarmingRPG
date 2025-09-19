@@ -4,6 +4,7 @@ using Assets.Scripts.Inventory;
 using Assets.Scripts.Item;
 using Assets.Scripts.Map;
 using Assets.Scripts.Scene;
+using Assets.Scripts.Events;
 using UnityEngine;
 
 namespace Assets.Scripts.Crop
@@ -12,6 +13,7 @@ namespace Assets.Scripts.Crop
     {
         #region Fields
         private int _harvestActionCount = 0;
+        [SerializeField] private Transform _harvestActionEffectTransform = null;
         [SerializeField] private SpriteRenderer _cropHarvestedSpriteRenderer = null;
         [HideInInspector] public Vector2Int cropGridPosition;
         private static readonly int _harvestedStateHash = Animator.StringToHash("Harvested");
@@ -50,6 +52,11 @@ namespace Assets.Scripts.Crop
             else if (isToolLeft || isToolDown)
             {
                 animator.SetTrigger("usetoolleft");
+            }
+
+            if (cropDetails.isHarvestActionEffect)
+            {
+                EventHandler.CallHarvestActionEffectEvent(_harvestActionEffectTransform.position, cropDetails.harvestActionEffect);
             }
 
             int requiredHarvestActions = cropDetails.RequiredHarvestActionsForTool(itemDetails.itemCode);
@@ -114,7 +121,7 @@ namespace Assets.Scripts.Crop
         {
             while (animator.GetCurrentAnimatorStateInfo(0).shortNameHash != _harvestedStateHash)
             {
-                yield return _waitForSeconds0_1; 
+                yield return _waitForSeconds0_1;
             }
 
             HarvestActions(cropDetails, gridPropertyDetails);

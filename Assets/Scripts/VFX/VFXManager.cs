@@ -11,6 +11,7 @@ namespace Assets.Scripts.VFX
         #region Fields
         private WaitForSeconds _twoSeconds;
         [SerializeField] private GameObject _reapingPrefab = null;
+        [SerializeField] private GameObject _deciduousLeavesFallingPrefab = null;
         #endregion
 
         #region Lifecycle Methods
@@ -40,6 +41,11 @@ namespace Assets.Scripts.VFX
                     GameObject reaping = PoolManager.Instance.ReuseObject(_reapingPrefab, position, Quaternion.identity);
                     reaping.SetActive(true);
                     StartCoroutine(DisplayHarvestActionEffectCoroutine(reaping, _twoSeconds));
+                    break;
+                case HarvestActionEffect.DeciduousLeavesFalling:
+                    GameObject deciduousLeavesFalling = PoolManager.Instance.ReuseObject(_deciduousLeavesFallingPrefab, position, Quaternion.identity);
+                    deciduousLeavesFalling.SetActive(true);
+                    StartCoroutine(DisplayHarvestActionEffectCoroutine(deciduousLeavesFalling, _twoSeconds));
                     break;
                 case HarvestActionEffect.None:
                 default:
