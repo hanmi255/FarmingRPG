@@ -12,7 +12,7 @@ namespace Assets.Scripts.Map
         public bool isNPCObstacle = false;
         public int daysSinceLastDig = -1;
         public int daysSinceLastWater = -1;
-        public int DaysSinceLastHarvest = -1;
+        public int daysSinceLastHarvest = -1;
         public int seedItemCode = -1;
         public int growthDays = -1;
 

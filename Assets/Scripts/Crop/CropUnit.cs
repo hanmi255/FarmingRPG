@@ -1,10 +1,10 @@
 using System.Collections;
 using Assets.Scripts.Enums;
+using Assets.Scripts.Events;
 using Assets.Scripts.Inventory;
 using Assets.Scripts.Item;
 using Assets.Scripts.Map;
 using Assets.Scripts.Scene;
-using Assets.Scripts.Events;
 using UnityEngine;
 
 namespace Assets.Scripts.Crop
@@ -113,7 +113,7 @@ namespace Assets.Scripts.Crop
         {
             gridPropertyDetails.seedItemCode = -1;
             gridPropertyDetails.growthDays = -1;
-            gridPropertyDetails.DaysSinceLastHarvest = -1;
+            gridPropertyDetails.daysSinceLastHarvest = -1;
             gridPropertyDetails.daysSinceLastWater = -1;
         }
 
@@ -135,6 +135,10 @@ namespace Assets.Scripts.Crop
         private void HarvestActions(CropDetails cropDetails, GridPropertyDetails gridPropertyDetails)
         {
             SpawnHarvestedItems(cropDetails);
+
+            if(cropDetails.harvestedTransformItemCode > 0){
+                CreateHarvestedTransformItem(cropDetails, gridPropertyDetails);
+            }
 
             Destroy(gameObject);
         }
@@ -172,6 +176,22 @@ namespace Assets.Scripts.Crop
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// 创建收获后的转变作物
+        /// </summary>
+        /// <param name="cropDetails"></param>
+        /// <param name="gridPropertyDetails"></param>
+        private void CreateHarvestedTransformItem(CropDetails cropDetails, GridPropertyDetails gridPropertyDetails)
+        {
+            gridPropertyDetails.seedItemCode = cropDetails.harvestedTransformItemCode;
+            gridPropertyDetails.growthDays = 0;
+            gridPropertyDetails.daysSinceLastHarvest = -1;
+            gridPropertyDetails.daysSinceLastWater = -1;
+
+            GridPropertyManager.Instance.SetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY, gridPropertyDetails);
+            GridPropertyManager.Instance.DisplayPlantedCrops(gridPropertyDetails);
         }
         #endregion
     }
