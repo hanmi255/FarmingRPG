@@ -91,6 +91,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0e1c417360cd604ea537ccbbbb1a25d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _harvestActionEffectTransform: {fileID: 6281708409214077876}
   _cropHarvestedSpriteRenderer: {fileID: 0}
   cropGridPosition: {x: 0, y: 0}
 --- !u!1 &2886384146437771796
@@ -270,6 +271,7 @@ Transform:
   m_Children:
   - {fileID: 9180366691376280572}
   - {fileID: 2896869850663509885}
+  - {fileID: 6281708409214077876}
   m_Father: {fileID: 5181853112125965902}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!210 &5379862279830340167
@@ -357,6 +359,37 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!1 &4275741787522809835
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6281708409214077876}
+  m_Layer: 0
+  m_Name: LeavesSpawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6281708409214077876
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4275741787522809835}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 4, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6626623044246303573}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4557685164010224827
 GameObject:
   m_ObjectHideFlags: 0

@@ -11,6 +11,8 @@ namespace Assets.Scripts.VFX
         #region Fields
         private WaitForSeconds _twoSeconds;
         [SerializeField] private GameObject _reapingPrefab = null;
+        [SerializeField] private GameObject _deciduousLeavesFallingPrefab = null;
+        [SerializeField] private GameObject _choppingTreeTrunkPrefab = null;
         #endregion
 
         #region Lifecycle Methods
@@ -32,19 +34,42 @@ namespace Assets.Scripts.VFX
         #endregion
 
         #region Private Methods
+        /// <summary>
+        /// 显示收获动作效果
+        /// </summary>
+        /// <param name="position">效果生成位置</param>
+        /// <param name="harvestActionEffect">收获动作效果</param>
         private void DisplayHarvestActionEffect(Vector3 position, HarvestActionEffect harvestActionEffect)
         {
             switch (harvestActionEffect)
             {
                 case HarvestActionEffect.Reaping:
-                    GameObject reaping = PoolManager.Instance.ReuseObject(_reapingPrefab, position, Quaternion.identity);
-                    reaping.SetActive(true);
-                    StartCoroutine(DisplayHarvestActionEffectCoroutine(reaping, _twoSeconds));
+                    SpawnAndActivateHarvestEffect(_reapingPrefab, position);
+                    break;
+                case HarvestActionEffect.DeciduousLeavesFalling:
+                    SpawnAndActivateHarvestEffect(_deciduousLeavesFallingPrefab, position);
+                    break;
+                case HarvestActionEffect.ChoppingTreeTrunk:
+                    SpawnAndActivateHarvestEffect(_choppingTreeTrunkPrefab, position);
                     break;
                 case HarvestActionEffect.None:
                 default:
                     break;
             }
+        }
+
+        /// <summary>
+        /// 生成并激活收获效果
+        /// </summary>
+        /// <param name="effectPrefab">效果预制体</param>
+        /// <param name="position">生成位置</param>
+        private void SpawnAndActivateHarvestEffect(GameObject effectPrefab, Vector3 position)
+        {
+            if (effectPrefab == null) return;
+
+            GameObject effect = PoolManager.Instance.ReuseObject(effectPrefab, position, Quaternion.identity);
+            effect.SetActive(true);
+            StartCoroutine(DisplayHarvestActionEffectCoroutine(effect, _twoSeconds));
         }
 
         private IEnumerator DisplayHarvestActionEffectCoroutine(GameObject effect, WaitForSeconds twoSeconds)

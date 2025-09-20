@@ -1,5 +1,6 @@
 using System.Collections;
 using Assets.Scripts.Enums;
+using Assets.Scripts.Events;
 using Assets.Scripts.Inventory;
 using Assets.Scripts.Item;
 using Assets.Scripts.Map;
@@ -12,6 +13,7 @@ namespace Assets.Scripts.Crop
     {
         #region Fields
         private int _harvestActionCount = 0;
+        [SerializeField] private Transform _harvestActionEffectTransform = null;
         [SerializeField] private SpriteRenderer _cropHarvestedSpriteRenderer = null;
         [HideInInspector] public Vector2Int cropGridPosition;
         private static readonly int _harvestedStateHash = Animator.StringToHash("Harvested");
@@ -50,6 +52,11 @@ namespace Assets.Scripts.Crop
             else if (isToolLeft || isToolDown)
             {
                 animator.SetTrigger("usetoolleft");
+            }
+
+            if (cropDetails.isHarvestActionEffect)
+            {
+                EventHandler.CallHarvestActionEffectEvent(_harvestActionEffectTransform.position, cropDetails.harvestActionEffect);
             }
 
             int requiredHarvestActions = cropDetails.RequiredHarvestActionsForTool(itemDetails.itemCode);
@@ -106,7 +113,7 @@ namespace Assets.Scripts.Crop
         {
             gridPropertyDetails.seedItemCode = -1;
             gridPropertyDetails.growthDays = -1;
-            gridPropertyDetails.DaysSinceLastHarvest = -1;
+            gridPropertyDetails.daysSinceLastHarvest = -1;
             gridPropertyDetails.daysSinceLastWater = -1;
         }
 
@@ -114,7 +121,7 @@ namespace Assets.Scripts.Crop
         {
             while (animator.GetCurrentAnimatorStateInfo(0).shortNameHash != _harvestedStateHash)
             {
-                yield return _waitForSeconds0_1; 
+                yield return _waitForSeconds0_1;
             }
 
             HarvestActions(cropDetails, gridPropertyDetails);
@@ -128,6 +135,10 @@ namespace Assets.Scripts.Crop
         private void HarvestActions(CropDetails cropDetails, GridPropertyDetails gridPropertyDetails)
         {
             SpawnHarvestedItems(cropDetails);
+
+            if(cropDetails.harvestedTransformItemCode > 0){
+                CreateHarvestedTransformItem(cropDetails, gridPropertyDetails);
+            }
 
             Destroy(gameObject);
         }
@@ -165,6 +176,22 @@ namespace Assets.Scripts.Crop
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// 创建收获后的转变作物
+        /// </summary>
+        /// <param name="cropDetails"></param>
+        /// <param name="gridPropertyDetails"></param>
+        private void CreateHarvestedTransformItem(CropDetails cropDetails, GridPropertyDetails gridPropertyDetails)
+        {
+            gridPropertyDetails.seedItemCode = cropDetails.harvestedTransformItemCode;
+            gridPropertyDetails.growthDays = 0;
+            gridPropertyDetails.daysSinceLastHarvest = -1;
+            gridPropertyDetails.daysSinceLastWater = -1;
+
+            GridPropertyManager.Instance.SetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY, gridPropertyDetails);
+            GridPropertyManager.Instance.DisplayPlantedCrops(gridPropertyDetails);
         }
         #endregion
     }
