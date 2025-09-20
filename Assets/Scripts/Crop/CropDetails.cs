@@ -1,4 +1,3 @@
-using System;
 using Assets.Scripts.Enums;
 using Assets.Scripts.Utilities.PropertyDrawers;
 using UnityEngine;

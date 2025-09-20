@@ -91,6 +91,9 @@ namespace Assets.Scripts.Events
         // 背包更新事件
         public static event Action<InventoryLocation, List<InventoryItem>> InventoryUpdatedEvent;
 
+        // 实例化作物Prefab事件
+        public static event Action InstantiateCropPrefabsEvent;
+
         // 移除选中物品事件
         public static event Action RemoveSelectedItemFromInventoryEvent;
 
@@ -149,6 +152,14 @@ namespace Assets.Scripts.Events
         public static void CallInventoryUpdatedEvent(InventoryLocation inventoryLocation, List<InventoryItem> inventoryList)
         {
             InventoryUpdatedEvent?.Invoke(inventoryLocation, inventoryList);
+        }
+
+        /// <summary>
+        /// 触发实例化作物Prefab事件
+        /// </summary>
+        public static void CallInstantiateCropPrefabsEvent()
+        {
+            InstantiateCropPrefabsEvent?.Invoke();
         }
 
         /// <summary>
