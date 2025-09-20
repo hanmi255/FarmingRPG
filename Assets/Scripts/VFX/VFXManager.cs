@@ -12,6 +12,7 @@ namespace Assets.Scripts.VFX
         private WaitForSeconds _twoSeconds;
         [SerializeField] private GameObject _reapingPrefab = null;
         [SerializeField] private GameObject _deciduousLeavesFallingPrefab = null;
+        [SerializeField] private GameObject _pineConesFallingPrefab = null;
         [SerializeField] private GameObject _choppingTreeTrunkPrefab = null;
         #endregion
 
@@ -48,6 +49,9 @@ namespace Assets.Scripts.VFX
                     break;
                 case HarvestActionEffect.DeciduousLeavesFalling:
                     SpawnAndActivateHarvestEffect(_deciduousLeavesFallingPrefab, position);
+                    break;
+                case HarvestActionEffect.PineConesFalling:
+                    SpawnAndActivateHarvestEffect(_pineConesFallingPrefab, position);
                     break;
                 case HarvestActionEffect.ChoppingTreeTrunk:
                     SpawnAndActivateHarvestEffect(_choppingTreeTrunkPrefab, position);
