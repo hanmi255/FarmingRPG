@@ -14,6 +14,7 @@ namespace Assets.Scripts.VFX
         [SerializeField] private GameObject _deciduousLeavesFallingPrefab = null;
         [SerializeField] private GameObject _pineConesFallingPrefab = null;
         [SerializeField] private GameObject _choppingTreeTrunkPrefab = null;
+        [SerializeField] private GameObject _breakingStonePrefab = null;
         #endregion
 
         #region Lifecycle Methods
@@ -55,6 +56,9 @@ namespace Assets.Scripts.VFX
                     break;
                 case HarvestActionEffect.ChoppingTreeTrunk:
                     SpawnAndActivateHarvestEffect(_choppingTreeTrunkPrefab, position);
+                    break;
+                case HarvestActionEffect.BreakingStone:
+                    SpawnAndActivateHarvestEffect(_breakingStonePrefab, position);
                     break;
                 case HarvestActionEffect.None:
                 default:

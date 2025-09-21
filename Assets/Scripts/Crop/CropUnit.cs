@@ -97,6 +97,15 @@ namespace Assets.Scripts.Crop
                 GetComponentInChildren<SpriteRenderer>().enabled = false;
             }
 
+            if (cropDetails.disableCropCollidersBeforeHarvestedAnimation)
+            {
+                Collider2D[] collider2Ds = GetComponentsInChildren<Collider2D>();
+                foreach (var collider2D in collider2Ds)
+                {
+                    collider2D.enabled = false;
+                }
+            }
+
             GridPropertyManager.Instance.SetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY, gridPropertyDetails);
 
             if (cropDetails.isHarvestedAnimation && animator != null)
@@ -136,7 +145,8 @@ namespace Assets.Scripts.Crop
         {
             SpawnHarvestedItems(cropDetails);
 
-            if(cropDetails.harvestedTransformItemCode > 0){
+            if (cropDetails.harvestedTransformItemCode > 0)
+            {
                 CreateHarvestedTransformItem(cropDetails, gridPropertyDetails);
             }
 

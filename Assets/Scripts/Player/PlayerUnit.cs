@@ -16,7 +16,6 @@ using UnityEngine;
 namespace Assets.Scripts.Player
 {
     [RequireComponent(typeof(Rigidbody2D))]
-    [RequireComponent(typeof(AnimationOverrides))]
     public class PlayerUnit : SingletonMonoBehaviour<PlayerUnit>
     {
         #region Fields
@@ -96,6 +95,19 @@ namespace Assets.Scripts.Player
 
         #region Private Fields - State
         private bool _isInputDisabled = false;
+
+        /// <summary>
+        /// 工具动作类型枚举
+        /// </summary>
+        private enum ToolActionType
+        {
+            /// <summary>收集动作（使用拾取动画状态）</summary>
+            Collecting,
+            /// <summary>砍伐动作（使用通用工具动画状态）</summary>
+            Chopping,
+            /// <summary>挖矿动作（使用通用工具动画状态）</summary>
+            Breaking
+        }
         #endregion
 
         #endregion
@@ -121,7 +133,7 @@ namespace Assets.Scripts.Player
 
             _rigidbody2D = GetComponent<Rigidbody2D>();
 
-            _animationOverrides = GetComponent<AnimationOverrides>();
+            _animationOverrides = GetComponentInChildren<AnimationOverrides>();
 
             _armsCharacterAttribute = new CharacterAttribute(CharacterPartAnimator.Arms, PartVariantColour.None, PartVariantType.None);
             _toolCharacterAttribute = new CharacterAttribute(CharacterPartAnimator.Tool, PartVariantColour.None, PartVariantType.None);
@@ -420,7 +432,8 @@ namespace Assets.Scripts.Player
                 || itemDetails.itemType == ItemType.WateringTool
                 || itemDetails.itemType == ItemType.ReapingTool
                 || itemDetails.itemType == ItemType.CollectingTool
-                || itemDetails.itemType == ItemType.ChoppingTool)
+                || itemDetails.itemType == ItemType.ChoppingTool
+                || itemDetails.itemType == ItemType.BreakingTool)
             {
                 UseTool(gridPropertyDetails, itemDetails, playerDirection);
             }
@@ -632,6 +645,23 @@ namespace Assets.Scripts.Player
                             _afterUseToolAnimationPause,
                             null,  // no grid property update needed
                             (details, direction) => ExecuteChoppingLogic(details, itemDetails)));
+                    }
+                    return;
+                case ItemType.BreakingTool:
+                    if (_gridCursorHighlight.CursorPositionIsValid)
+                    {
+                        StartCoroutine(UseToolAtCursorCoroutine(
+                            gridPropertyDetails,
+                            playerDirection,
+                            PartVariantType.Pickaxe,
+                            ToolEffect.None,
+                            true, // use general animation
+                            false,  // not swinging animation
+                            false, // not picking animation
+                            _useToolAnimationPause,
+                            _afterUseToolAnimationPause,
+                            null,  // no grid property update needed
+                            (details, direction) => ExecuteBreakingLogic(details, itemDetails)));
                     }
                     return;
                 default:
@@ -938,23 +968,69 @@ namespace Assets.Scripts.Player
         }
 
         /// <summary>
+        /// 执行作物相关工具逻辑的通用函数
+        /// </summary>
+        /// <param name="gridPropertyDetails">网格属性详情</param>
+        /// <param name="itemDetails">物品详情</param>
+        /// <param name="actionType">工具动作类型</param>
+        private void ExecuteCropToolLogic(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails, ToolActionType actionType)
+        {
+            // 参数验证
+            if (gridPropertyDetails == null || itemDetails == null)
+                return;
+
+            // 获取网格位置的作物单元
+            CropUnit cropUnit = GridPropertyManager.Instance.GetCropUnitAtGridLocation(gridPropertyDetails);
+            if (cropUnit == null)
+                return;
+
+            // 根据动作类型选择对应的动画状态参数
+            GetToolAnimationStates(actionType, out bool rightState, out bool leftState, out bool upState, out bool downState);
+
+            // 处理工具对作物的作用
+            cropUnit.ProcessToolAction(itemDetails, rightState, leftState, upState, downState);
+        }
+
+        /// <summary>
+        /// 根据工具动作类型获取对应的动画状态
+        /// </summary>
+        /// <param name="actionType">工具动作类型</param>
+        /// <param name="rightState">右侧动画状态</param>
+        /// <param name="leftState">左侧动画状态</param>
+        /// <param name="upState">上方动画状态</param>
+        /// <param name="downState">下方动画状态</param>
+        private void GetToolAnimationStates(ToolActionType actionType, out bool rightState, out bool leftState, out bool upState, out bool downState)
+        {
+            switch (actionType)
+            {
+                case ToolActionType.Collecting:
+                    // 收集工具使用拾取动画状态
+                    rightState = _isPickingRight;
+                    leftState = _isPickingLeft;
+                    upState = _isPickingUp;
+                    downState = _isPickingDown;
+                    break;
+
+                case ToolActionType.Chopping:
+                case ToolActionType.Breaking:
+                default:
+                    // 砍伐和挖矿工具使用通用工具动画状态
+                    rightState = _isUsingToolRight;
+                    leftState = _isUsingToolLeft;
+                    upState = _isUsingToolUp;
+                    downState = _isUsingToolDown;
+                    break;
+            }
+        }
+
+        /// <summary>
         /// 执行收集逻辑
         /// </summary>
         /// <param name="gridPropertyDetails">网格属性详情</param>
         /// <param name="itemDetails">物品详情</param>
         private void ExecuteCollectingLogic(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails)
         {
-            if (gridPropertyDetails == null || itemDetails == null)
-                return;
-
-            // 获取网格位置的作物单元
-            CropUnit cropUnit = GridPropertyManager.Instance.GetCropUnitAtGridLocation(gridPropertyDetails);
-
-            if (cropUnit != null)
-            {
-                // 处理收集工具对作物的作用
-                cropUnit.ProcessToolAction(itemDetails, _isPickingRight, _isPickingLeft, _isPickingUp, _isPickingDown);
-            }
+            ExecuteCropToolLogic(gridPropertyDetails, itemDetails, ToolActionType.Collecting);
         }
 
         /// <summary>
@@ -964,17 +1040,17 @@ namespace Assets.Scripts.Player
         /// <param name="itemDetails">物品详情</param>
         private void ExecuteChoppingLogic(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails)
         {
-            if (gridPropertyDetails == null || itemDetails == null)
-                return;
+            ExecuteCropToolLogic(gridPropertyDetails, itemDetails, ToolActionType.Chopping);
+        }
 
-            // 获取网格位置的作物单元
-            CropUnit cropUnit = GridPropertyManager.Instance.GetCropUnitAtGridLocation(gridPropertyDetails);
-
-            if (cropUnit != null)
-            {
-                // 处理砍伐工具对作物的作用
-                cropUnit.ProcessToolAction(itemDetails, _isUsingToolRight, _isUsingToolLeft, _isUsingToolUp, _isUsingToolDown);
-            }
+        /// <summary>
+        /// 执行挖矿逻辑
+        /// </summary>
+        /// <param name="gridPropertyDetails">网格属性详情</param>
+        /// <param name="itemDetails">物品详情</param>
+        private void ExecuteBreakingLogic(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails)
+        {
+            ExecuteCropToolLogic(gridPropertyDetails, itemDetails, ToolActionType.Breaking);
         }
         #endregion
     }

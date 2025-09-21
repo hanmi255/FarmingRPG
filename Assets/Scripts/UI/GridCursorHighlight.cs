@@ -288,6 +288,7 @@ namespace Assets.Scripts.UI
 
                 case ItemType.ChoppingTool:
                 case ItemType.CollectingTool:
+                case ItemType.BreakingTool:
                     if (gridPropertyDetails.seedItemCode == -1)
                         return false;
 
