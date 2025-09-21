@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Assets.Scripts.Crop;
 using Assets.Scripts.Enums;
 using Assets.Scripts.Events;
@@ -19,6 +18,7 @@ namespace Assets.Scripts.Map
     {
         #region Fields
 
+        private bool _isFirstTimeSceneLoaded = true;
         private Transform _cropsParentTransform;
         private Grid _grid;
         private Tilemap _groundDecoration1;
@@ -147,7 +147,12 @@ namespace Assets.Scripts.Map
 
             SceneSave sceneSave = new()
             {
-                gridPropertyDetailsDictionary = _gridPropertyDetailsDictionary
+                gridPropertyDetailsDictionary = _gridPropertyDetailsDictionary,
+
+                boolDictionary = new Dictionary<string, bool>
+                {
+                    { "isFirstTimeSceneLoaded", _isFirstTimeSceneLoaded }
+                }
             };
 
             GameObjectSave.sceneData.Add(sceneName, sceneSave);
@@ -167,11 +172,26 @@ namespace Assets.Scripts.Map
 
             _gridPropertyDetailsDictionary = sceneSave.gridPropertyDetailsDictionary;
 
+            if (sceneSave.boolDictionary != null && sceneSave.boolDictionary.TryGetValue("isFirstTimeSceneLoaded", out var storedIsFirstTimeSceneLoaded))
+            {
+                _isFirstTimeSceneLoaded = storedIsFirstTimeSceneLoaded;
+            }
+
+            if (_isFirstTimeSceneLoaded)
+            {
+                EventHandler.CallInstantiateCropPrefabsEvent();
+            }
+
             if (_gridPropertyDetailsDictionary.Count > 0)
             {
                 ClearDisplayGridPropertyDetails();
 
                 DisplayGridPropertyDetails();
+            }
+
+            if (_isFirstTimeSceneLoaded)
+            {
+                _isFirstTimeSceneLoaded = false;
             }
         }
 
@@ -303,6 +323,11 @@ namespace Assets.Scripts.Map
                 {
                     _gridPropertyDetailsDictionary = gridPropertyDetailsDictionary;
                 }
+
+                sceneSave.boolDictionary = new Dictionary<string, bool>
+                {
+                    { "isFirstTimeSceneLoaded", true }
+                };
 
                 // 将场景数据添加到游戏对象保存数据中
                 GameObjectSave.sceneData.Add(so_gridProperties.sceneName.ToString(), sceneSave);

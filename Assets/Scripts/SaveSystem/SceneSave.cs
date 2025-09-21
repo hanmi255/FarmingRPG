@@ -8,5 +8,6 @@ namespace Assets.Scripts.SaveSystem
     {
         public List<SceneItem> listSceneItem;
         public Dictionary<string, GridPropertyDetails> gridPropertyDetailsDictionary;
+        public Dictionary<string, bool> boolDictionary;
     }
 }
