@@ -89,6 +89,37 @@ namespace Assets.Scripts.UI.UIInventory
             }
         }
 
+        /// <summary>
+        /// 销毁当前拖拽的物品
+        /// </summary>
+        public void DestroyCurrentlyDraggedItems()
+        {
+            if (_inventorySlots == null || _inventorySlots.Length == 0)
+                return;
+
+            for (int i = 0; i < _inventorySlots.Length; i++)
+            {
+                if (_inventorySlots[i].draggedItem != null)
+                {
+                    Destroy(_inventorySlots[i].draggedItem);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 清除当前选中的物品
+        /// </summary>
+        public void ClearCurrentlySelectedItems()
+        {
+            if (_inventorySlots == null || _inventorySlots.Length == 0)
+                return;
+
+            for (int i = 0; i < _inventorySlots.Length; i++)
+            {
+                _inventorySlots[i].ClearSelectedItem();
+            }
+        }
+
         #endregion
 
         #region Private Methods
