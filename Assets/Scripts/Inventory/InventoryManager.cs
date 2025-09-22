@@ -16,17 +16,13 @@ namespace Assets.Scripts.Inventory
 
         #region Private Fields
         private Dictionary<int, ItemDetails> _itemDetailsDic;            // 物品详情字典
-        private List<InventoryItem>[] _inventoryLists;                   // 背包列表
+        public List<InventoryItem>[] inventoryLists;                     // 背包列表
+        public int[] inventoryListCapacityIntArray;                      // 背包列表容量
         private int[] selectedInventoryItem;                             // index是 inventory_list, value是 item_code
-        private int[] _inventoryListCapacityIntArray;                    // 背包列表容量
         #endregion
 
         #region Serialization Fields
         [SerializeField] private SO_ItemList _itemList = null;           // 物品列表
-        #endregion
-
-        #region Hidden Fields
-        [HideInInspector] private int[] _inventoryListCapacityIntArrayHidden;  // 背包列表容量（隐藏）
         #endregion
 
         #endregion
@@ -78,19 +74,19 @@ namespace Assets.Scripts.Inventory
         /// <param name="itemCode">物品代码</param>
         public void AddItem(InventoryLocation inventoryLocation, int itemCode)
         {
-            List<InventoryItem> inventoryList = _inventoryLists[(int)inventoryLocation];
+            List<InventoryItem> inventoryList = inventoryLists[(int)inventoryLocation];
 
             int itemPosition = FindItemInInventory(inventoryLocation, itemCode);
             if (itemPosition != -1)
             {
-                AddItemAtPosition(inventoryList, itemCode, itemPosition);
+                AddItemAtPosition(inventoryList,itemPosition);
             }
             else
             {
-                AddItemAtPosition(inventoryList, itemCode);
+                AddNewItemToInventory(inventoryList, itemCode);
             }
 
-            EventHandler.CallInventoryUpdatedEvent(inventoryLocation, _inventoryLists[(int)inventoryLocation]);
+            EventHandler.CallInventoryUpdatedEvent(inventoryLocation, inventoryLists[(int)inventoryLocation]);
         }
 
         /// <summary>
@@ -100,15 +96,15 @@ namespace Assets.Scripts.Inventory
         /// <param name="itemCode">物品代码</param>
         public void RemoveItem(InventoryLocation inventoryLocation, int itemCode)
         {
-            List<InventoryItem> inventoryList = _inventoryLists[(int)inventoryLocation];
+            List<InventoryItem> inventoryList = inventoryLists[(int)inventoryLocation];
 
             int itemPosition = FindItemInInventory(inventoryLocation, itemCode);
             if (itemPosition != -1)
             {
-                RemoveItemAtPosition(inventoryList, itemCode, itemPosition);
+                RemoveItemAtPosition(inventoryList, itemPosition);
             }
 
-            EventHandler.CallInventoryUpdatedEvent(inventoryLocation, _inventoryLists[(int)inventoryLocation]);
+            EventHandler.CallInventoryUpdatedEvent(inventoryLocation, inventoryLists[(int)inventoryLocation]);
         }
 
         /// <summary>
@@ -120,16 +116,16 @@ namespace Assets.Scripts.Inventory
         public void SwapInventoryItems(InventoryLocation player, int fromSlot, int toSlot)
         {
             // 检查槽位索引是否有效
-            if (fromSlot < _inventoryLists[(int)player].Count && toSlot < _inventoryLists[(int)player].Count
+            if (fromSlot < inventoryLists[(int)player].Count && toSlot < inventoryLists[(int)player].Count
                 && fromSlot != toSlot && fromSlot >= 0 && toSlot >= 0)
             {
-                InventoryItem fromItem = _inventoryLists[(int)player][fromSlot];
-                InventoryItem toItem = _inventoryLists[(int)player][toSlot];
+                InventoryItem fromItem = inventoryLists[(int)player][fromSlot];
+                InventoryItem toItem = inventoryLists[(int)player][toSlot];
 
-                _inventoryLists[(int)player][fromSlot] = toItem;
-                _inventoryLists[(int)player][toSlot] = fromItem;
+                inventoryLists[(int)player][fromSlot] = toItem;
+                inventoryLists[(int)player][toSlot] = fromItem;
 
-                EventHandler.CallInventoryUpdatedEvent(player, _inventoryLists[(int)player]);
+                EventHandler.CallInventoryUpdatedEvent(player, inventoryLists[(int)player]);
             }
 
         }
@@ -142,7 +138,7 @@ namespace Assets.Scripts.Inventory
         /// <returns>返回物品在背包中的位置 或 -1 表示未找到</returns>
         public int FindItemInInventory(InventoryLocation inventoryLocation, int itemCode)
         {
-            List<InventoryItem> inventoryList = _inventoryLists[(int)inventoryLocation];
+            List<InventoryItem> inventoryList = inventoryLists[(int)inventoryLocation];
 
             for (int i = 0; i < inventoryList.Count; i++)
             {
@@ -224,15 +220,15 @@ namespace Assets.Scripts.Inventory
         /// </summary>
         private void CreateInventoryLists()
         {
-            _inventoryLists = new List<InventoryItem>[(int)InventoryLocation.Count];
+            inventoryLists = new List<InventoryItem>[(int)InventoryLocation.Count];
 
             for (int i = 0; i < (int)InventoryLocation.Count; i++)
             {
-                _inventoryLists[i] = new List<InventoryItem>();
+                inventoryLists[i] = new List<InventoryItem>();
             }
 
-            _inventoryListCapacityIntArray = new int[(int)InventoryLocation.Count];
-            _inventoryListCapacityIntArray[(int)InventoryLocation.Player] = Settings.playerInitialInventoryCapacity;
+            inventoryListCapacityIntArray = new int[(int)InventoryLocation.Count];
+            inventoryListCapacityIntArray[(int)InventoryLocation.Player] = Settings.playerInitialInventoryCapacity;
         }
 
         /// <summary>
@@ -255,9 +251,8 @@ namespace Assets.Scripts.Inventory
         /// 添加物品到背包指定位置 计数+1
         /// </summary>
         /// <param name="inventoryList">背包列表</param>
-        /// <param name="itemCode">物品代码</param>
         /// <param name="itemPosition">物品位置</param>
-        private void AddItemAtPosition(List<InventoryItem> inventoryList, int itemCode, int itemPosition)
+        private void AddItemAtPosition(List<InventoryItem> inventoryList, int itemPosition)
         {
             InventoryItem inventoryItem = inventoryList[itemPosition];
             inventoryItem.itemQuantity++;
@@ -265,11 +260,11 @@ namespace Assets.Scripts.Inventory
         }
 
         /// <summary>
-        /// 添加物品到背包末尾
+        /// 添加新物品到背包末尾
         /// </summary>
         /// <param name="inventoryList">背包列表</param>
         /// <param name="itemCode">物品代码</param>
-        private void AddItemAtPosition(List<InventoryItem> inventoryList, int itemCode)
+        private void AddNewItemToInventory(List<InventoryItem> inventoryList, int itemCode)
         {
             InventoryItem inventoryItem = new()
             {
@@ -286,7 +281,7 @@ namespace Assets.Scripts.Inventory
         /// <param name="inventoryList">背包列表</param>
         /// <param name="itemCode">物品代码</param>
         /// <param name="itemPosition">物品位置</param>
-        private void RemoveItemAtPosition(List<InventoryItem> inventoryList, int itemCode, int itemPosition)
+        private void RemoveItemAtPosition(List<InventoryItem> inventoryList, int itemPosition)
         {
             InventoryItem inventoryItem = inventoryList[itemPosition];
             inventoryItem.itemQuantity--;

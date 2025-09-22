@@ -36,7 +36,7 @@ namespace Assets.Scripts.UI.UIInventory
         private Transform _parentItem;
         private GridCursorHighlight _gridCursorHighlight;
         private CursorHighlight _cursorHighlight;
-        private GameObject _draggedItem;
+        public GameObject draggedItem;
 
         private TextParameters _textParameters;
         private string _itemTypeDescription;
@@ -87,8 +87,8 @@ namespace Assets.Scripts.UI.UIInventory
             // 禁止玩家输入移动
             PlayerUnit.Instance.DisablePlayerInputAndResetMovement();
             // 实例化拖拽物品
-            _draggedItem = Instantiate(_inventoryBar.inventoryDraggedItem, _inventoryBar.transform);
-            Image draggedItemImage = _draggedItem.GetComponentInChildren<Image>();
+            draggedItem = Instantiate(_inventoryBar.inventoryDraggedItem, _inventoryBar.transform);
+            Image draggedItemImage = draggedItem.GetComponentInChildren<Image>();
             draggedItemImage.sprite = itemDetails.itemSprite;
 
             SetSelectedItem();
@@ -100,10 +100,10 @@ namespace Assets.Scripts.UI.UIInventory
         /// <param name="eventData">指针事件数据</param>
         public void OnDrag(PointerEventData eventData)
         {
-            if (_draggedItem == null)
+            if (draggedItem == null)
                 return;
 
-            _draggedItem.transform.position = Input.mousePosition;
+            draggedItem.transform.position = Input.mousePosition;
         }
 
         /// <summary>
@@ -112,10 +112,10 @@ namespace Assets.Scripts.UI.UIInventory
         /// <param name="eventData">指针事件数据</param>
         public void OnEndDrag(PointerEventData eventData)
         {
-            if (_draggedItem == null)
+            if (draggedItem == null)
                 return;
 
-            Destroy(_draggedItem);
+            Destroy(draggedItem);
 
             // 交换物品位置
             if (eventData.pointerCurrentRaycast.gameObject != null &&
@@ -200,6 +200,20 @@ namespace Assets.Scripts.UI.UIInventory
                     SetSelectedItem();
                 }
             }
+        }
+
+        /// <summary>
+        /// 清除选中物品
+        /// </summary>
+        public void ClearSelectedItem()
+        {
+            ClearCusors();
+
+            _inventoryBar.ClearHighlightOnInventorySlots();
+            isSelected = false;
+            InventoryManager.Instance.ClearSelectedInventoryItem(InventoryLocation.Player);
+
+            PlayerUnit.Instance.ClearCarriedItem();
         }
 
         #endregion
@@ -328,20 +342,6 @@ namespace Assets.Scripts.UI.UIInventory
             {
                 PlayerUnit.Instance.ClearCarriedItem();
             }
-        }
-
-        /// <summary>
-        /// 清除选中物品
-        /// </summary>
-        private void ClearSelectedItem()
-        {
-            ClearCusors();
-
-            _inventoryBar.ClearHighlightOnInventorySlots();
-            isSelected = false;
-            InventoryManager.Instance.ClearSelectedInventoryItem(InventoryLocation.Player);
-
-            PlayerUnit.Instance.ClearCarriedItem();
         }
 
         /// <summary>

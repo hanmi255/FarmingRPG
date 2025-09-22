@@ -1,7 +1,9 @@
 using Assets.Scripts.Enums;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Assets.Scripts.Map
 {
@@ -24,6 +26,7 @@ namespace Assets.Scripts.Map
 
         private void OnEnable()
         {
+#if UNITY_EDITOR
             // 在播放模式下不执行
             if (Application.IsPlaying(gameObject)) return;
 
@@ -33,10 +36,12 @@ namespace Assets.Scripts.Map
 
             // 清空网格属性列表
             _gridProperties.gridPropertyList.Clear();
+#endif
         }
 
         private void OnDisable()
         {
+#if UNITY_EDITOR
             // 在播放模式下不执行
             if (Application.IsPlaying(gameObject)) return;
 
@@ -47,12 +52,14 @@ namespace Assets.Scripts.Map
 
             // 标记资源为 dirty，确保在编辑器中保存更改
             EditorUtility.SetDirty(_gridProperties);
+#endif
         }
 
         #endregion
 
         #region Private Methods
 
+#if UNITY_EDITOR
         /// <summary>
         /// 更新网格属性，根据瓦片地图中的瓦片设置相应的网格属性
         /// </summary>
@@ -86,6 +93,7 @@ namespace Assets.Scripts.Map
                 }
             }
         }
+#endif
 
         #endregion
     }
