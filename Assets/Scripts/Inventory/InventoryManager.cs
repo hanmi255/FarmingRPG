@@ -3,22 +3,33 @@ using Assets.Scripts.Enums;
 using Assets.Scripts.Events;
 using Assets.Scripts.Item;
 using Assets.Scripts.Misc;
+using Assets.Scripts.Player;
+using Assets.Scripts.SaveSystem;
+using Assets.Scripts.UI.UIInventory;
 using UnityEngine;
 
 namespace Assets.Scripts.Inventory
 {
+    [RequireComponent(typeof(GenerateGUID))]
     /// <summary>
     /// 背包管理器，负责管理游戏中的各种背包和物品
     /// </summary>
-    public class InventoryManager : SingletonMonoBehaviour<InventoryManager>
+    public class InventoryManager : SingletonMonoBehaviour<InventoryManager>, ISaveable
     {
         #region Fields
 
         #region Private Fields
         private Dictionary<int, ItemDetails> _itemDetailsDic;            // 物品详情字典
-        public List<InventoryItem>[] inventoryLists;                     // 背包列表
-        public int[] inventoryListCapacityIntArray;                      // 背包列表容量
+        [HideInInspector] public List<InventoryItem>[] inventoryLists;   // 背包列表
+        [HideInInspector] public int[] inventoryListCapacityIntArray;    // 背包列表容量
         private int[] selectedInventoryItem;                             // index是 inventory_list, value是 item_code
+        private string _iSaveableUniqueID;                               // 保存ID
+        private GameObjectSave _gameObjectSave;                          // 游戏对象保存
+        private UIInventoryBar _uiInventoryBar;                          // UI背包栏
+
+        public string ISaveableUniqueID { get => _iSaveableUniqueID; set => _iSaveableUniqueID = value; }
+
+        public GameObjectSave GameObjectSave { get => _gameObjectSave; set => _gameObjectSave = value; }
         #endregion
 
         #region Serialization Fields
@@ -41,6 +52,26 @@ namespace Assets.Scripts.Inventory
             selectedInventoryItem = new int[(int)InventoryLocation.Count];
             // 使用-1填充数组，表示没有选中任何物品
             System.Array.Fill(selectedInventoryItem, -1);
+
+            _iSaveableUniqueID = GetComponent<GenerateGUID>().GUID;
+            _gameObjectSave = new GameObjectSave();
+
+            _uiInventoryBar = FindObjectOfType<UIInventoryBar>();
+        }
+
+        private void Start()
+        {
+            _uiInventoryBar = FindObjectOfType<UIInventoryBar>();
+        }
+
+        private void OnEnable()
+        {
+            ISaveableRegister();
+        }
+
+        private void OnDisable()
+        {
+            ISaveableDeregister();
         }
         #endregion
 
@@ -79,7 +110,7 @@ namespace Assets.Scripts.Inventory
             int itemPosition = FindItemInInventory(inventoryLocation, itemCode);
             if (itemPosition != -1)
             {
-                AddItemAtPosition(inventoryList,itemPosition);
+                AddItemAtPosition(inventoryList, itemPosition);
             }
             else
             {
@@ -211,6 +242,90 @@ namespace Assets.Scripts.Inventory
         public void ClearSelectedInventoryItem(InventoryLocation inventoryLocation)
         {
             selectedInventoryItem[(int)inventoryLocation] = -1;
+        }
+        #endregion
+
+        #region ISaveable Interface Methods
+        /// <summary>
+        /// 注册可保存对象到保存管理器
+        /// </summary>
+        public void ISaveableRegister()
+        {
+            SaveLoadManager.Instance.iSaveableObjectList.Add(this);
+        }
+
+        /// <summary>
+        /// 从保存管理器中注销可保存对象
+        /// </summary>
+        public void ISaveableDeregister()
+        {
+            SaveLoadManager.Instance.iSaveableObjectList.Remove(this);
+        }
+
+        /// <summary>
+        /// 保存游戏数据
+        /// </summary>
+        /// <returns>游戏对象保存数据</returns>
+        public GameObjectSave ISaveableSave()
+        {
+            _gameObjectSave.sceneData.Remove(Settings.PersistentSceneName);
+
+            SceneSave sceneSave = new()
+            {
+                listInventoryItems = inventoryLists,
+                intArrayDictionary = new Dictionary<string, int[]>()
+            };
+
+            sceneSave.intArrayDictionary.Add("inventoryListCapacityIntArray", inventoryListCapacityIntArray);
+
+            _gameObjectSave.sceneData.Add(Settings.PersistentSceneName, sceneSave);
+
+            return _gameObjectSave;
+        }
+
+        /// <summary>
+        /// 加载游戏数据
+        /// </summary>
+        /// <param name="gameSave">游戏保存数据</param>
+        public void ISaveableLoad(GameSave gameSave)
+        {
+            if (!gameSave.gameObjectData.TryGetValue(ISaveableUniqueID, out var gameObjectSave))
+                return;
+
+            _gameObjectSave = gameObjectSave;
+
+            if (!_gameObjectSave.sceneData.TryGetValue(Settings.PersistentSceneName, out var sceneSave))
+                return;
+
+            if (sceneSave.listInventoryItems == null)
+                return;
+
+            inventoryLists = sceneSave.listInventoryItems;
+
+            // 更新库存 玩家背包 UI
+            for (int i = 0; i < (int)InventoryLocation.Count; i++)
+            {
+                EventHandler.CallInventoryUpdatedEvent((InventoryLocation)i, inventoryLists[i]);
+            }
+
+            PlayerUnit.Instance.ClearCarriedItem();
+
+            _uiInventoryBar.ClearHighlightOnInventorySlots();
+
+            if (sceneSave.intArrayDictionary != null && sceneSave.intArrayDictionary.TryGetValue("inventoryListCapacityIntArray", out int[] inventoryListCapacityIntArray))
+            {
+                this.inventoryListCapacityIntArray = inventoryListCapacityIntArray;
+            }
+        }
+
+        public void ISaveableStoreScene(string sceneName)
+        {
+            // Nothing to store
+        }
+
+        public void ISaveableRestoreScene(string sceneName)
+        {
+            // Nothing to restore
         }
         #endregion
 

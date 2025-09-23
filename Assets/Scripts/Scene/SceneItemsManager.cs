@@ -4,11 +4,12 @@ using Assets.Scripts.Item;
 using Assets.Scripts.Misc;
 using Assets.Scripts.SaveSystem;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Assets.Scripts.Scene
 {
     [RequireComponent(typeof(GenerateGUID))]
-    public class SceneItemsManager : SingletonMonoBehaviour<SceneItemsManager>, ISaveble
+    public class SceneItemsManager : SingletonMonoBehaviour<SceneItemsManager>, ISaveable
     {
         #region Fields
 
@@ -63,6 +64,29 @@ namespace Assets.Scripts.Scene
         public void ISaveableDeregister()
         {
             SaveLoadManager.Instance.iSaveableObjectList.Remove(this);
+        }
+
+        /// <summary>
+        /// 保存游戏数据
+        /// </summary>
+        public GameObjectSave ISaveableSave()
+        {
+            ISaveableStoreScene(SceneManager.GetActiveScene().name);
+
+            return GameObjectSave;
+        }
+
+        /// <summary>
+        /// 加载游戏数据
+        /// </summary>
+        public void ISaveableLoad(GameSave gameSave)
+        {
+            if(gameSave.gameObjectData.TryGetValue(ISaveableUniqueID, out var gameObjectSave))
+            {
+                GameObjectSave = gameObjectSave;
+
+                ISaveableRestoreScene(SceneManager.GetActiveScene().name);
+            }
         }
 
         /// <summary>

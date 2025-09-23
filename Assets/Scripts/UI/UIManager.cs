@@ -52,6 +52,13 @@ namespace Assets.Scripts.UI
             HighlighteButtonForSelectedTab();
         }
 
+        public void DisablePauseMenu()
+        {
+            _pauseMenuInventoryManagement.DestroyCurrentlyDraggedItems();
+
+            SetPauseMenuState(false);
+        }
+
         /// <summary>
         /// 退出游戏
         /// </summary>
@@ -93,13 +100,6 @@ namespace Assets.Scripts.UI
             GC.Collect();
 
             HighlighteButtonForSelectedTab();
-        }
-
-        private void DisablePauseMenu()
-        {
-            _pauseMenuInventoryManagement.DestroyCurrentlyDraggedItems();
-
-            SetPauseMenuState(false);
         }
 
         private void SetPauseMenuState(bool isActive)

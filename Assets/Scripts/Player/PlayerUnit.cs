@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Assets.Scripts.Animation;
@@ -9,14 +10,18 @@ using Assets.Scripts.Inventory;
 using Assets.Scripts.Item;
 using Assets.Scripts.Map;
 using Assets.Scripts.Misc;
+using Assets.Scripts.SaveSystem;
+using Assets.Scripts.Scene;
 using Assets.Scripts.TimeSystem;
 using Assets.Scripts.UI;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Assets.Scripts.Player
 {
     [RequireComponent(typeof(Rigidbody2D))]
-    public class PlayerUnit : SingletonMonoBehaviour<PlayerUnit>
+    [RequireComponent(typeof(GenerateGUID))]
+    public class PlayerUnit : SingletonMonoBehaviour<PlayerUnit>, ISaveable
     {
         #region Fields
 
@@ -82,6 +87,8 @@ namespace Assets.Scripts.Player
         private GridCursorHighlight _gridCursorHighlight;
         private CursorHighlight _cursorHighlight;
         private Camera _mainCamera;
+        private string _iSaveableUniqueID;
+        private GameObjectSave _gameObjectSave;
 
         // 优化：缓存ItemUseRadius的一半值，避免重复计算
         private float _itemUseRadiusHalfValue = 0f;
@@ -121,6 +128,10 @@ namespace Assets.Scripts.Player
             get => _isInputDisabled;
             set => _isInputDisabled = value;
         }
+
+        public string ISaveableUniqueID { get => _iSaveableUniqueID; set => _iSaveableUniqueID = value; }
+
+        public GameObjectSave GameObjectSave { get => _gameObjectSave; set => _gameObjectSave = value; }
         #endregion
 
         #region Lifecycle Methods
@@ -140,19 +151,26 @@ namespace Assets.Scripts.Player
 
             _characterAttributeCustomisationList = new List<CharacterAttribute>();
 
+            _iSaveableUniqueID = GetComponent<GenerateGUID>().GUID;
+            _gameObjectSave = new GameObjectSave();
+
             _mainCamera = Camera.main;
         }
 
         private void OnEnable()
         {
-            EventHandler.BeforeSceneUnloadFadeOutEvent += DisablePlayerInputAndResetMovement;
-            EventHandler.AfterSceneLoadFadeInEvent += EnablePlayerInput;
+            ISaveableRegister();
+
+            Events.EventHandler.BeforeSceneUnloadFadeOutEvent += DisablePlayerInputAndResetMovement;
+            Events.EventHandler.AfterSceneLoadFadeInEvent += EnablePlayerInput;
         }
 
         private void OnDisable()
         {
-            EventHandler.BeforeSceneUnloadFadeOutEvent -= DisablePlayerInputAndResetMovement;
-            EventHandler.AfterSceneLoadFadeInEvent -= EnablePlayerInput;
+            ISaveableDeregister();
+
+            Events.EventHandler.BeforeSceneUnloadFadeOutEvent -= DisablePlayerInputAndResetMovement;
+            Events.EventHandler.AfterSceneLoadFadeInEvent -= EnablePlayerInput;
         }
 
         /// <summary>
@@ -185,7 +203,7 @@ namespace Assets.Scripts.Player
                 TestInput();
 
                 SetMovementParameters();
-                EventHandler.CallMovementEvent(_parameters);
+                Events.EventHandler.CallMovementEvent(_parameters);
             }
         }
 
@@ -220,7 +238,7 @@ namespace Assets.Scripts.Player
             DisablePlayerInput();
             ResetMovement();
 
-            EventHandler.CallMovementEvent(_parameters);
+            Events.EventHandler.CallMovementEvent(_parameters);
         }
 
         /// <summary>
@@ -287,6 +305,102 @@ namespace Assets.Scripts.Player
         public Vector3 GetPlayerCenterPosition()
         {
             return new Vector3(transform.position.x, transform.position.y + Settings.playerCenterYOffset, transform.position.z);
+        }
+        #endregion
+
+        #region ISaveable Interface Methods
+        /// <summary>
+        /// 注册可保存对象到保存管理器
+        /// </summary>
+        public void ISaveableRegister()
+        {
+            SaveLoadManager.Instance.iSaveableObjectList.Add(this);
+        }
+
+        /// <summary>
+        /// 从保存管理器中注销可保存对象
+        /// </summary>
+        public void ISaveableDeregister()
+        {
+            SaveLoadManager.Instance.iSaveableObjectList.Remove(this);
+        }
+
+        /// <summary>
+        /// 保存游戏数据
+        /// </summary>
+        /// <returns>游戏对象保存数据</returns>
+        public GameObjectSave ISaveableSave()
+        {
+            _gameObjectSave.sceneData.Remove(Settings.PersistentSceneName);
+
+            SceneSave sceneSave = new()
+            {
+                vector3Dictionary = new Dictionary<string, Vector3Serializable>(),
+                stringDictionary = new Dictionary<string, string>()
+            };
+
+            Vector3Serializable position = new()
+            {
+                x = transform.position.x,
+                y = transform.position.y,
+                z = transform.position.z
+            };
+            sceneSave.vector3Dictionary.Add("playerPosition", position);
+
+            sceneSave.stringDictionary.Add("currentScene", SceneManager.GetActiveScene().name);
+            sceneSave.stringDictionary.Add("playerDirection", _direction.ToString());
+
+            _gameObjectSave.sceneData.Add(Settings.PersistentSceneName, sceneSave);
+
+            return _gameObjectSave;
+        }
+
+        /// <summary>
+        /// 加载游戏数据
+        /// </summary>
+        /// <param name="gameSave">游戏保存数据</param>
+        public void ISaveableLoad(GameSave gameSave)
+        {
+            if (!gameSave.gameObjectData.TryGetValue(ISaveableUniqueID, out var gameObjectSave))
+                return;
+
+            if (!gameObjectSave.sceneData.TryGetValue(Settings.PersistentSceneName, out var sceneSave))
+                return;
+
+            // 设置玩家位置和方向 设置场景
+            if (sceneSave.vector3Dictionary != null && sceneSave.vector3Dictionary.TryGetValue("playerPosition", out var position))
+            {
+                transform.position = new(position.x, position.y, position.z);
+            }
+
+            if (sceneSave.stringDictionary == null)
+                return;
+
+            if (sceneSave.stringDictionary.TryGetValue("currentScene", out var currentScene))
+            {
+                SceneControllerManager.Instance.FadeAndLoadScene(currentScene, transform.position);
+            }
+
+            if (sceneSave.stringDictionary.TryGetValue("playerDirection", out var playerDirection))
+            {
+                bool playerDirectionFound = Enum.TryParse<Direction>(playerDirection, true, out var direction);
+
+                if (playerDirectionFound)
+                {
+                    _direction = direction;
+                    SetPlayerDirection(_direction);
+                }
+            }
+        }
+
+        public void ISaveableStoreScene(string sceneName)
+        {
+            // Nothing to store
+        }
+
+        public void ISaveableRestoreScene(string sceneName)
+        {
+            // Nothing to restore
         }
         #endregion
 
@@ -467,7 +581,7 @@ namespace Assets.Scripts.Player
         /// <summary>
         /// 设置移动参数并更新事件系统
         /// </summary>
-        private void SetMovementParameters()
+        private void SetMovementParameters(bool isIdleUp = false, bool isIdleDown = false, bool isIdleLeft = false, bool isIdleRight = false)
         {
             _parameters = new()
             {
@@ -499,11 +613,40 @@ namespace Assets.Scripts.Player
                 isSwingingToolLeft = _isSwingingToolLeft,
                 isSwingingToolRight = _isSwingingToolRight,
 
-                isIdleUp = false,
-                isIdleDown = false,
-                isIdleLeft = false,
-                isIdleRight = false
+                isIdleUp = isIdleUp,
+                isIdleDown = isIdleDown,
+                isIdleLeft = isIdleLeft,
+                isIdleRight = isIdleRight
             };
+        }
+
+        /// <summary>
+        /// 设置玩家方向
+        /// </summary>
+        /// <param name="direction"></param>
+        private void SetPlayerDirection(Direction direction)
+        {
+            switch (direction)
+            {
+                case Direction.Up:
+                    SetMovementParameters(isIdleUp: true);
+                    Events.EventHandler.CallMovementEvent(_parameters);
+                    break;
+                case Direction.Down:
+                    SetMovementParameters(isIdleDown: true);
+                    Events.EventHandler.CallMovementEvent(_parameters);
+                    break;
+                case Direction.Left:
+                    SetMovementParameters(isIdleLeft: true);
+                    Events.EventHandler.CallMovementEvent(_parameters);
+                    break;
+                case Direction.Right:
+                    SetMovementParameters(isIdleRight: true);
+                    Events.EventHandler.CallMovementEvent(_parameters);
+                    break;
+                default:
+                    break;
+            }
         }
         #endregion
 
@@ -528,13 +671,13 @@ namespace Assets.Scripts.Player
                     }
                     else
                     {
-                        EventHandler.CallDropSelectedItemEvent();
+                        Events.EventHandler.CallDropSelectedItemEvent();
                     }
                     break;
 
                 case ItemType.Commodity:
                     // 商品可以直接放置
-                    EventHandler.CallDropSelectedItemEvent();
+                    Events.EventHandler.CallDropSelectedItemEvent();
                     break;
             }
         }
@@ -694,8 +837,8 @@ namespace Assets.Scripts.Player
             bool isPickingAnimation,
             WaitForSeconds animationPause,
             WaitForSeconds afterAnimationPause,
-            System.Action<GridPropertyDetails> updateGridProperty,
-            System.Action<GridPropertyDetails, Vector3Int> customToolAction = null)
+            Action<GridPropertyDetails> updateGridProperty,
+            Action<GridPropertyDetails, Vector3Int> customToolAction = null)
         {
             // 禁用输入和工具使用，防止重复操作
             _isInputDisabled = true;
@@ -862,7 +1005,7 @@ namespace Assets.Scripts.Player
 
                 GridPropertyManager.Instance.DisplayPlantedCrops(gridPropertyDetails);
 
-                EventHandler.CallRemoveSelectedItemFromInventoryEvent();
+                Events.EventHandler.CallRemoveSelectedItemFromInventoryEvent();
             }
         }
 
@@ -962,7 +1105,7 @@ namespace Assets.Scripts.Player
                 item.transform.position.z
             );
 
-            EventHandler.CallHarvestActionEffectEvent(effectPosition, HarvestActionEffect.Reaping);
+            Events.EventHandler.CallHarvestActionEffectEvent(effectPosition, HarvestActionEffect.Reaping);
 
             Destroy(item.gameObject);
         }

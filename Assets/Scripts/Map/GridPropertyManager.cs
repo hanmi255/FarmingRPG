@@ -6,6 +6,7 @@ using Assets.Scripts.Misc;
 using Assets.Scripts.SaveSystem;
 using Assets.Scripts.Scene;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 
 namespace Assets.Scripts.Map
@@ -14,7 +15,7 @@ namespace Assets.Scripts.Map
     /// 网格属性管理器，负责管理游戏场景中网格的各种属性，如可挖掘、可放置家具等
     /// </summary>
     [RequireComponent(typeof(GenerateGUID))]
-    public class GridPropertyManager : SingletonMonoBehaviour<GridPropertyManager>, ISaveble
+    public class GridPropertyManager : SingletonMonoBehaviour<GridPropertyManager>, ISaveable
     {
         #region Fields
 
@@ -135,6 +136,29 @@ namespace Assets.Scripts.Map
         public void ISaveableDeregister()
         {
             SaveLoadManager.Instance.iSaveableObjectList.Remove(this);
+        }
+
+        /// <summary>
+        /// 保存游戏数据
+        /// </summary>
+        public GameObjectSave ISaveableSave()
+        {
+            ISaveableStoreScene(SceneManager.GetActiveScene().name);
+
+            return GameObjectSave;
+        }
+
+        /// <summary>
+        /// 加载游戏数据
+        /// </summary>
+        public void ISaveableLoad(GameSave gameSave)
+        {
+            if(gameSave.gameObjectData.TryGetValue(ISaveableUniqueID, out var gameObjectSave))
+            {
+                GameObjectSave = gameObjectSave;
+
+                ISaveableRestoreScene(SceneManager.GetActiveScene().name);
+            }
         }
 
         /// <summary>

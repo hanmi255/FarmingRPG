@@ -5,6 +5,9 @@ namespace Assets.Scripts.Misc
 {
     public static class Settings
     {
+        // Scene
+        public const string PersistentSceneName = "PersistentScene";
+
         // 玩家与物体接触时暗淡
         public const float fadeInSeconds = 0.25f;
         public const float fadeOutSeconds = 0.35f;
