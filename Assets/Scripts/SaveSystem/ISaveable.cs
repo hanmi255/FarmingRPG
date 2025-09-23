@@ -1,6 +1,6 @@
 namespace Assets.Scripts.SaveSystem
 {
-    public interface ISaveble
+    public interface ISaveable
     {
         string ISaveableUniqueID { get; set; }
 
@@ -9,6 +9,10 @@ namespace Assets.Scripts.SaveSystem
         void ISaveableRegister();
 
         void ISaveableDeregister();
+
+        GameObjectSave ISaveableSave();
+
+        void ISaveableLoad(GameSave gameSave);
 
         void ISaveableStoreScene(string sceneName);
 
