@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: so_GridProperties_Farm
   m_EditorClassIdentifier: 
   sceneName: 0
-  gridWidth: 61
-  gridHeight: 0
+  gridWidth: 81
+  gridHeight: 61
   originX: -40
   originY: -30
   gridPropertyList:
