@@ -15,7 +15,7 @@ MonoBehaviour:
   sceneName: 2
   gridWidth: 14
   gridHeight: 16
-  originX: 1
+  originX: 0
   originY: -16
   gridPropertyList:
   - gridCoordinate:

@@ -55,6 +55,7 @@
     <Compile Include="Assets\Scripts\SaveSystem\SceneSave.cs" />
     <Compile Include="Assets\Scripts\Map\GridProperty.cs" />
     <Compile Include="Assets\Scripts\Map\TilemapGridProperties.cs" />
+    <Compile Include="Assets\Scripts\AStarAlgorithm\AStarTest.cs" />
     <Compile Include="Assets\Scripts\Scene\SceneTeleport.cs" />
     <Compile Include="Assets\Scripts\SaveSystem\GameObjectSave.cs" />
     <Compile Include="Assets\Scripts\UI\UIPauseMenu\PauseMenuInventoryManagement.cs" />
@@ -64,6 +65,7 @@
     <Compile Include="Assets\Scripts\Inventory\InventoryManager.cs" />
     <Compile Include="Assets\Scripts\UI\UIPauseMenu\PauseMenuInventoryManagementSlot.cs" />
     <Compile Include="Assets\Scripts\Crop\CropDetails.cs" />
+    <Compile Include="Assets\Scripts\AStarAlgorithm\AStar.cs" />
     <Compile Include="Assets\Scripts\Map\GridCoordinate.cs" />
     <Compile Include="Assets\Scripts\SaveSystem\GenerateGUID.cs" />
     <Compile Include="Assets\Scripts\SaveSystem\SaveLoadManager.cs" />
@@ -73,6 +75,7 @@
     <Compile Include="Assets\Scripts\Item\ObscuringItemFader.cs" />
     <Compile Include="Assets\Scripts\Scene\SceneControllerManager.cs" />
     <Compile Include="Assets\Scripts\Events\EventHandler.cs" />
+    <Compile Include="Assets\Scripts\AStarAlgorithm\Node.cs" />
     <Compile Include="Assets\Scripts\Crop\CropUnit.cs" />
     <Compile Include="Assets\Scripts\Utilities\PropertyDrawers\ItemCodeDescriptionAttribute.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerUnit.cs" />
@@ -96,11 +99,13 @@
     <Compile Include="Assets\Scripts\Scene\SwitchConfineBoundingShape.cs" />
     <Compile Include="Assets\Scripts\Item\TriggerObscuringItemFader.cs" />
     <Compile Include="Assets\Scripts\Item\ItemUnit.cs" />
+    <Compile Include="Assets\Scripts\NPC\NPCMovementStep.cs" />
     <Compile Include="Assets\Scripts\UI\UIManager.cs" />
     <Compile Include="Assets\Scripts\Item\ItemNudge.cs" />
     <Compile Include="Assets\Scripts\UI\GridCursorHighlight.cs" />
     <Compile Include="Assets\Scripts\Crop\SO_CropDetailsList.cs" />
     <Compile Include="Assets\Scripts\Crop\CropInstantiator.cs" />
+    <Compile Include="Assets\Scripts\AStarAlgorithm\GridNodes.cs" />
     <Compile Include="Assets\Scripts\Animation\CharacterAttribute.cs" />
     <Compile Include="Assets\Scripts\Map\GridPropertyManager.cs" />
     <Compile Include="Assets\Scripts\Misc\Vector3Serializable.cs" />

@@ -153,7 +153,7 @@ namespace Assets.Scripts.Map
         /// </summary>
         public void ISaveableLoad(GameSave gameSave)
         {
-            if(gameSave.gameObjectData.TryGetValue(ISaveableUniqueID, out var gameObjectSave))
+            if (gameSave.gameObjectData.TryGetValue(ISaveableUniqueID, out var gameObjectSave))
             {
                 GameObjectSave = gameObjectSave;
 
@@ -388,6 +388,35 @@ namespace Assets.Scripts.Map
         public GridPropertyDetails GetGridPropertyDetails(int gridX, int gridY)
         {
             return GetGridPropertyDetails(gridX, gridY, _gridPropertyDetailsDictionary);
+        }
+
+        /// <summary>
+        /// 获取指定场景的网格属性维度（从SO Grid Properties中获取）
+        /// </summary>
+        /// <param name="sceneName">场景名称</param>
+        /// <param name="gridDimensions">网格维度</param>
+        /// <param name="gridOrigin">网格原点</param>
+        /// <returns>如果找到则返回true，否则返回false</returns>
+        public bool GetGridDimensions(SceneName sceneName, out Vector2Int gridDimensions, out Vector2Int gridOrigin)
+        {
+            gridDimensions = Vector2Int.zero;
+            gridOrigin = Vector2Int.zero;
+
+            foreach (var so_gridProperties in _so_gridPropertiesArray)
+            {
+                if (so_gridProperties.sceneName == sceneName)
+                {
+                    gridDimensions.x = so_gridProperties.gridWidth;
+                    gridDimensions.y = so_gridProperties.gridHeight;
+
+                    gridOrigin.x = so_gridProperties.originX;
+                    gridOrigin.y = so_gridProperties.originY;
+
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
