@@ -186,6 +186,17 @@ namespace Assets.Scripts.Enums
     }
 
     /// <summary>
+    /// 面向枚举
+    /// </summary>
+    public enum Facing
+    {
+        None,
+        Front,
+        Back,
+        Right
+    }
+
+    /// <summary>
     /// 物品类型枚举，定义游戏中物品的类型分类
     /// </summary>
     public enum ItemType
