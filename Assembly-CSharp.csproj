@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Animation\SO_AnimationType.cs" />
     <Compile Include="Assets\Scripts\Item\ItemDetails.cs" />
+    <Compile Include="Assets\Scripts\NPC\NPCScheduleEvent.cs" />
     <Compile Include="Assets\Scripts\VFX\PoolManager.cs" />
     <Compile Include="Assets\Scripts\GameManager\GameManager.cs" />
     <Compile Include="Assets\Scripts\TimeSystem\GameClock.cs" />
@@ -64,6 +65,7 @@
     <Compile Include="Assets\Scripts\SaveSystem\SceneItem.cs" />
     <Compile Include="Assets\Scripts\Inventory\InventoryManager.cs" />
     <Compile Include="Assets\Scripts\UI\UIPauseMenu\PauseMenuInventoryManagementSlot.cs" />
+    <Compile Include="Assets\Scripts\NPC\NPCManager.cs" />
     <Compile Include="Assets\Scripts\Crop\CropDetails.cs" />
     <Compile Include="Assets\Scripts\AStarAlgorithm\AStar.cs" />
     <Compile Include="Assets\Scripts\Map\GridCoordinate.cs" />
@@ -80,6 +82,7 @@
     <Compile Include="Assets\Scripts\Utilities\PropertyDrawers\ItemCodeDescriptionAttribute.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerUnit.cs" />
     <Compile Include="Assets\Scripts\UI\UIInventory\UIInventorySlot.cs" />
+    <Compile Include="Assets\Scripts\NPC\NPCPath.cs" />
     <Compile Include="Assets\Scripts\TimeSystem\TimeManager.cs" />
     <Compile Include="Assets\Scripts\Map\SO_GridProperties.cs" />
     <Compile Include="Assets\Scripts\Animation\AnimationOverrides.cs" />
@@ -94,6 +97,7 @@
     <Compile Include="Assets\Scripts\Scene\SceneItemsManager.cs" />
     <Compile Include="Assets\Scripts\Animation\ApplyCharacterCustomisation.cs" />
     <Compile Include="Assets\Scripts\Misc\Settings.cs" />
+    <Compile Include="Assets\Scripts\NPC\NPCUnit.cs" />
     <Compile Include="Assets\Scripts\Map\GridPropertyDetails.cs" />
     <Compile Include="Assets\Scripts\SaveSystem\GameSave.cs" />
     <Compile Include="Assets\Scripts\Scene\SwitchConfineBoundingShape.cs" />
@@ -102,6 +106,7 @@
     <Compile Include="Assets\Scripts\NPC\NPCMovementStep.cs" />
     <Compile Include="Assets\Scripts\UI\UIManager.cs" />
     <Compile Include="Assets\Scripts\Item\ItemNudge.cs" />
+    <Compile Include="Assets\Scripts\NPC\NPCMovement.cs" />
     <Compile Include="Assets\Scripts\UI\GridCursorHighlight.cs" />
     <Compile Include="Assets\Scripts\Crop\SO_CropDetailsList.cs" />
     <Compile Include="Assets\Scripts\Crop\CropInstantiator.cs" />

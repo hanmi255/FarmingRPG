@@ -15,6 +15,7 @@ namespace Assets.Scripts.Misc
 
         // 瓦片地图
         public const float gridCellSize = 1.0f;
+        public const float gridDiagonalSize = 1.414f;
         public const float halfGridCellSize = 0.5f;
         public static Vector2 cursorSize = Vector2.one;
 
@@ -22,6 +23,11 @@ namespace Assets.Scripts.Misc
         public static float playerCenterYOffset = 0.875f;
         public const float walkingSpeed = 2.666f;
         public const float runningSpeed = 5.333f;
+
+        // NPC 数据
+        public static float pixelSize = 0.0625f;
+
+        public static int eventAnimation;
 
         // 动画暂停时间
         public static float useToolAnimationPause = 0.25f;
@@ -71,7 +77,8 @@ namespace Assets.Scripts.Misc
             LiftingTool,
             Picking,
             SwingingTool,
-            Idle
+            Idle,
+            Walk
         }
 
         // 使用嵌套字典存储所有方向相关的动画参数
@@ -100,6 +107,7 @@ namespace Assets.Scripts.Misc
             isWalking = Animator.StringToHash("isWalking");
             isRunning = Animator.StringToHash("isRunning");
             toolEffect = Animator.StringToHash("toolEffect");
+            eventAnimation = Animator.StringToHash("eventAnimation");
 
             // 初始化方向相关动画参数字典
             _directionalAnimations = new Dictionary<ActionType, Dictionary<Direction, int>>
@@ -134,10 +142,17 @@ namespace Assets.Scripts.Misc
                 },
                 [ActionType.Idle] = new Dictionary<Direction, int>
                 {
-                    [Direction.Up] = Animator.StringToHash("isIdleUp"),
-                    [Direction.Down] = Animator.StringToHash("isIdleDown"),
-                    [Direction.Left] = Animator.StringToHash("isIdleLeft"),
-                    [Direction.Right] = Animator.StringToHash("isIdleRight")
+                    [Direction.Up] = Animator.StringToHash("idleUp"),
+                    [Direction.Down] = Animator.StringToHash("idleDown"),
+                    [Direction.Left] = Animator.StringToHash("idleLeft"),
+                    [Direction.Right] = Animator.StringToHash("idleRight")
+                },
+                [ActionType.Walk] = new Dictionary<Direction, int>
+                {
+                    [Direction.Up] = Animator.StringToHash("walkUp"),
+                    [Direction.Down] = Animator.StringToHash("walkDown"),
+                    [Direction.Left] = Animator.StringToHash("walkLeft"),
+                    [Direction.Right] = Animator.StringToHash("walkRight")
                 }
             };
         }

@@ -140,23 +140,23 @@ namespace Assets.Scripts.TimeSystem
             if (!_gameObjectSave.sceneData.TryGetValue(Settings.PersistentSceneName, out var sceneSave))
                 return;
 
-            if(sceneSave.intDictionary == null || sceneSave.stringDictionary == null)
+            if (sceneSave.intDictionary == null || sceneSave.stringDictionary == null)
                 return;
 
-            if(sceneSave.intDictionary.TryGetValue("gameYear", out int gameYear))
+            if (sceneSave.intDictionary.TryGetValue("gameYear", out int gameYear))
                 _gameYear = gameYear;
-            if(sceneSave.intDictionary.TryGetValue("gameDay", out int gameDay))
+            if (sceneSave.intDictionary.TryGetValue("gameDay", out int gameDay))
                 _gameDay = gameDay;
-            if(sceneSave.intDictionary.TryGetValue("gameHour", out int gameHour))
+            if (sceneSave.intDictionary.TryGetValue("gameHour", out int gameHour))
                 _gameHour = gameHour;
-            if(sceneSave.intDictionary.TryGetValue("gameMinute", out int gameMinute))
+            if (sceneSave.intDictionary.TryGetValue("gameMinute", out int gameMinute))
                 _gameMinute = gameMinute;
-            if(sceneSave.intDictionary.TryGetValue("gameSecond", out int gameSecond))
+            if (sceneSave.intDictionary.TryGetValue("gameSecond", out int gameSecond))
                 _gameSecond = gameSecond;
 
-            if(sceneSave.stringDictionary.TryGetValue("gameDayOfWeek", out string gameDayOfWeek))
+            if (sceneSave.stringDictionary.TryGetValue("gameDayOfWeek", out string gameDayOfWeek))
                 _gameDayOfWeek = gameDayOfWeek;
-            if(sceneSave.stringDictionary.TryGetValue("gameSeason", out string gameSeason))
+            if (sceneSave.stringDictionary.TryGetValue("gameSeason", out string gameSeason))
                 _gameSeason = (Season)Enum.Parse(typeof(Season), gameSeason);
 
             _gameTick = 0f;
@@ -173,6 +173,17 @@ namespace Assets.Scripts.TimeSystem
         public void ISaveableRestoreScene(string sceneName)
         {
             // Nothing to restore
+        }
+        #endregion
+
+        #region Public Methods
+        /// <summary>
+        /// 获取游戏时间
+        /// </summary>
+        /// <returns>游戏时间</returns>
+        public TimeSpan GetGameTime()
+        {
+            return new TimeSpan(_gameHour, _gameMinute, _gameSecond);
         }
         #endregion
 

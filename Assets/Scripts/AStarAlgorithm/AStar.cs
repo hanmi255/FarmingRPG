@@ -37,6 +37,8 @@ namespace Assets.Scripts.AStarAlgorithm
         #region Public Methods
         public bool BuildPath(SceneName sceneName, Vector2Int startGridPosition, Vector2Int targetGridPosition, Stack<NPCMovementStep> npcMovementStepStack)
         {
+            _pathFound = false;
+
             if (!PopulateGridNodesFromGridPropertiesDictionary(sceneName, startGridPosition, targetGridPosition))
                 return false;
 

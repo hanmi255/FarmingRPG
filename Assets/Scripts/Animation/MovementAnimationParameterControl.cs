@@ -52,27 +52,27 @@ namespace Assets.Scripts.Animation
             _animator.SetInteger(Settings.toolEffect, (int)movementParams.toolEffect);
 
             // 工具使用状态
-            SetDirectionalTriggers(movementParams, Settings.ActionType.UsingTool,
+            SetDirectionalTriggers(Settings.ActionType.UsingTool,
                 movementParams.isUsingToolUp, movementParams.isUsingToolDown,
                 movementParams.isUsingToolLeft, movementParams.isUsingToolRight);
 
             // 工具抬起状态
-            SetDirectionalTriggers(movementParams, Settings.ActionType.LiftingTool,
+            SetDirectionalTriggers(Settings.ActionType.LiftingTool,
                 movementParams.isLiftingToolUp, movementParams.isLiftingToolDown,
                 movementParams.isLiftingToolLeft, movementParams.isLiftingToolRight);
 
             // 拾取状态
-            SetDirectionalTriggers(movementParams, Settings.ActionType.Picking,
+            SetDirectionalTriggers(Settings.ActionType.Picking,
                 movementParams.isPickingUp, movementParams.isPickingDown,
                 movementParams.isPickingLeft, movementParams.isPickingRight);
 
             // 工具挥动状态
-            SetDirectionalTriggers(movementParams, Settings.ActionType.SwingingTool,
+            SetDirectionalTriggers(Settings.ActionType.SwingingTool,
                 movementParams.isSwingingToolUp, movementParams.isSwingingToolDown,
                 movementParams.isSwingingToolLeft, movementParams.isSwingingToolRight);
 
             // 空闲方向状态
-            SetDirectionalTriggers(movementParams, Settings.ActionType.Idle,
+            SetDirectionalTriggers(Settings.ActionType.Idle,
                 movementParams.isIdleUp, movementParams.isIdleDown,
                 movementParams.isIdleLeft, movementParams.isIdleRight);
         }
@@ -82,13 +82,12 @@ namespace Assets.Scripts.Animation
         /// <summary>
         /// 设置方向性触发器
         /// </summary>
-        /// <param name="movementParams">移动参数</param>
         /// <param name="actionType">动作类型</param>
         /// <param name="isUp">是否向上</param>
         /// <param name="isDown">是否向下</param>
         /// <param name="isLeft">是否向左</param>
         /// <param name="isRight">是否向右</param>
-        private void SetDirectionalTriggers(MovementParameters movementParams, Settings.ActionType actionType,
+        private void SetDirectionalTriggers(Settings.ActionType actionType,
             bool isUp, bool isDown, bool isLeft, bool isRight)
         {
             if (isUp)
