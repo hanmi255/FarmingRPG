@@ -175,10 +175,23 @@ namespace Assets.Scripts.Enums
     }
 
     /// <summary>
+    /// 天气枚举，定义游戏中的天气
+    /// </summary>
+    public enum Weather
+    {
+        None,
+        Dry,
+        Rainy,
+        Snowy,
+        Count
+    }
+
+    /// <summary>
     /// 方向枚举，定义游戏中的基本方向
     /// </summary>
     public enum Direction
     {
+        None,
         Up,
         Down,
         Left,

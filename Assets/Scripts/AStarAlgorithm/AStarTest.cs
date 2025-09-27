@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
 using Assets.Scripts.Enums;
+using Assets.Scripts.Map;
 using Assets.Scripts.NPC;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.Tilemaps;
 
 namespace Assets.Scripts.AStarAlgorithm
 {
@@ -12,61 +9,40 @@ namespace Assets.Scripts.AStarAlgorithm
     public class AStarTest : MonoBehaviour
     {
         #region Fields
-        [SerializeField] private AStar _astar;
-        [SerializeField] private Vector2Int _startPosition;
-        [SerializeField] private Vector2Int _targetPosition;
-        [SerializeField] private Tilemap _tileMapToDisplayPath = null;
-        [SerializeField] private TileBase _pathTile = null;
-        [SerializeField] private bool _displayStartAndTarget = false;
-        [SerializeField] private bool _displayPath = false;
-
-        private Stack<NPCMovementStep> _npcMovementStepStack;
+        [SerializeField] private NPCPath _npcPath = null;
+        [SerializeField] private bool _moveNPC = false;
+        [SerializeField] private Vector2Int _finishPosition;
+        [SerializeField] private AnimationClip _idleDownAnimationClip = null;
+        [SerializeField] private AnimationClip _eventAnimationClip = null;
+        private NPCMovement _npcMovement;
         #endregion
 
         #region Lifecycle Methods
-        private void Awake()
+        private void Start()
         {
-            _astar = GetComponent<AStar>();
-            _npcMovementStepStack = new Stack<NPCMovementStep>();
+            _npcMovement = _npcPath.GetComponent<NPCMovement>();
+            _npcMovement.npcFacingDirectionAtDestination = Direction.Down;
+            _npcMovement.npcTargetAnimationClip = _idleDownAnimationClip;
         }
 
         private void Update()
         {
-            if (_startPosition != null && _targetPosition != null && _tileMapToDisplayPath != null && _pathTile != null)
+            if (_moveNPC)
             {
-                if (_displayStartAndTarget)
-                {
-                    _tileMapToDisplayPath.SetTile(new Vector3Int(_startPosition.x, _startPosition.y, 0), _pathTile);
-                    _tileMapToDisplayPath.SetTile(new Vector3Int(_targetPosition.x, _targetPosition.y, 0), _pathTile);
-                }
-                else
-                {
-                    _tileMapToDisplayPath.SetTile(new Vector3Int(_startPosition.x, _startPosition.y, 0), null);
-                    _tileMapToDisplayPath.SetTile(new Vector3Int(_targetPosition.x, _targetPosition.y, 0), null);
-                }
+                _moveNPC = false;
 
-                if (_displayPath)
-                {
-                    Enum.TryParse<SceneName>(SceneManager.GetActiveScene().name, out SceneName sceneName);
-                    _astar.BuildPath(sceneName, _startPosition, _targetPosition, _npcMovementStepStack);
+                NPCScheduleEvent npcScheduleEvent = new(
+                    0,
+                    0,
+                    0,
+                    0,
+                    Weather.None,
+                    Season.None,
+                    SceneName.Farm,
+                    new GridCoordinate(_finishPosition.x, _finishPosition.y),
+                    _eventAnimationClip);
 
-                    foreach (var npcMovementStep in _npcMovementStepStack)
-                    {
-                        _tileMapToDisplayPath.SetTile(new Vector3Int(npcMovementStep.gridCoordinate.x, npcMovementStep.gridCoordinate.y, 0), _pathTile);
-                    }
-                }
-                else
-                {
-                    if (_npcMovementStepStack.Count > 0)
-                    {
-                        foreach (var npcMovementStep in _npcMovementStepStack)
-                        {
-                            _tileMapToDisplayPath.SetTile(new Vector3Int(npcMovementStep.gridCoordinate.x, npcMovementStep.gridCoordinate.y, 0), null);
-                        }
-
-                        _npcMovementStepStack.Clear();
-                    }
-                }
+                _npcPath.BuildPath(npcScheduleEvent);
             }
         }
         #endregion
