@@ -10585,7 +10585,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _observeMovementPenalties: 1
   _pathMovementPenalty: 0
-  _defaultMovementPenalty: 0
+  _defaultMovementPenalty: 5
 --- !u!4 &1459788568
 Transform:
   m_ObjectHideFlags: 0
