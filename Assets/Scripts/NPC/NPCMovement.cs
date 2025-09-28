@@ -121,6 +121,29 @@ namespace Assets.Scripts.NPC
         }
 
         /// <summary>
+        /// 取消NPC移动
+        /// </summary>
+        public void CancelNPCMovement()
+        {
+            _npcPath.ClearPath();
+            _npcNextGridPosition = Vector3Int.zero;
+            _npcNextWorldPosition = Vector3.zero;
+            _isMoving = false;
+
+            if(_moveToGridPositionCoroutine != null)
+            {
+                StopCoroutine(_moveToGridPositionCoroutine);
+                _moveToGridPositionCoroutine = null;
+            }
+
+            ResetMoveAnimation();
+            ClearNPCEventAnimation();
+            npcTargetAnimationClip = null;
+            ResetIdleAnimation();
+            SetIdleAnimation();
+        }
+
+        /// <summary>
         /// 设置NPC事件细节
         /// </summary>
         /// <param name="npcScheduleEvent">NPC事件</param>
@@ -133,17 +156,6 @@ namespace Assets.Scripts.NPC
             npcTargetAnimationClip = npcScheduleEvent.animationAtDestination;
 
             ClearNPCEventAnimation();
-        }
-
-        /// <summary>
-        /// 清除NPC事件动画
-        /// </summary>
-        private void ClearNPCEventAnimation()
-        {
-            _animatorOverrideController[_blankAnimation] = _blankAnimation;
-            _animator.SetBool(Settings.eventAnimation, false);
-
-            transform.rotation = Quaternion.identity;
         }
         #endregion
 
@@ -164,6 +176,17 @@ namespace Assets.Scripts.NPC
         private void BeforeSceneUnload()
         {
             _sceneLoaded = false;
+        }
+
+        /// <summary>
+        /// 清除NPC事件动画
+        /// </summary>
+        private void ClearNPCEventAnimation()
+        {
+            _animatorOverrideController[_blankAnimation] = _blankAnimation;
+            _animator.SetBool(Settings.eventAnimation, false);
+
+            transform.rotation = Quaternion.identity;
         }
 
         #region Used For Fixed Update()
