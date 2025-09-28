@@ -17,6 +17,8 @@ namespace Assets.Scripts.Misc
         public const float gridCellSize = 1.0f;
         public const float gridDiagonalSize = 1.414f;
         public const float halfGridCellSize = 0.5f;
+        public const int maxGridWidth = 99999;
+        public const int maxGridHeight = 99999;
         public static Vector2 cursorSize = Vector2.one;
 
         // 玩家数据

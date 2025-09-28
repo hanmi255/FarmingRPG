@@ -10567,6 +10567,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _npcPath: {fileID: 1843422259}
   _moveNPC: 0
+  _sceneName: 0
   _finishPosition: {x: 0, y: 0}
   _idleDownAnimationClip: {fileID: 7400000, guid: cb83867c6252b5c4a8e8758697474f88, type: 2}
   _eventAnimationClip: {fileID: 7400000, guid: cb83867c6252b5c4a8e8758697474f88, type: 2}
@@ -10612,6 +10613,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f27d3bbd35d36845a1377f49e2a242e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  so_SceneRouteList: {fileID: 11400000, guid: 4112441169bdf73409e6d13d9f97b24d, type: 2}
   npcUnits: []
 --- !u!1001 &1474702427
 PrefabInstance:
@@ -12869,11 +12871,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 287374716201692799, guid: 3436d6d2d5233564b8d76d6e80d7b345, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 9.32
+      value: 15.93
       objectReference: {fileID: 0}
     - target: {fileID: 287374716201692799, guid: 3436d6d2d5233564b8d76d6e80d7b345, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -10.05
+      value: -17.42
       objectReference: {fileID: 0}
     - target: {fileID: 287374716201692799, guid: 3436d6d2d5233564b8d76d6e80d7b345, type: 3}
       propertyPath: m_LocalPosition.z
@@ -12919,10 +12921,6 @@ PrefabInstance:
       propertyPath: m_WasSpriteAssigned
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 720893705089269106, guid: 3436d6d2d5233564b8d76d6e80d7b345, type: 3}
-      propertyPath: _blankAnimation
-      value: 
-      objectReference: {fileID: 7400000, guid: de73329f78eb6d645a9a70faf2bddfce, type: 2}
     - target: {fileID: 4693129185983522916, guid: 3436d6d2d5233564b8d76d6e80d7b345, type: 3}
       propertyPath: m_SpriteTilingProperty.pivot.x
       value: 0.5
