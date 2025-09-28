@@ -12949,6 +12949,10 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: 627610733496a2c44bdfa3f64de1857e, type: 2}
+    - target: {fileID: 5396699911215397760, guid: 3436d6d2d5233564b8d76d6e80d7b345, type: 3}
+      propertyPath: _so_NPCScheduleEventList
+      value: 
+      objectReference: {fileID: 11400000, guid: 22f58e22026002f44a4a3b1348848c37, type: 2}
     - target: {fileID: 6151523691817022018, guid: 3436d6d2d5233564b8d76d6e80d7b345, type: 3}
       propertyPath: m_Name
       value: Butch
@@ -13532,6 +13536,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d9e3126a5c78b647875167bbc6eff9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentWeather: 1
 --- !u!4 &2058592765
 Transform:
   m_ObjectHideFlags: 0
