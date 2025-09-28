@@ -51,13 +51,13 @@
     <Compile Include="Assets\Scripts\Item\ItemDetails.cs" />
     <Compile Include="Assets\Scripts\NPC\NPCScheduleEvent.cs" />
     <Compile Include="Assets\Scripts\VFX\PoolManager.cs" />
-    <Compile Include="Assets\Scripts\GameManager\GameManager.cs" />
     <Compile Include="Assets\Scripts\TimeSystem\GameClock.cs" />
     <Compile Include="Assets\Scripts\SaveSystem\SceneSave.cs" />
     <Compile Include="Assets\Scripts\Map\GridProperty.cs" />
     <Compile Include="Assets\Scripts\Map\TilemapGridProperties.cs" />
     <Compile Include="Assets\Scripts\AStarAlgorithm\AStarTest.cs" />
     <Compile Include="Assets\Scripts\Scene\SceneTeleport.cs" />
+    <Compile Include="Assets\Scripts\NPC\NPCScheduleEventSort.cs" />
     <Compile Include="Assets\Scripts\SaveSystem\GameObjectSave.cs" />
     <Compile Include="Assets\Scripts\UI\UIPauseMenu\PauseMenuInventoryManagement.cs" />
     <Compile Include="Assets\Scripts\Player\ItemPickUp.cs" />
@@ -76,6 +76,7 @@
     <Compile Include="Assets\Scripts\UI\UIInventory\UIInventoryBar.cs" />
     <Compile Include="Assets\Scripts\Item\ObscuringItemFader.cs" />
     <Compile Include="Assets\Scripts\Scene\SceneControllerManager.cs" />
+    <Compile Include="Assets\Scripts\NPC\SO_NPCScheduleEventList.cs" />
     <Compile Include="Assets\Scripts\Events\EventHandler.cs" />
     <Compile Include="Assets\Scripts\AStarAlgorithm\Node.cs" />
     <Compile Include="Assets\Scripts\Crop\CropUnit.cs" />
@@ -90,11 +91,14 @@
     <Compile Include="Assets\Scripts\Enums\Enums.cs" />
     <Compile Include="Assets\Scripts\UI\UIInventory\UIInventoryTextBox.cs" />
     <Compile Include="Assets\Scripts\Inventory\InventoryItem.cs" />
+    <Compile Include="Assets\Scripts\Game\GameManager.cs" />
     <Compile Include="Assets\Scripts\Misc\Tags.cs" />
     <Compile Include="Assets\Scripts\Animation\MovementAnimationParameterControl.cs" />
     <Compile Include="Assets\Scripts\SaveSystem\ISaveable.cs" />
     <Compile Include="Assets\Scripts\UI\CursorHighlight.cs" />
+    <Compile Include="Assets\Scripts\Scene\ScenePath.cs" />
     <Compile Include="Assets\Scripts\Scene\SceneItemsManager.cs" />
+    <Compile Include="Assets\Scripts\NPC\NPCSchedule.cs" />
     <Compile Include="Assets\Scripts\Animation\ApplyCharacterCustomisation.cs" />
     <Compile Include="Assets\Scripts\Misc\Settings.cs" />
     <Compile Include="Assets\Scripts\NPC\NPCUnit.cs" />
@@ -109,11 +113,13 @@
     <Compile Include="Assets\Scripts\NPC\NPCMovement.cs" />
     <Compile Include="Assets\Scripts\UI\GridCursorHighlight.cs" />
     <Compile Include="Assets\Scripts\Crop\SO_CropDetailsList.cs" />
+    <Compile Include="Assets\Scripts\Scene\SO_SceneRouteList.cs" />
     <Compile Include="Assets\Scripts\Crop\CropInstantiator.cs" />
     <Compile Include="Assets\Scripts\AStarAlgorithm\GridNodes.cs" />
     <Compile Include="Assets\Scripts\Animation\CharacterAttribute.cs" />
     <Compile Include="Assets\Scripts\Map\GridPropertyManager.cs" />
     <Compile Include="Assets\Scripts\Misc\Vector3Serializable.cs" />
+    <Compile Include="Assets\Scripts\Scene\SceneRoute.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

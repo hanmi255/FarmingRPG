@@ -8,6 +8,20 @@ using UnityEngine;
 
 namespace Assets.Scripts.TimeSystem
 {
+    /// <summary>
+    /// 时间事件类型标志枚举
+    /// </summary>
+    [System.Flags]
+    public enum TimeEventTypes
+    {
+        None = 0,
+        Minute = 1,
+        Hour = 2,
+        Day = 4,
+        Season = 8,
+        Year = 16
+    }
+
     [RequireComponent(typeof(GenerateGUID))]
     /// <summary>
     /// 时间管理器 - 负责游戏内时间的推进和管理
@@ -224,48 +238,82 @@ namespace Assets.Scripts.TimeSystem
                 return;
             }
 
+            // 重置秒数并推进分钟
             _gameSecond = 0;
             _gameMinute++;
+
+            // 检查并处理时间进位，获取需要触发的事件类型
+            var eventsToTrigger = HandleTimeCarryOver();
+
+            // 设置时间参数并触发相应事件
             SetTimeEventParameters();
-            Events.EventHandler.CallAdvanceGameMinuteEvent(_parameters);
+            TriggerTimeEvents(eventsToTrigger);
+        }
 
-            if (_gameMinute <= 59)
-                return;
+        /// <summary>
+        /// 处理时间进位逻辑
+        /// </summary>
+        /// <returns>需要触发的事件类型</returns>
+        private TimeEventTypes HandleTimeCarryOver()
+        {
+            var events = TimeEventTypes.Minute;
 
-            _gameMinute = 0;
-            _gameHour++;
-            SetTimeEventParameters();
-            Events.EventHandler.CallAdvanceGameHourEvent(_parameters);
+            if (_gameMinute >= 60)
+            {
+                _gameMinute = 0;
+                _gameHour++;
+                events |= TimeEventTypes.Hour;
 
-            if (_gameHour <= 23)
-                return;
+                if (_gameHour >= 24)
+                {
+                    _gameHour = 0;
+                    _gameDay++;
+                    _gameDayOfWeek = GetDayOfWeek();
+                    events |= TimeEventTypes.Day;
 
-            _gameHour = 0;
-            _gameDay++;
-            _gameDayOfWeek = GetDayOfWeek();
-            SetTimeEventParameters();
-            Events.EventHandler.CallAdvanceGameDayEvent(_parameters);
+                    if (_gameDay >= 31)
+                    {
+                        _gameDay = 1;
+                        _gameSeason++;
+                        events |= TimeEventTypes.Season;
 
-            if (_gameDay <= 30)
-                return;
+                        if ((int)_gameSeason > 3)
+                        {
+                            _gameSeason = 0;
+                            _gameYear++;
 
-            _gameDay = 1;
-            _gameSeason++;
-            SetTimeEventParameters();
-            Events.EventHandler.CallAdvanceGameSeasonEvent(_parameters);
+                            if (_gameYear > 9999)
+                                _gameYear = 1;
 
-            if ((int)_gameSeason <= 3)
-                return;
+                            events |= TimeEventTypes.Year;
+                        }
+                    }
+                }
+            }
 
-            _gameSeason = 0;
-            _gameYear++;
+            return events;
+        }
 
-            // 重置年
-            if (_gameYear > 9999)
-                _gameYear = 1;
+        /// <summary>
+        /// 根据事件类型触发相应的时间事件
+        /// </summary>
+        /// <param name="events">要触发的事件类型</param>
+        private void TriggerTimeEvents(TimeEventTypes events)
+        {
+            if (events.HasFlag(TimeEventTypes.Year))
+                Events.EventHandler.CallAdvanceGameYearEvent(_parameters);
 
-            SetTimeEventParameters();
-            Events.EventHandler.CallAdvanceGameYearEvent(_parameters);
+            if (events.HasFlag(TimeEventTypes.Season))
+                Events.EventHandler.CallAdvanceGameSeasonEvent(_parameters);
+
+            if (events.HasFlag(TimeEventTypes.Day))
+                Events.EventHandler.CallAdvanceGameDayEvent(_parameters);
+
+            if (events.HasFlag(TimeEventTypes.Hour))
+                Events.EventHandler.CallAdvanceGameHourEvent(_parameters);
+
+            if (events.HasFlag(TimeEventTypes.Minute))
+                Events.EventHandler.CallAdvanceGameMinuteEvent(_parameters);
         }
 
         /// <summary>

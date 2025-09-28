@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using Assets.Scripts.Map;
 using Assets.Scripts.Misc;
+using Assets.Scripts.Scene;
 using Assets.Scripts.TimeSystem;
 using UnityEngine;
 
@@ -31,26 +33,22 @@ namespace Assets.Scripts.NPC
         /// <summary>
         /// 构建路径
         /// </summary>
-        /// <param name="npcScheduleEvent"></param>
+        /// <param name="npcScheduleEvent">NPC调度事件</param>
         public void BuildPath(NPCScheduleEvent npcScheduleEvent)
         {
             ClearPath();
 
-            if (npcScheduleEvent.toSceneName != _npcMovement.npcCurrentScene)
-                return;
-
-            Vector2Int npcCurrentGridPosition = (Vector2Int)_npcMovement.npcCurrentGridPosition;
-            Vector2Int npcTargetGridPosition = (Vector2Int)npcScheduleEvent.toGridCoordinate;
-
-            NPCManager.Instance.BuildPath(npcScheduleEvent.toSceneName, npcCurrentGridPosition, npcTargetGridPosition, npcMovementStepStack);
-
-            if (npcMovementStepStack.Count > 1)
+            // 检查是否为同场景路径构建
+            if (IsSameSceneMovement(npcScheduleEvent))
             {
-                UpdateTimesOnPath();
-                npcMovementStepStack.Pop();
-
-                _npcMovement.SetScheduleEventDetails(npcScheduleEvent);
+                BuildSameScenePath(npcScheduleEvent);
             }
+            else
+            {
+                BuildCrossScenePath(npcScheduleEvent);
+            }
+
+            FinalizePathIfValid(npcScheduleEvent);
         }
 
         /// <summary>
@@ -61,10 +59,146 @@ namespace Assets.Scripts.NPC
             TimeSpan currentGameTime = TimeManager.Instance.GetGameTime();
             ProcessMovementStepsWithTiming(currentGameTime);
         }
-
         #endregion
 
         #region Private Methods
+        /// <summary>
+        /// 检查是否为同场景移动
+        /// </summary>
+        /// <param name="npcScheduleEvent">NPC调度事件</param>
+        /// <returns>是否为同场景移动</returns>
+        private bool IsSameSceneMovement(NPCScheduleEvent npcScheduleEvent)
+        {
+            return npcScheduleEvent.toSceneName == _npcMovement.npcCurrentScene;
+        }
+
+        /// <summary>
+        /// 构建同场景路径
+        /// </summary>
+        /// <param name="npcScheduleEvent">NPC调度事件</param>
+        private void BuildSameScenePath(NPCScheduleEvent npcScheduleEvent)
+        {
+            Vector2Int npcCurrentGridPosition = (Vector2Int)_npcMovement.npcCurrentGridPosition;
+            Vector2Int npcTargetGridPosition = (Vector2Int)npcScheduleEvent.toGridCoordinate;
+
+            NPCManager.Instance.BuildPath(
+                npcScheduleEvent.toSceneName, 
+                npcCurrentGridPosition, 
+                npcTargetGridPosition, 
+                npcMovementStepStack);
+        }
+
+        /// <summary>
+        /// 构建跨场景路径
+        /// </summary>
+        /// <param name="npcScheduleEvent">NPC调度事件</param>
+        private void BuildCrossScenePath(NPCScheduleEvent npcScheduleEvent)
+        {
+            SceneRoute sceneRoute = GetSceneRoute(npcScheduleEvent);
+
+            if (sceneRoute == null)
+                return;
+
+            ProcessScenePathList(sceneRoute, npcScheduleEvent);
+        }
+
+        /// <summary>
+        /// 获取场景路线
+        /// </summary>
+        /// <param name="npcScheduleEvent">NPC调度事件</param>
+        /// <returns>场景路线</returns>
+        private SceneRoute GetSceneRoute(NPCScheduleEvent npcScheduleEvent)
+        {
+            return NPCManager.Instance.GetSceneRoute(
+                _npcMovement.npcCurrentScene.ToString(), 
+                npcScheduleEvent.toSceneName.ToString());
+        }
+
+        /// <summary>
+        /// 处理场景路径列表
+        /// </summary>
+        /// <param name="sceneRoute">场景路线</param>
+        /// <param name="npcScheduleEvent">NPC调度事件</param>
+        private void ProcessScenePathList(SceneRoute sceneRoute, NPCScheduleEvent npcScheduleEvent)
+        {
+            for (int i = sceneRoute.scenePathList.Count - 1; i >= 0; i--)
+            {
+                ScenePath scenePath = sceneRoute.scenePathList[i];
+                ProcessSingleScenePath(scenePath, npcScheduleEvent);
+            }
+        }
+
+        /// <summary>
+        /// 处理单个场景路径
+        /// </summary>
+        /// <param name="scenePath">场景路径</param>
+        /// <param name="npcScheduleEvent">NPC调度事件</param>
+        private void ProcessSingleScenePath(ScenePath scenePath, NPCScheduleEvent npcScheduleEvent)
+        {
+            Vector2Int toGridPosition = CalculateToGridPosition(scenePath, npcScheduleEvent);
+            Vector2Int fromGridPosition = CalculateFromGridPosition(scenePath);
+
+            NPCManager.Instance.BuildPath(
+                scenePath.sceneName, 
+                fromGridPosition, 
+                toGridPosition, 
+                npcMovementStepStack);
+        }
+
+        /// <summary>
+        /// 计算目标网格位置
+        /// </summary>
+        /// <param name="scenePath">场景路径</param>
+        /// <param name="npcScheduleEvent">NPC调度事件</param>
+        /// <returns>目标网格位置</returns>
+        private Vector2Int CalculateToGridPosition(ScenePath scenePath, NPCScheduleEvent npcScheduleEvent)
+        {
+            // 如果目标网格超出边界，使用事件坐标
+            if (IsGridCellOutOfBounds(scenePath.toGridCell))
+                return (Vector2Int)npcScheduleEvent.toGridCoordinate;
+
+            return (Vector2Int)scenePath.toGridCell;
+        }
+
+        /// <summary>
+        /// 计算起始网格位置
+        /// </summary>
+        /// <param name="scenePath">场景路径</param>
+        /// <returns>起始网格位置</returns>
+        private Vector2Int CalculateFromGridPosition(ScenePath scenePath)
+        {
+            // 如果起始网格超出边界，使用当前位置
+            if (IsGridCellOutOfBounds(scenePath.fromGridCell))
+                return (Vector2Int)_npcMovement.npcCurrentGridPosition;
+
+            return (Vector2Int)scenePath.fromGridCell;
+        }
+
+        /// <summary>
+        /// 检查网格单元是否超出边界
+        /// </summary>
+        /// <param name="gridCell">网格单元</param>
+        /// <returns>是否超出边界</returns>
+        private bool IsGridCellOutOfBounds(GridCoordinate gridCell)
+        {
+            return gridCell.x >= Settings.maxGridWidth || gridCell.y >= Settings.maxGridHeight;
+        }
+
+        /// <summary>
+        /// 如果路径有效则完成路径构建
+        /// </summary>
+        /// <param name="npcScheduleEvent">NPC调度事件</param>
+        private void FinalizePathIfValid(NPCScheduleEvent npcScheduleEvent)
+        {
+            // 如果路径步骤少于2步则不处理
+            if (npcMovementStepStack.Count <= 1)
+                return;
+
+            UpdateTimesOnPath();
+            npcMovementStepStack.Pop();
+            _npcMovement.SetScheduleEventDetails(npcScheduleEvent);
+        }
+
         /// <summary>
         /// 处理移动步骤并计算时间
         /// </summary>
@@ -107,8 +241,8 @@ namespace Assets.Scripts.NPC
         /// <returns>移动持续时间</returns>
         private TimeSpan CalculateMovementDuration(NPCMovementStep currentStep, NPCMovementStep previousStep)
         {
-            float gridSize = MovementIsDiagonal(currentStep, previousStep) 
-                ? Settings.gridDiagonalSize 
+            float gridSize = MovementIsDiagonal(currentStep, previousStep)
+                ? Settings.gridDiagonalSize
                 : Settings.gridCellSize;
 
             int movementSeconds = CalculateMovementSeconds(gridSize);

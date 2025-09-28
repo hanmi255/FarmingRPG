@@ -11,6 +11,7 @@ namespace Assets.Scripts.AStarAlgorithm
         #region Fields
         [SerializeField] private NPCPath _npcPath = null;
         [SerializeField] private bool _moveNPC = false;
+        [SerializeField] private SceneName _sceneName = SceneName.Farm;
         [SerializeField] private Vector2Int _finishPosition;
         [SerializeField] private AnimationClip _idleDownAnimationClip = null;
         [SerializeField] private AnimationClip _eventAnimationClip = null;
@@ -38,7 +39,7 @@ namespace Assets.Scripts.AStarAlgorithm
                     0,
                     Weather.None,
                     Season.None,
-                    SceneName.Farm,
+                    _sceneName,
                     new GridCoordinate(_finishPosition.x, _finishPosition.y),
                     _eventAnimationClip);
 

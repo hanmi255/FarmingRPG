@@ -92,44 +92,16 @@ namespace Assets.Scripts.NPC
             SetIdleAnimation();
         }
 
+        /// <summary>
+        /// FixedUpdate - 处理NPC移动和动画状态的主函数
+        /// </summary>
         private void FixedUpdate()
         {
-            if (!_sceneLoaded)
+            if (!ValidateMovementPreConditions())
                 return;
 
-            if (_isMoving)
-                return;
-
-            npcCurrentGridPosition = GetGridPosition(transform.position);
-            _npcNextGridPosition = npcCurrentGridPosition;
-
-            if (_npcPath.npcMovementStepStack.Count > 0)
-            {
-                NPCMovementStep npcMovementStep = _npcPath.npcMovementStepStack.Peek();
-
-                npcCurrentScene = npcMovementStep.sceneName;
-
-                if (npcCurrentScene.ToString() == SceneManager.GetActiveScene().name)
-                {
-                    SetNPCActiveInScene();
-
-                    npcMovementStep = _npcPath.npcMovementStepStack.Pop();
-
-                    _npcNextGridPosition = (Vector3Int)npcMovementStep.gridCoordinate;
-
-                    TimeSpan npcMovementStepTime = new(npcMovementStep.hour, npcMovementStep.minute, npcMovementStep.second);
-
-                    MoveToGridPosition(_npcNextGridPosition, npcMovementStepTime, TimeManager.Instance.GetGameTime());
-                }
-            }
-            else
-            {
-                ResetMoveAnimation();
-
-                SetNPCFacingDirection();
-
-                SetNPCEventAnimation();
-            }
+            UpdateNPCGridPosition();
+            ProcessNPCMovement();
         }
         #endregion
 
@@ -149,6 +121,29 @@ namespace Assets.Scripts.NPC
         }
 
         /// <summary>
+        /// 取消NPC移动
+        /// </summary>
+        public void CancelNPCMovement()
+        {
+            _npcPath.ClearPath();
+            _npcNextGridPosition = Vector3Int.zero;
+            _npcNextWorldPosition = Vector3.zero;
+            _isMoving = false;
+
+            if(_moveToGridPositionCoroutine != null)
+            {
+                StopCoroutine(_moveToGridPositionCoroutine);
+                _moveToGridPositionCoroutine = null;
+            }
+
+            ResetMoveAnimation();
+            ClearNPCEventAnimation();
+            npcTargetAnimationClip = null;
+            ResetIdleAnimation();
+            SetIdleAnimation();
+        }
+
+        /// <summary>
         /// 设置NPC事件细节
         /// </summary>
         /// <param name="npcScheduleEvent">NPC事件</param>
@@ -161,17 +156,6 @@ namespace Assets.Scripts.NPC
             npcTargetAnimationClip = npcScheduleEvent.animationAtDestination;
 
             ClearNPCEventAnimation();
-        }
-
-        /// <summary>
-        /// 清除NPC事件动画
-        /// </summary>
-        private void ClearNPCEventAnimation()
-        {
-            _animatorOverrideController[_blankAnimation] = _blankAnimation;
-            _animator.SetBool(Settings.eventAnimation, false);
-
-            transform.rotation = Quaternion.identity;
         }
         #endregion
 
@@ -194,6 +178,197 @@ namespace Assets.Scripts.NPC
             _sceneLoaded = false;
         }
 
+        /// <summary>
+        /// 清除NPC事件动画
+        /// </summary>
+        private void ClearNPCEventAnimation()
+        {
+            _animatorOverrideController[_blankAnimation] = _blankAnimation;
+            _animator.SetBool(Settings.eventAnimation, false);
+
+            transform.rotation = Quaternion.identity;
+        }
+
+        #region Used For Fixed Update()
+        /// <summary>
+        /// 验证NPC移动的前置条件
+        /// </summary>
+        /// <returns>如果满足移动条件返回true，否则返回false</returns>
+        private bool ValidateMovementPreConditions()
+        {
+            if (!_sceneLoaded)
+                return false;
+
+            if (_isMoving)
+                return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// 更新NPC当前网格位置
+        /// </summary>
+        private void UpdateNPCGridPosition()
+        {
+            npcCurrentGridPosition = GetGridPosition(transform.position);
+            _npcNextGridPosition = npcCurrentGridPosition;
+        }
+
+        /// <summary>
+        /// 处理NPC移动的主逻辑
+        /// </summary>
+        private void ProcessNPCMovement()
+        {
+            if (_npcPath.npcMovementStepStack.Count > 0)
+                ProcessMovementStep();
+            else
+                HandleNoMovementSteps();
+        }
+
+        /// <summary>
+        /// 处理单个移动步骤
+        /// </summary>
+        private void ProcessMovementStep()
+        {
+            NPCMovementStep npcMovementStep = _npcPath.npcMovementStepStack.Peek();
+            npcCurrentScene = npcMovementStep.sceneName;
+
+            HandleSceneTransition(npcMovementStep);
+            HandleMovementExecution(npcMovementStep);
+        }
+
+        /// <summary>
+        /// 处理场景转换逻辑
+        /// </summary>
+        /// <param name="npcMovementStep">NPC移动步骤</param>
+        private void HandleSceneTransition(NPCMovementStep npcMovementStep)
+        {
+            // 如果当前场景与上一步场景相同，则无需处理场景转换
+            if (npcCurrentScene == _npcPreviousMovementStepScene)
+                return;
+
+            // 重置NPC位置到新场景的起始位置
+            npcCurrentGridPosition = (Vector3Int)npcMovementStep.gridCoordinate;
+            _npcNextGridPosition = npcCurrentGridPosition;
+            transform.position = GetWorldPosition(npcCurrentGridPosition);
+            _npcPreviousMovementStepScene = npcCurrentScene;
+            _npcPath.UpdateTimesOnPath();
+        }
+
+        /// <summary>
+        /// 执行移动逻辑
+        /// </summary>
+        /// <param name="npcMovementStep">NPC移动步骤</param>
+        private void HandleMovementExecution(NPCMovementStep npcMovementStep)
+        {
+            bool isInActiveScene = IsNPCInActiveScene();
+
+            if (isInActiveScene)
+            {
+                HandleActiveSceneMovement(npcMovementStep);
+            }
+            else
+            {
+                HandleInactiveSceneMovement(npcMovementStep);
+            }
+        }
+
+        /// <summary>
+        /// 检查NPC是否在当前活动场景中
+        /// </summary>
+        /// <returns>如果在活动场景中返回true，否则返回false</returns>
+        private bool IsNPCInActiveScene()
+        {
+            return npcCurrentScene.ToString() == SceneManager.GetActiveScene().name;
+        }
+
+        /// <summary>
+        /// 处理活动场景中的移动
+        /// </summary>
+        /// <param name="npcMovementStep">NPC移动步骤</param>
+        private void HandleActiveSceneMovement(NPCMovementStep npcMovementStep)
+        {
+            SetNPCActiveInScene();
+
+            npcMovementStep = _npcPath.npcMovementStepStack.Pop();
+            _npcNextGridPosition = (Vector3Int)npcMovementStep.gridCoordinate;
+
+            TimeSpan npcMovementStepTime = CreateTimeSpanFromMovementStep(npcMovementStep);
+            MoveToGridPosition(_npcNextGridPosition, npcMovementStepTime, TimeManager.Instance.GetGameTime());
+        }
+
+        /// <summary>
+        /// 处理非活动场景中的移动
+        /// </summary>
+        /// <param name="npcMovementStep">NPC移动步骤</param>
+        private void HandleInactiveSceneMovement(NPCMovementStep npcMovementStep)
+        {
+            SetNPCInactiveInScene();
+
+            UpdateNPCPositionToMovementStep(npcMovementStep);
+
+            TimeSpan npcMovementStepTime = CreateTimeSpanFromMovementStep(npcMovementStep);
+            TimeSpan gameTime = TimeManager.Instance.GetGameTime();
+
+            // 如果移动时间已过，则直接跳到下一个步骤
+            if (ShouldSkipToNextStep(npcMovementStepTime, gameTime))
+            {
+                ProcessSkipToNextStep();
+            }
+        }
+
+        /// <summary>
+        /// 更新NPC位置到移动步骤指定的位置
+        /// </summary>
+        /// <param name="npcMovementStep">NPC移动步骤</param>
+        private void UpdateNPCPositionToMovementStep(NPCMovementStep npcMovementStep)
+        {
+            npcCurrentGridPosition = (Vector3Int)npcMovementStep.gridCoordinate;
+            _npcNextGridPosition = npcCurrentGridPosition;
+            transform.position = GetWorldPosition(npcCurrentGridPosition);
+        }
+
+        /// <summary>
+        /// 检查是否应跳过到下一个步骤
+        /// </summary>
+        /// <param name="npcMovementStepTime">移动步骤时间</param>
+        /// <param name="gameTime">游戏时间</param>
+        /// <returns>如果应跳过返回true，否则返回false</returns>
+        private bool ShouldSkipToNextStep(TimeSpan npcMovementStepTime, TimeSpan gameTime)
+        {
+            return npcMovementStepTime < gameTime;
+        }
+
+        /// <summary>
+        /// 处理跳过到下一个步骤的逻辑
+        /// </summary>
+        private void ProcessSkipToNextStep()
+        {
+            NPCMovementStep npcMovementStep = _npcPath.npcMovementStepStack.Pop();
+            UpdateNPCPositionToMovementStep(npcMovementStep);
+        }
+
+        /// <summary>
+        /// 从移动步骤创建TimeSpan对象
+        /// </summary>
+        /// <param name="npcMovementStep">NPC移动步骤</param>
+        /// <returns>TimeSpan对象</returns>
+        private TimeSpan CreateTimeSpanFromMovementStep(NPCMovementStep npcMovementStep)
+        {
+            return new TimeSpan(npcMovementStep.hour, npcMovementStep.minute, npcMovementStep.second);
+        }
+
+        /// <summary>
+        /// 处理没有移动步骤时的状态
+        /// </summary>
+        private void HandleNoMovementSteps()
+        {
+            ResetMoveAnimation();
+            SetNPCFacingDirection();
+            SetNPCEventAnimation();
+        }
+        #endregion
+
         private void InitialiseNPC()
         {
             if (npcCurrentScene.ToString() == SceneManager.GetActiveScene().name)
@@ -204,6 +379,8 @@ namespace Assets.Scripts.NPC
             {
                 SetNPCInactiveInScene();
             }
+
+            _npcPreviousMovementStepScene = npcCurrentScene;
 
             npcCurrentGridPosition = GetGridPosition(transform.position);
 
