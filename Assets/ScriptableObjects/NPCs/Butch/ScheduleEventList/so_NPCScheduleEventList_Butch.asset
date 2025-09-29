@@ -61,3 +61,51 @@ MonoBehaviour:
       y: -10
     npcFacingDirectionAtDestination: 0
     animationAtDestination: {fileID: 0}
+  - hour: 6
+    minute: 31
+    priority: 3
+    day: 0
+    weather: 0
+    season: 0
+    toSceneName: 2
+    toGridCoordinate:
+      x: 4
+      y: -10
+    npcFacingDirectionAtDestination: 2
+    animationAtDestination: {fileID: 7400000, guid: bc72b54e068840044a4b381c76eec014, type: 2}
+  - hour: 9
+    minute: 31
+    priority: 3
+    day: 0
+    weather: 0
+    season: 0
+    toSceneName: 1
+    toGridCoordinate:
+      x: -6
+      y: 1
+    npcFacingDirectionAtDestination: 2
+    animationAtDestination: {fileID: 7400000, guid: bc72b54e068840044a4b381c76eec014, type: 2}
+  - hour: 11
+    minute: 31
+    priority: 3
+    day: 0
+    weather: 0
+    season: 0
+    toSceneName: 1
+    toGridCoordinate:
+      x: -14
+      y: -5
+    npcFacingDirectionAtDestination: 2
+    animationAtDestination: {fileID: 7400000, guid: d78b30f0d628d8a4cab29e8b91e311a8, type: 2}
+  - hour: 14
+    minute: 31
+    priority: 3
+    day: 0
+    weather: 0
+    season: 0
+    toSceneName: 0
+    toGridCoordinate:
+      x: -15
+      y: -16
+    npcFacingDirectionAtDestination: 2
+    animationAtDestination: {fileID: 7400000, guid: d78b30f0d628d8a4cab29e8b91e311a8, type: 2}

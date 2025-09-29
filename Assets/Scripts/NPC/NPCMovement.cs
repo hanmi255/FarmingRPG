@@ -16,12 +16,12 @@ namespace Assets.Scripts.NPC
     public class NPCMovement : MonoBehaviour
     {
         #region Fields
-        [HideInInspector] public SceneName npcCurrentScene;
+        public SceneName npcCurrentScene;
         [HideInInspector] public SceneName npcTargetScene;
         [HideInInspector] public Vector3Int npcCurrentGridPosition;
         [HideInInspector] public Vector3Int npcTargetGridPosition;
         [HideInInspector] public Vector3 npcTargetWorldPosition;
-        [HideInInspector] public Direction npcFacingDirectionAtDestination;
+        public Direction npcFacingDirectionAtDestination;
 
         private SceneName _npcPreviousMovementStepScene;
         private Vector3Int _npcNextGridPosition;
