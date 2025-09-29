@@ -75,8 +75,8 @@
     <Compile Include="Assets\Scripts\HelperClasses\HelperMethods.cs" />
     <Compile Include="Assets\Scripts\UI\UIInventory\UIInventoryBar.cs" />
     <Compile Include="Assets\Scripts\Item\ObscuringItemFader.cs" />
-    <Compile Include="Assets\Scripts\Scene\SceneControllerManager.cs" />
     <Compile Include="Assets\Scripts\NPC\SO_NPCScheduleEventList.cs" />
+    <Compile Include="Assets\Scripts\Scene\SceneControllerManager.cs" />
     <Compile Include="Assets\Scripts\Events\EventHandler.cs" />
     <Compile Include="Assets\Scripts\AStarAlgorithm\Node.cs" />
     <Compile Include="Assets\Scripts\Crop\CropUnit.cs" />
