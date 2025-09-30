@@ -25,6 +25,7 @@ namespace Assets.Scripts.Crop
         public bool isHarvestActionEffect; // 是否有收获特效
         public bool spawnCropProducedAtPlayerPosition; // 是否在玩家位置生成作物产品
         public HarvestActionEffect harvestActionEffect; // 收获特效
+        public SoundName harvestSoundName; // 收获音效
 
         [ItemCodeDescription]
         public int[] harvestToolItemCode; // 可用于收获的工具物品代码

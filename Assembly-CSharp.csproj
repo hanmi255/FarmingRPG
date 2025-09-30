@@ -74,6 +74,7 @@
     <Compile Include="Assets\Scripts\Misc\SingletonMonoBehaviour.cs" />
     <Compile Include="Assets\Scripts\HelperClasses\HelperMethods.cs" />
     <Compile Include="Assets\Scripts\UI\UIInventory\UIInventoryBar.cs" />
+    <Compile Include="Assets\Scripts\Sounds\Sound.cs" />
     <Compile Include="Assets\Scripts\Item\ObscuringItemFader.cs" />
     <Compile Include="Assets\Scripts\NPC\SO_NPCScheduleEventList.cs" />
     <Compile Include="Assets\Scripts\Scene\SceneControllerManager.cs" />
@@ -84,11 +85,13 @@
     <Compile Include="Assets\Scripts\Player\PlayerUnit.cs" />
     <Compile Include="Assets\Scripts\UI\UIInventory\UIInventorySlot.cs" />
     <Compile Include="Assets\Scripts\NPC\NPCPath.cs" />
+    <Compile Include="Assets\Scripts\Sounds\SceneSoundItem.cs" />
     <Compile Include="Assets\Scripts\TimeSystem\TimeManager.cs" />
     <Compile Include="Assets\Scripts\Map\SO_GridProperties.cs" />
     <Compile Include="Assets\Scripts\Animation\AnimationOverrides.cs" />
     <Compile Include="Assets\Scripts\Item\SO_ItemList.cs" />
     <Compile Include="Assets\Scripts\Enums\Enums.cs" />
+    <Compile Include="Assets\Scripts\Sounds\SO_SoundList.cs" />
     <Compile Include="Assets\Scripts\UI\UIInventory\UIInventoryTextBox.cs" />
     <Compile Include="Assets\Scripts\Inventory\InventoryItem.cs" />
     <Compile Include="Assets\Scripts\Game\GameManager.cs" />
@@ -98,12 +101,14 @@
     <Compile Include="Assets\Scripts\UI\CursorHighlight.cs" />
     <Compile Include="Assets\Scripts\Scene\ScenePath.cs" />
     <Compile Include="Assets\Scripts\Scene\SceneItemsManager.cs" />
+    <Compile Include="Assets\Scripts\Sounds\SO_SceneSoundList.cs" />
     <Compile Include="Assets\Scripts\NPC\NPCSchedule.cs" />
     <Compile Include="Assets\Scripts\Animation\ApplyCharacterCustomisation.cs" />
     <Compile Include="Assets\Scripts\Misc\Settings.cs" />
     <Compile Include="Assets\Scripts\NPC\NPCUnit.cs" />
     <Compile Include="Assets\Scripts\Map\GridPropertyDetails.cs" />
     <Compile Include="Assets\Scripts\SaveSystem\GameSave.cs" />
+    <Compile Include="Assets\Scripts\Sounds\SoundItem.cs" />
     <Compile Include="Assets\Scripts\Scene\SwitchConfineBoundingShape.cs" />
     <Compile Include="Assets\Scripts\Item\TriggerObscuringItemFader.cs" />
     <Compile Include="Assets\Scripts\Item\ItemUnit.cs" />
@@ -114,6 +119,7 @@
     <Compile Include="Assets\Scripts\UI\GridCursorHighlight.cs" />
     <Compile Include="Assets\Scripts\Crop\SO_CropDetailsList.cs" />
     <Compile Include="Assets\Scripts\Scene\SO_SceneRouteList.cs" />
+    <Compile Include="Assets\Scripts\Sounds\AudioManager.cs" />
     <Compile Include="Assets\Scripts\Crop\CropInstantiator.cs" />
     <Compile Include="Assets\Scripts\AStarAlgorithm\GridNodes.cs" />
     <Compile Include="Assets\Scripts\Animation\CharacterAttribute.cs" />

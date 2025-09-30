@@ -130,7 +130,7 @@ namespace Assets.Scripts.NPC
             _npcNextWorldPosition = Vector3.zero;
             _isMoving = false;
 
-            if(_moveToGridPositionCoroutine != null)
+            if (_moveToGridPositionCoroutine != null)
             {
                 StopCoroutine(_moveToGridPositionCoroutine);
                 _moveToGridPositionCoroutine = null;
@@ -439,7 +439,7 @@ namespace Assets.Scripts.NPC
             if (npcMovementStepTime > gameTime)
             {
                 float timeToMove = (float)(npcMovementStepTime.TotalSeconds - gameTime.TotalSeconds);
-                float npcCalculatedSpeed = Vector3.Distance(transform.position, _npcNextWorldPosition) / timeToMove / Settings.secondsPerGameSecond;
+                float npcCalculatedSpeed = Mathf.Max(_npcMinSpeed, Vector3.Distance(transform.position, _npcNextWorldPosition) / timeToMove / Settings.secondsPerGameSecond);
 
                 if (npcCalculatedSpeed <= _npcMaxSpeed)
                 {

@@ -1,5 +1,7 @@
+using Assets.Scripts.Enums;
 using Assets.Scripts.Events;
 using Assets.Scripts.Misc;
+using Assets.Scripts.Sounds;
 using UnityEngine;
 
 namespace Assets.Scripts.Animation
@@ -113,7 +115,7 @@ namespace Assets.Scripts.Animation
         /// </summary>
         private void AnimationEventPlayFootstepSound()
         {
-
+            AudioManager.Instance.PlaySound(SoundName.EffectFootstepHardGround);
         }
         #endregion
     }
