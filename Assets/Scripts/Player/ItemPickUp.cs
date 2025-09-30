@@ -1,6 +1,7 @@
 using Assets.Scripts.Enums;
 using Assets.Scripts.Inventory;
 using Assets.Scripts.Item;
+using Assets.Scripts.Sounds;
 using UnityEngine;
 
 namespace Assets.Scripts.Player
@@ -18,6 +19,8 @@ namespace Assets.Scripts.Player
                 if (itemDetails.canBePickedUp == true)
                 {
                     InventoryManager.Instance.AddItem(InventoryLocation.Player, item, collision.gameObject);
+
+                    AudioManager.Instance.PlaySound(SoundName.EffectPickupSound);
                 }
             }
         }

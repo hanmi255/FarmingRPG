@@ -5,6 +5,7 @@ using Assets.Scripts.Inventory;
 using Assets.Scripts.Item;
 using Assets.Scripts.Map;
 using Assets.Scripts.Scene;
+using Assets.Scripts.Sounds;
 using UnityEngine;
 
 namespace Assets.Scripts.Crop
@@ -87,6 +88,12 @@ namespace Assets.Scripts.Crop
 
                 string triggerName = (isUsingToolRight || isUsingToolUp) ? "harvestright" : "harvestleft";
                 animator.SetTrigger(triggerName);
+            }
+
+            // 播放收获音效
+            if(cropDetails.harvestSoundName != SoundName.None)
+            {
+                AudioManager.Instance.PlaySound(cropDetails.harvestSoundName);
             }
 
             // 重置网格属性

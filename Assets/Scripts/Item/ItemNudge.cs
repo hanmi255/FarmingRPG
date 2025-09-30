@@ -1,4 +1,6 @@
 using System.Collections;
+using Assets.Scripts.Enums;
+using Assets.Scripts.Sounds;
 using UnityEngine;
 
 namespace Assets.Scripts.Item
@@ -54,6 +56,11 @@ namespace Assets.Scripts.Item
             {
                 StartCoroutine(RotateClock());
             }
+
+            if (collision.gameObject.CompareTag("Player"))
+            {
+                AudioManager.Instance.PlaySound(SoundName.EffectRustle);
+            }
         }
 
         /// <summary>
@@ -73,6 +80,11 @@ namespace Assets.Scripts.Item
             else
             {
                 StartCoroutine(RotateClock());
+            }
+
+            if (collision.gameObject.CompareTag("Player"))
+            {
+                AudioManager.Instance.PlaySound(SoundName.EffectRustle);
             }
         }
 

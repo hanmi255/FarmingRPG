@@ -12,6 +12,7 @@ using Assets.Scripts.Map;
 using Assets.Scripts.Misc;
 using Assets.Scripts.SaveSystem;
 using Assets.Scripts.Scene;
+using Assets.Scripts.Sounds;
 using Assets.Scripts.TimeSystem;
 using Assets.Scripts.UI;
 using UnityEngine;
@@ -695,6 +696,8 @@ namespace Assets.Scripts.Player
                 case ItemType.HoeingTool:
                     if (_gridCursorHighlight.CursorPositionIsValid)
                     {
+                        AudioManager.Instance.PlaySound(SoundName.EffectHoe);
+
                         StartCoroutine(UseToolAtCursorCoroutine(
                             gridPropertyDetails,
                             playerDirection,
@@ -718,6 +721,8 @@ namespace Assets.Scripts.Player
                 case ItemType.WateringTool:
                     if (_gridCursorHighlight.CursorPositionIsValid)
                     {
+                        AudioManager.Instance.PlaySound(SoundName.EffectWateringCan);
+
                         StartCoroutine(UseToolAtCursorCoroutine(
                             gridPropertyDetails,
                             playerDirection,
@@ -741,6 +746,8 @@ namespace Assets.Scripts.Player
                 case ItemType.ReapingTool:
                     if (_cursorHighlight.CursorPositionIsValid)
                     {
+                        AudioManager.Instance.PlaySound(SoundName.EffectScythe);
+
                         playerDirection = GetPlayerDirection(_cursorHighlight.GetWorldPositionForCursor(), GetPlayerCenterPosition());
                         StartCoroutine(UseToolAtCursorCoroutine(
                             null, // gridPropertyDetails not needed for reaping
@@ -759,6 +766,8 @@ namespace Assets.Scripts.Player
                 case ItemType.CollectingTool:
                     if (_gridCursorHighlight.CursorPositionIsValid)
                     {
+                        AudioManager.Instance.PlaySound(SoundName.EffectBasket);
+
                         StartCoroutine(UseToolAtCursorCoroutine(
                             gridPropertyDetails,
                             playerDirection,
@@ -776,6 +785,8 @@ namespace Assets.Scripts.Player
                 case ItemType.ChoppingTool:
                     if (_gridCursorHighlight.CursorPositionIsValid)
                     {
+                        AudioManager.Instance.PlaySound(SoundName.EffectAxe);
+
                         StartCoroutine(UseToolAtCursorCoroutine(
                             gridPropertyDetails,
                             playerDirection,
@@ -793,6 +804,8 @@ namespace Assets.Scripts.Player
                 case ItemType.BreakingTool:
                     if (_gridCursorHighlight.CursorPositionIsValid)
                     {
+                        AudioManager.Instance.PlaySound(SoundName.EffectPickaxe);
+
                         StartCoroutine(UseToolAtCursorCoroutine(
                             gridPropertyDetails,
                             playerDirection,
@@ -1006,6 +1019,8 @@ namespace Assets.Scripts.Player
                 GridPropertyManager.Instance.DisplayPlantedCrops(gridPropertyDetails);
 
                 Events.EventHandler.CallRemoveSelectedItemFromInventoryEvent();
+
+                AudioManager.Instance.PlaySound(SoundName.EffectPlantingSound);
             }
         }
 

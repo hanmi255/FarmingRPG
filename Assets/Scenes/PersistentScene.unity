@@ -6017,6 +6017,52 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 35f7a2c68d7c6c24eaad03d533acf6c9, type: 3}
+--- !u!1 &862608797
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 862608799}
+  - component: {fileID: 862608798}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &862608798
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 862608797}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 803ac030b55ca6e498e486b2d1310955, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _soundPrefab: {fileID: 8791416965359483205, guid: 396b15c2791154b489b2135beb273e06, type: 3}
+  _so_soundList: {fileID: 11400000, guid: 20b3464d43e69744c9abcb7420746b04, type: 2}
+--- !u!4 &862608799
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 862608797}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &866803758
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8625,6 +8671,8 @@ MonoBehaviour:
     prefab: {fileID: 5969045734023332583, guid: 03d004256f2c8524f9810de90fb10985, type: 3}
   - poolSize: 5
     prefab: {fileID: 1004454404958488955, guid: aa8baf5bd434b3d4397da2d30246929b, type: 3}
+  - poolSize: 20
+    prefab: {fileID: 8791416965359483205, guid: 396b15c2791154b489b2135beb273e06, type: 3}
   objectPoolTransform: {fileID: 1178761851}
 --- !u!4 &1178761851
 Transform:
@@ -15258,5 +15306,6 @@ SceneRoots:
   - {fileID: 64426674}
   - {fileID: 1178761851}
   - {fileID: 320044632}
+  - {fileID: 862608799}
   - {fileID: 1459788568}
   - {fileID: 381334937}
