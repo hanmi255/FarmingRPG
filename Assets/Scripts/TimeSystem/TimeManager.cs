@@ -11,7 +11,7 @@ namespace Assets.Scripts.TimeSystem
     /// <summary>
     /// 时间事件类型标志枚举
     /// </summary>
-    [System.Flags]
+    [Flags]
     public enum TimeEventTypes
     {
         None = 0,
@@ -199,6 +199,16 @@ namespace Assets.Scripts.TimeSystem
         {
             return new TimeSpan(_gameHour, _gameMinute, _gameSecond);
         }
+
+        /// <summary>
+        /// 获取游戏季节
+        /// </summary>
+        /// <returns>游戏季节</returns>
+        public Season GetGameSeason()
+        {
+            return _gameSeason;
+        }
+
         #endregion
 
         #region Private Methods

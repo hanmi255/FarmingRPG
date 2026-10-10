@@ -47,7 +47,6 @@ namespace Assets.Scripts.NPC
         private BoxCollider2D _boxCollider2D;
         private WaitForFixedUpdate _waitForFixedUpdate;
         private AnimatorOverrideController _animatorOverrideController;
-        private int _lastMoveAnimationParameter;
         private bool _npcInitialised = false;
         [HideInInspector] public bool npcActiveInScene = false;
 
@@ -265,7 +264,7 @@ namespace Assets.Scripts.NPC
 
             if (isInActiveScene)
             {
-                HandleActiveSceneMovement(npcMovementStep);
+                HandleActiveSceneMovement();
             }
             else
             {
@@ -286,11 +285,11 @@ namespace Assets.Scripts.NPC
         /// 处理活动场景中的移动
         /// </summary>
         /// <param name="npcMovementStep">NPC移动步骤</param>
-        private void HandleActiveSceneMovement(NPCMovementStep npcMovementStep)
+        private void HandleActiveSceneMovement()
         {
             SetNPCActiveInScene();
 
-            npcMovementStep = _npcPath.npcMovementStepStack.Pop();
+            var npcMovementStep = _npcPath.npcMovementStepStack.Pop();
             _npcNextGridPosition = (Vector3Int)npcMovementStep.gridCoordinate;
 
             TimeSpan npcMovementStepTime = CreateTimeSpanFromMovementStep(npcMovementStep);
