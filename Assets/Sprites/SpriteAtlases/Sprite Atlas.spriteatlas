@@ -64,6 +64,7 @@ SpriteAtlas:
     - 7da78110e28e0f74aaa3ef4a41f4c0ed: 21300000
     - 207ad99171e171b418bcaaa396d5a6f6: 21300000
     - aa1fcd9144ccf574985824378256b95c: 21300000
+    - 0ad43e323beeb3846858aa123f526e6f: 21300000
     - 8298ab725cafa93429a58bd3e8273289: 21300000
     - 081b5033ea188cb48b5d44b99ab920bc: 21300000
     - 0e9e72533af4a924cb98248a27955a25: 21300000
@@ -199,6 +200,7 @@ SpriteAtlas:
     - d241c496741a12d4290e12ba81dd6724: 6019493940114240039
     - d241c496741a12d4290e12ba81dd6724: 4789355601316357596
     - e26dc0d638731ec47abe9c4b3cae62ac: 21300000
+    - 6796c11821a28a14aa4b160d3d6ead7a: 21300000
     - 2e92a61802edadc4495e4d901e3a97cb: 21300000
     - 37e09848a493a0a4b89a743f73f75963: 21300000
     - 4fb548784c08c2c40b86a99493efa98d: 21300000
@@ -899,6 +901,7 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 7da78110e28e0f74aaa3ef4a41f4c0ed, type: 3}
   - {fileID: 21300000, guid: 207ad99171e171b418bcaaa396d5a6f6, type: 3}
   - {fileID: 21300000, guid: aa1fcd9144ccf574985824378256b95c, type: 3}
+  - {fileID: 21300000, guid: 0ad43e323beeb3846858aa123f526e6f, type: 3}
   - {fileID: 21300000, guid: 8298ab725cafa93429a58bd3e8273289, type: 3}
   - {fileID: 21300000, guid: 081b5033ea188cb48b5d44b99ab920bc, type: 3}
   - {fileID: 21300000, guid: 0e9e72533af4a924cb98248a27955a25, type: 3}
@@ -1034,6 +1037,7 @@ SpriteAtlas:
   - {fileID: 6019493940114240039, guid: d241c496741a12d4290e12ba81dd6724, type: 3}
   - {fileID: 4789355601316357596, guid: d241c496741a12d4290e12ba81dd6724, type: 3}
   - {fileID: 21300000, guid: e26dc0d638731ec47abe9c4b3cae62ac, type: 3}
+  - {fileID: 21300000, guid: 6796c11821a28a14aa4b160d3d6ead7a, type: 3}
   - {fileID: 21300000, guid: 2e92a61802edadc4495e4d901e3a97cb, type: 3}
   - {fileID: 21300000, guid: 37e09848a493a0a4b89a743f73f75963, type: 3}
   - {fileID: 21300000, guid: 4fb548784c08c2c40b86a99493efa98d, type: 3}
@@ -1733,6 +1737,7 @@ SpriteAtlas:
   - ParsnipSeeds
   - Grass1
   - Clock
+  - Lamp
   - TumbleweedThistle
   - Sweetcorn
   - PauseScreen9Sprite
@@ -1868,6 +1873,7 @@ SpriteAtlas:
   - CanyonOak_1
   - CanyonOak_0
   - Wood
+  - Twisted_Root_Lamp
   - GreenGridCursor
   - Cactus1
   - Stone1Seed

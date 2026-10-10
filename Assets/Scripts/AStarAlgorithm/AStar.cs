@@ -10,7 +10,6 @@ namespace Assets.Scripts.AStarAlgorithm
     public class AStar : MonoBehaviour
     {
         #region Fields
-        [Header("Tiles & Tilemap References")]
         [Header("Options")]
         [SerializeField] private bool _observeMovementPenalties = true;
 

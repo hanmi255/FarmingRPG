@@ -426,7 +426,7 @@ namespace Assets.Scripts.Map
         /// <param name="gridY">网格Y坐标</param>
         /// <param name="gridPropertyDetails">网格属性详情对象</param>
         /// <param name="gridPropertyDetailsDictionary">网格属性详情字典</param>
-        public void SetGridPropertyDetails(int gridX, int gridY, GridPropertyDetails gridPropertyDetails, Dictionary<string, GridPropertyDetails> gridPropertyDetailsDictionary)
+        private void SetGridPropertyDetails(int gridX, int gridY, GridPropertyDetails gridPropertyDetails, Dictionary<string, GridPropertyDetails> gridPropertyDetailsDictionary)
         {
             string key = "x" + gridX + "y" + gridY;
 
